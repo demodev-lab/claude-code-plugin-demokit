@@ -44,21 +44,37 @@ async function main() {
 
   // Entity 생성 시 관련 파일 제안
   if (layerType === 'entity') {
-    const related = fileUtil.relatedFiles(domainName, getDomainBasePath(filePath, domainName));
+    const pascalName = capitalize(domainName);
+    const related = fileUtil.relatedFiles(pascalName, getDomainBasePath(filePath, domainName));
     const missing = [];
 
+    // relatedFiles 키 → 실제 스킬 커맨드 매핑
+    const typeToSkill = {
+      repository: 'repository',
+      service: 'service',
+      controller: 'controller',
+      createRequest: 'dto',
+      updateRequest: 'dto',
+      response: 'dto',
+    };
+
+    const suggestedSkills = new Set();
     for (const [type, relPath] of Object.entries(related)) {
       if (type !== 'entity' && !fileExists(relPath)) {
-        missing.push(type);
+        const skill = typeToSkill[type];
+        if (skill && !suggestedSkills.has(skill)) {
+          suggestedSkills.add(skill);
+          missing.push(skill);
+        }
       }
     }
 
     if (missing.length > 0) {
-      suggestions.push(`[제안] ${domainName} Entity 생성됨. 관련 파일 생성을 권장합니다:`);
-      missing.forEach(type => {
-        suggestions.push(`  - /${type} ${capitalize(domainName)}`);
+      suggestions.push(`[제안] ${pascalName} Entity 생성됨. 관련 파일 생성을 권장합니다:`);
+      missing.forEach(skill => {
+        suggestions.push(`  - /${skill} ${pascalName}`);
       });
-      suggestions.push(`  또는 /crud ${capitalize(domainName)} 으로 일괄 생성`);
+      suggestions.push(`  또는 /crud ${pascalName} 으로 일괄 생성`);
     }
   }
 

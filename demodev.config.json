@@ -186,7 +186,7 @@
       "report": "report-generator",
       "erd": "domain-expert",
       "optimize": "domain-expert",
-      "changelog": null,
+      "changelog": "infra-expert",
       "properties": "infra-expert"
     },
     "modelAssignment": {

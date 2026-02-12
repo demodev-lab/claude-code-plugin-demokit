@@ -26,13 +26,16 @@ async function main() {
     return;
   }
 
-  // 1. build.gradle 파싱
+  // 1. build.gradle / build.gradle.kts 파싱
+  const fs = require('fs');
   const buildGradlePath = path.join(projectRoot, 'build.gradle');
-  const gradle = gradleParser.parseGradleBuild(buildGradlePath);
+  const buildGradleKtsPath = path.join(projectRoot, 'build.gradle.kts');
+  const gradlePath = fs.existsSync(buildGradleKtsPath) ? buildGradleKtsPath : buildGradlePath;
+  const gradle = gradleParser.parseGradleBuild(gradlePath);
 
   if (!gradle) {
     const result = {
-      systemMessage: '[demokit] build.gradle 파싱 실패. Gradle 프로젝트인지 확인하세요.',
+      systemMessage: '[demokit] build.gradle(.kts) 파싱 실패. Gradle 프로젝트인지 확인하세요.',
     };
     console.log(JSON.stringify(result));
     return;
