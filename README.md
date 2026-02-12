@@ -4,17 +4,41 @@ Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 
 
 ## 설치
 
-### 1. 플러그인 저장소 클론
+### 방법 1: 마켓플레이스에서 설치 (권장)
+
+Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
+
+```
+/plugin marketplace add demodev-lab/claude-code-plugin-be
+/plugin install demodev-be@demodev-plugins
+```
+
+> **비공개 레포 인증**: 사전에 `gh auth login`으로 GitHub 인증이 필요하다. 자동 업데이트를 위해 `GITHUB_TOKEN` 환경변수 설정을 권장한다.
+
+#### 팀 자동 배포
+
+프로젝트의 `.claude/settings.json`에 추가하면 팀원이 프로젝트 폴더를 신뢰할 때 자동으로 마켓플레이스가 등록된다.
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "demodev-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "demodev-lab/claude-code-plugin-be"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "demodev-be@demodev-plugins": true
+  }
+}
+```
+
+### 방법 2: 로컬 설치
 
 ```bash
 git clone https://github.com/demodev-lab/claude-code-plugin-be.git
-```
-
-### 2. Spring Boot 프로젝트에서 플러그인 로드
-
-**Spring Boot 프로젝트 디렉토리**에서 `--plugin-dir`로 플러그인 경로를 지정하여 실행한다.
-
-```bash
 cd /path/to/my-spring-boot-project
 claude --plugin-dir /path/to/claude-code-plugin-be
 ```
@@ -97,7 +121,8 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 ```
 demodev-be/
 ├── .claude-plugin/
-│   └── plugin.json            # 플러그인 메타데이터
+│   ├── plugin.json            # 플러그인 메타데이터
+│   └── marketplace.json       # 마켓플레이스 카탈로그
 ├── agents/                    # 11개 전문 에이전트
 ├── hooks/                     # 이벤트 훅 (세션 시작, 파일 검증 등)
 ├── lib/                       # 핵심 라이브러리 모듈
