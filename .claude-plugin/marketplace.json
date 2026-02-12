@@ -1,0 +1,45 @@
+{
+  "name": "demodev-be",
+  "displayName": "demodev Spring Boot Backend",
+  "version": "1.0.0",
+  "description": "Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반 체계적 개발 워크플로우, 컨벤션 자동 검증, 도메인 기반 코드 생성을 제공합니다.",
+  "author": "demodev",
+  "license": "MIT",
+  "keywords": [
+    "spring-boot",
+    "java",
+    "backend",
+    "pdca",
+    "querydsl",
+    "jpa",
+    "gradle",
+    "code-generation",
+    "convention-checker"
+  ],
+  "categories": [
+    "Backend Development",
+    "Code Generation",
+    "Code Quality"
+  ],
+  "repository": "",
+  "homepage": "",
+  "compatibility": {
+    "claudeCode": ">=1.0.0"
+  },
+  "features": {
+    "agents": 11,
+    "skills": 20,
+    "hooks": 8,
+    "templates": 16,
+    "outputStyles": 3
+  },
+  "stack": {
+    "language": "java",
+    "framework": "spring-boot",
+    "buildTool": "gradle-groovy",
+    "targetVersions": {
+      "springBoot": "3.5.x",
+      "java": "21"
+    }
+  }
+}

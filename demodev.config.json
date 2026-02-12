@@ -1,0 +1,196 @@
+{
+  "project": {
+    "type": "spring-boot",
+    "language": "java",
+    "javaVersion": "21",
+    "springBootVersion": "3.5.10",
+    "buildTool": "gradle-groovy"
+  },
+  "spring": {
+    "bestPractices": {
+      "version": "Spring Boot 3.5 / 2025-2026",
+      "dtoStyle": "record (불변, compact, Bean Validation 직접 선언)",
+      "errorResponse": "ProblemDetail (RFC 9457, spring.mvc.problemdetails.enabled=true)",
+      "httpClient": "WebClient (RestTemplate/RestClient 사용 금지)",
+      "virtualThreads": "spring.threads.virtual.enabled=true + spring.main.keep-alive=true",
+      "testing": "@MockitoBean (3.4+, @MockBean deprecated), @ServiceConnection + Testcontainers",
+      "orm": "@SQLRestriction (Hibernate 6.3+, @Where deprecated), @SoftDelete (6.4+)",
+      "config": "@ConfigurationProperties record (불변 설정)",
+      "logging": "Structured Logging JSON (logging.structured.json, 3.4+)",
+      "observability": "Micrometer Observation API + spring-boot-starter-actuator",
+      "dockerCompose": "spring.docker.compose.* (3.1+)",
+      "repository": "default 메서드 패턴, ListCrudRepository, Interface Projection"
+    },
+    "dry": {
+      "principle": "Don't Repeat Yourself - 모든 지식은 시스템 내에서 단 하나의 명확한 표현을 가져야 한다",
+      "patterns": [
+        "BaseEntity: createdAt/updatedAt 공통 필드 단일 정의",
+        "Entity.create() 정적 팩토리: 생성 로직 단일 정의",
+        "Entity.update() 비즈니스 메서드: 수정 로직 단일 정의",
+        "Repository.getById() default 메서드: 조회+예외 로직 단일 정의",
+        "Response.from() 정적 팩토리: Entity→DTO 변환 단일 정의",
+        "GlobalExceptionHandler: 예외→HTTP 응답 매핑 단일 정의",
+        "ProblemDetail 표준: 커스텀 에러 객체 만들지 않음",
+        "@ConfigurationProperties record: 설정값 단일 소스"
+      ],
+      "antiPatterns": [
+        "여러 Service에서 동일한 조회+예외 로직 반복",
+        "Controller마다 try-catch로 예외 처리",
+        "Entity 필드를 DTO에 수동으로 하나씩 복사하는 코드",
+        "여러 클래스에서 동일한 매직 넘버/문자열 사용",
+        "BaseEntity 없이 모든 Entity에 createdAt/updatedAt 반복"
+      ]
+    },
+    "codeStyle": {
+      "principles": ["Clean Code", "SRP (Single Responsibility Principle)"],
+      "cleanCode": [
+        "메서드는 하나의 작업만 수행, 15줄 이내 권장",
+        "메서드/변수명만으로 의도가 드러나야 함 (주석 의존 최소화)",
+        "중첩 깊이(depth) 2단계 이내 → early return 또는 메서드 추출",
+        "매직 넘버/문자열 금지 → 상수 또는 Enum",
+        "불필요한 주석, 죽은 코드(dead code) 즉시 제거"
+      ],
+      "srp": {
+        "Controller": "HTTP 요청/응답 처리만 (비즈니스 로직 금지)",
+        "Service": "비즈니스 로직만 (HTTP, 영속성 세부사항 분리)",
+        "Repository": "데이터 접근만",
+        "Entity": "도메인 규칙과 자기 자신의 상태 관리만",
+        "DTO": "데이터 전달만 (로직 금지, 변환용 정적 팩토리 허용)",
+        "Config": "설정만 (비즈니스 로직 금지)"
+      },
+      "methodDesign": [
+        "public 메서드: 무엇을 하는지 (what) / private 메서드: 어떻게 하는지 (how)",
+        "파라미터 3개 이하 권장, 초과 시 객체로 묶기",
+        "boolean 파라미터 지양 → 별도 메서드 분리 또는 Enum"
+      ]
+    },
+    "packageStrategy": "domain-based",
+    "packageStructure": {
+      "common": {
+        "base": "{basePackage}/common",
+        "config": "{basePackage}/common/config",
+        "exception": "{basePackage}/common/exception",
+        "security": "{basePackage}/common/security",
+        "domain": "{basePackage}/common/domain"
+      },
+      "domain": {
+        "base": "{basePackage}/domain/{domainName}",
+        "entity": "{basePackage}/domain/{domainName}/entity",
+        "repository": "{basePackage}/domain/{domainName}/repository",
+        "service": "{basePackage}/domain/{domainName}/service",
+        "controller": "{basePackage}/domain/{domainName}/controller",
+        "dto": "{basePackage}/domain/{domainName}/dto"
+      }
+    },
+    "namingConventions": {
+      "entity": "{Name}",
+      "repository": "{Name}Repository",
+      "service": "{Name}Service",
+      "controller": "{Name}Controller",
+      "requestDto": "Create{Name}Request / Update{Name}Request (record)",
+      "responseDto": "{Name}Response (record)",
+      "exception": "{Name}Exception",
+      "config": "{Name}Config"
+    },
+    "requiredAnnotations": {
+      "entity": ["@Entity", "@Getter", "@NoArgsConstructor(access = AccessLevel.PROTECTED)"],
+      "repository": [],
+      "service": ["@Service", "@RequiredArgsConstructor"],
+      "controller": ["@RestController", "@RequestMapping", "@RequiredArgsConstructor"],
+      "config": ["@Configuration"],
+      "dto": []
+    }
+  },
+  "gradle": {
+    "buildFilePath": "build.gradle",
+    "requiredDependencies": [
+      "spring-boot-starter-web",
+      "spring-boot-starter-data-jpa",
+      "spring-boot-starter-validation",
+      "lombok"
+    ],
+    "recommendedDependencies": [
+      "spring-boot-starter-actuator",
+      "spring-boot-devtools",
+      "spring-boot-configuration-processor",
+      "io.github.openfeign.querydsl:querydsl-jpa:6.12",
+      "io.github.openfeign.querydsl:querydsl-apt:6.12:jpa"
+    ],
+    "querydsl": {
+      "fork": "OpenFeign/querydsl (보안 패치 + 유지보수 활성화)",
+      "groupId": "io.github.openfeign.querydsl",
+      "version": "6.12",
+      "note": "6.x = Hibernate 6.x (Spring Boot 3.x 호환), 7.x = Hibernate 7.x (향후 Spring Boot 4.x)",
+      "jakartaNative": true,
+      "description": "복잡한 동적 쿼리에 QueryDSL 사용 (단순 쿼리는 쿼리 메서드/JPQL 유지)",
+      "dependencies": [
+        "io.github.openfeign.querydsl:querydsl-jpa:6.12 (implementation)",
+        "io.github.openfeign.querydsl:querydsl-apt:6.12:jpa (annotationProcessor)",
+        "jakarta.annotation:jakarta.annotation-api (annotationProcessor)",
+        "jakarta.persistence:jakarta.persistence-api (annotationProcessor)"
+      ],
+      "patterns": [
+        "JPAQueryFactory Bean 등록 (common/config/QuerydslConfig)",
+        "Custom Repository 패턴 ({Name}RepositoryCustom + {Name}RepositoryImpl)",
+        "BooleanExpression 재사용 가능한 조건 메서드 (null 반환 시 자동 무시)",
+        "Projections.constructor() → record DTO 직접 프로젝션",
+        "fetchJoin() → N+1 문제 방지",
+        "PageableExecutionUtils.getPage() → 페이징 최적화"
+      ],
+      "antiPatterns": [
+        "단순 쿼리에 QueryDSL 사용 → 쿼리 메서드 또는 @Query 우선",
+        "BooleanBuilder 남용 → BooleanExpression 메서드 분리",
+        "fetchResults() 사용 → deprecated, fetch() + count 쿼리 분리",
+        "@QueryProjection DTO에 사용 → QueryDSL 의존성 전파, Projections.constructor() 권장"
+      ]
+    }
+  },
+  "pdca": {
+    "documentPath": ".pdca",
+    "matchRateThreshold": 90,
+    "maxIterations": 5,
+    "matchRateWeights": {
+      "apiEndpoints": 30,
+      "dbSchema": 25,
+      "dtoFields": 15,
+      "errorHandling": 15,
+      "businessRules": 15
+    }
+  },
+  "levelDetection": {
+    "monolith": {
+      "indicators": ["단일 build.gradle", "단일 src/main/java"]
+    },
+    "msa": {
+      "indicators": ["settings.gradle에 include 다수", "spring-cloud 의존성", "멀티모듈 구조"],
+      "dependencies": ["spring-cloud-starter-netflix-eureka", "spring-cloud-starter-gateway", "spring-cloud-starter-openfeign"]
+    }
+  },
+  "agents": {
+    "taskBased": {
+      "entity": "domain-expert",
+      "repository": "domain-expert",
+      "service": "service-expert",
+      "controller": "api-expert",
+      "dto": "api-expert",
+      "exception": "api-expert",
+      "security": "security-expert",
+      "config": "infra-expert",
+      "docker": "infra-expert",
+      "gradle": "infra-expert",
+      "test": "test-expert",
+      "review": "code-reviewer",
+      "architecture": "spring-architect",
+      "gap-analysis": "gap-detector",
+      "pdca-iteration": "pdca-iterator",
+      "report": "report-generator"
+    }
+  },
+  "outputStyles": {
+    "levelDefaults": {
+      "Monolith": "demodev-monolith",
+      "MSA": "demodev-msa"
+    },
+    "pdcaGuide": "demodev-pdca-guide"
+  }
+}

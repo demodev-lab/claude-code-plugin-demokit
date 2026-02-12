@@ -1,0 +1,48 @@
+{
+  "hooks": [
+    {
+      "event": "SessionStart",
+      "script": "hooks/session-start.js",
+      "description": "세션 시작 시 프로젝트 감지 및 컨텍스트 초기화"
+    },
+    {
+      "event": "PreToolUse",
+      "tools": ["Write", "Edit"],
+      "script": "scripts/pre-write.js",
+      "description": "Java 파일 작성/편집 전 컨벤션 검증"
+    },
+    {
+      "event": "UserPromptSubmit",
+      "script": "scripts/user-prompt-handler.js",
+      "description": "사용자 프롬프트에서 의도 감지 및 Skill/Agent 트리거"
+    },
+    {
+      "event": "PostToolUse",
+      "tools": ["Write", "Edit"],
+      "script": "scripts/post-write.js",
+      "description": "Java 파일 작성 후 관련 파일 생성 제안"
+    },
+    {
+      "event": "PostToolUse",
+      "tools": ["Bash"],
+      "script": "scripts/post-bash.js",
+      "description": "빌드/테스트 결과 파싱 및 에러 요약"
+    },
+    {
+      "event": "PreToolUse",
+      "tools": ["Bash"],
+      "script": "scripts/pre-bash.js",
+      "description": "위험한 명령어 실행 전 경고"
+    },
+    {
+      "event": "Stop",
+      "script": "scripts/stop-handler.js",
+      "description": "자율 반복 루프 (Loop) 활성 시 종료를 가로채고 prompt 재주입"
+    },
+    {
+      "event": "ContextCompaction",
+      "script": "scripts/context-compaction.js",
+      "description": "컨텍스트 압축 전 PDCA/Loop/프로젝트 상태 보존"
+    }
+  ]
+}
