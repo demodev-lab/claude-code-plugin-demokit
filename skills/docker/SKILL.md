@@ -5,6 +5,22 @@ description: 이 스킬은 사용자가 "Docker", "docker-compose", "Dockerfile"
 
 # /docker - Docker 설정
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/docker — Docker/Docker Compose 설정 생성
+
+사용법:
+  /docker
+
+예시:
+  /docker
+
+관련 명령:
+  /gradle — Gradle 의존성 관리
+  /init   — 프로젝트 초기화
+```
+
 ## 실행 절차
 
 ### 1. 파일 병렬 생성

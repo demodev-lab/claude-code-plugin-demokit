@@ -5,6 +5,28 @@ description: 이 스킬은 사용자가 "설정", "config", "JPA 설정", "Web �
 
 # /config - 설정 관리
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/config — Spring 설정 클래스 생성
+
+사용법:
+  /config {type[,type2]}
+
+파라미터:
+  type  설정 종류 (필수, 쉼표로 복수 지정 가능)
+        jpa, web, cache, querydsl, webclient, properties
+
+예시:
+  /config jpa
+  /config jpa,web,cache
+  /config properties
+
+관련 명령:
+  /security — Spring Security 설정 생성
+  /cache    — 캐싱 전략 설정
+```
+
 ## 실행 절차
 
 1. **파일 위치**: `common/config/{Name}Config.java`

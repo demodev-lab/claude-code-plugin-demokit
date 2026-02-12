@@ -5,6 +5,29 @@ description: 이 스킬은 사용자가 "Repository 생성", "레포지토리", 
 
 # /repository - Repository 생성
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/repository — Spring Data JPA Repository 생성
+
+사용법:
+  /repository {Name} [--querydsl]
+
+파라미터:
+  Name       PascalCase 도메인명 (필수)
+
+옵션:
+  --querydsl  QueryDSL Custom Repository 함께 생성
+
+예시:
+  /repository User
+  /repository User --querydsl
+
+관련 명령:
+  /entity — JPA Entity 생성
+  /crud   — CRUD 일괄 생성
+```
+
 ## 실행 절차
 
 1. **Repository 파일 생성**: `domain/{name}/repository/{Name}Repository.java`

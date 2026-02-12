@@ -5,6 +5,33 @@ description: 이 스킬은 사용자가 "테스트 생성", "test", "테스트 �
 
 # /test - 테스트 생성
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/test — 단위/통합/슬라이스 테스트 코드 생성
+
+사용법:
+  /test {Name} [unit|integration|controller|all]
+
+파라미터:
+  Name  PascalCase 도메인명 (필수)
+
+옵션:
+  unit         Service 단위 테스트
+  integration  Repository 통합 테스트
+  controller   Controller 슬라이스 테스트
+  all          전체 생성 (기본)
+
+예시:
+  /test User
+  /test User unit
+  /test Order controller
+
+관련 명령:
+  /crud   — CRUD 일괄 생성
+  /review — 코드 리뷰 수행
+```
+
 ## 실행 절차
 
 ### unit (Service 단위 테스트)

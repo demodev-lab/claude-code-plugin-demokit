@@ -5,6 +5,37 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 
 # /pdca - PDCA 워크플로우
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/pdca — PDCA 워크플로우 관리
+
+사용법:
+  /pdca {subcommand} {feature}
+
+하위 명령:
+  plan      요구사항 정의 + API 초안 + 데이터 모델 초안
+  design    DB 스키마 상세 + API 상세 + 패키지 구조
+  do        Entity → Repo → Service → Controller → DTO → Test 구현
+  analyze   설계 vs 구현 Gap 분석
+  iterate   Match Rate < 90% 시 자동 수정 반복
+  report    완료 보고서 생성
+  status    현재 PDCA 상태 조회
+  next      다음 단계 안내
+
+예시:
+  /pdca plan user-management
+  /pdca design user-management
+  /pdca do user-management
+  /pdca status
+  /pdca next
+
+관련 명령:
+  /crud — CRUD 일괄 생성
+  /test — 테스트 코드 생성
+  /loop — 자동 반복 실행
+```
+
 ## 하위 명령
 
 ### /pdca plan {feature}

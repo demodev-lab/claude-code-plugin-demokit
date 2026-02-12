@@ -8,6 +8,31 @@ description: 이 스킬은 사용자가 "loop", "자율 반복", "자동 반복"
 > Ralph Wiggum 스타일: Stop hook으로 Claude 종료를 가로채서 같은 prompt를 재실행.
 > 작업 완료까지 자동으로 반복하며, 매 반복마다 이전 결과를 확인하고 개선.
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/loop — 작업 완료까지 자동 반복 실행
+
+사용법:
+  /loop {prompt} [--max-iterations N] [--completion-promise "..."]
+
+파라미터:
+  prompt  실행할 작업 프롬프트 (필수)
+
+옵션:
+  --max-iterations      최대 반복 횟수 (기본 10)
+  --completion-promise  완료 신호 문자열 (기본 LOOP_DONE)
+
+예시:
+  /loop User 도메인 CRUD 구현 + 테스트 작성
+  /loop 전체 테스트 통과시켜줘 --max-iterations 30
+  /loop 인증 시스템 구현 --completion-promise "AUTH_COMPLETE"
+
+관련 명령:
+  /cancel-loop  — 루프 즉시 취소
+  /pdca iterate — 설계-구현 Gap 반복 개선
+```
+
 ## 동작 원리
 
 ```

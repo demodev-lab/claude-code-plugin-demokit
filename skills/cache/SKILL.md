@@ -5,6 +5,28 @@ description: 이 스킬은 사용자가 "캐시", "cache", "Caffeine", "Redis �
 
 # /cache - 캐싱 전략
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/cache — 캐싱 전략 설정
+
+사용법:
+  /cache [caffeine|redis]
+
+옵션:
+  caffeine  Caffeine 로컬 캐시 (기본)
+  redis     Redis 분산 캐시
+
+예시:
+  /cache
+  /cache caffeine
+  /cache redis
+
+관련 명령:
+  /config — Spring 설정 클래스 생성
+  /gradle — Gradle 의존성 관리
+```
+
 ## 실행 절차
 
 ### Caffeine (로컬 캐시, 기본)

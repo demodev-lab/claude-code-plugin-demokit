@@ -5,6 +5,26 @@ description: 이 스킬은 사용자가 "커밋", "commit", "변경사항 커밋
 
 # /commit - 스마트 커밋
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/commit — 변경사항을 논리적 단위로 스마트 커밋
+
+사용법:
+  /commit [message]
+
+파라미터:
+  message  커밋 메시지 (선택, 없으면 논리적 그룹 분류)
+
+예시:
+  /commit
+  /commit "feat: User 엔티티 추가"
+
+관련 명령:
+  /commit-push — 커밋 후 원격 푸시
+  /push        — 원격 푸시
+```
+
 ## 실행 절차
 
 ### 1. 변경사항 분석

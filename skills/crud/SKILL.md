@@ -7,6 +7,29 @@ description: 이 스킬은 사용자가 "CRUD 만들어줘", "crud 생성", "도
 
 > Spring Boot 3.5.10 + Java 21 모던 패턴 적용
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/crud — 도메인 CRUD 일괄 생성 (Entity, Repository, Service, Controller, DTO)
+
+사용법:
+  /crud {Name} [fields]
+
+파라미터:
+  Name    PascalCase 도메인명 (필수)
+  fields  필드 목록 (선택, 형식: name:String, email:String)
+
+예시:
+  /crud User
+  /crud User name:String, email:String, age:Integer
+  /crud Order orderNumber:String, totalAmount:BigDecimal
+
+관련 명령:
+  /entity     — JPA Entity 생성
+  /test       — 테스트 코드 생성
+  /pdca plan  — PDCA 워크플로우 시작
+```
+
 ## 실행 절차
 
 ### 1. 입력 검증

@@ -5,6 +5,21 @@ description: 이 스킬은 사용자가 "루프 취소", "cancel-loop", "loop �
 
 # /cancel-loop - 루프 취소
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/cancel-loop — 활성화된 자율 반복 루프 취소
+
+사용법:
+  /cancel-loop
+
+예시:
+  /cancel-loop
+
+관련 명령:
+  /loop — 자동 반복 실행
+```
+
 ## 실행 절차
 
 ### 1. 루프 취소

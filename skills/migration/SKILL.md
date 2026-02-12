@@ -5,6 +5,29 @@ description: 이 스킬은 사용자가 "마이그레이션", "migration", "Flyw
 
 # /migration - DB 마이그레이션
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/migration — DB 마이그레이션 파일 생성
+
+사용법:
+  /migration {description} [--type flyway|liquibase]
+
+파라미터:
+  description  마이그레이션 설명 (필수)
+
+옵션:
+  --type  flyway(기본), liquibase
+
+예시:
+  /migration create_users_table
+  /migration add_email_column --type liquibase
+
+관련 명령:
+  /entity — JPA Entity 생성
+  /crud   — CRUD 일괄 생성
+```
+
 ## 실행 절차
 
 ### Flyway (기본)

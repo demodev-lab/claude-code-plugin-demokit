@@ -5,6 +5,27 @@ description: 이 스킬은 사용자가 "Entity 생성", "엔티티", "entity"�
 
 # /entity - JPA Entity 생성
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/entity — JPA Entity 생성
+
+사용법:
+  /entity {Name} [fields]
+
+파라미터:
+  Name    PascalCase 도메인명 (필수)
+  fields  필드 목록 (선택, 형식: name:String, email:String)
+
+예시:
+  /entity User name:String, email:String
+  /entity Order orderNumber:String, status:OrderStatus
+
+관련 명령:
+  /repository — Repository 생성
+  /crud       — CRUD 일괄 생성
+```
+
 ## 실행 절차
 
 1. **Entity 파일 생성**: `domain/{name}/entity/{Name}.java`

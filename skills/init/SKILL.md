@@ -7,6 +7,26 @@ description: 이 스킬은 사용자가 "프로젝트 초기화", "init", "프�
 
 > 기본 스택: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy DSL)
 
+## help
+인자가 `help`이면 아래 도움말만 출력하고 실행을 중단한다:
+```
+/init — Spring Boot 프로젝트 감지 및 초기화
+
+사용법:
+  /init [path]
+
+파라미터:
+  path  프로젝트 경로 (선택, 기본 현재 디렉토리)
+
+예시:
+  /init
+  /init ./backend
+
+관련 명령:
+  /crud      — CRUD 일괄 생성
+  /pdca plan — PDCA 워크플로우 시작
+```
+
 ## 실행 절차
 
 ### 1. 프로젝트 감지 + 구조 분석 (병렬)
