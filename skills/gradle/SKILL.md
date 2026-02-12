@@ -1,14 +1,6 @@
 ---
 name: gradle
-description: Gradle 의존성 관리 및 빌드 설정
-user_invocable: true
-arguments:
-  - name: action
-    description: "작업 (add, remove, check, update)"
-    required: false
-  - name: dependency
-    description: "의존성 (예: spring-boot-starter-security)"
-    required: false
+description: 이 스킬은 사용자가 "Gradle", "의존성 추가", "gradle", "빌드 설정"을 요청할 때 사용합니다. Gradle 의존성 관리 및 빌드 설정을 수행합니다.
 ---
 
 # /gradle - 의존성 관리

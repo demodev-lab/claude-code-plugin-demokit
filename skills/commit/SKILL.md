@@ -1,11 +1,6 @@
 ---
 name: commit
-description: 변경사항을 논리적 단위로 분해하여 커밋
-user_invocable: true
-arguments:
-  - name: message
-    description: 커밋 메시지 (지정 시 전체를 하나로 커밋)
-    required: false
+description: 이 스킬은 사용자가 "커밋", "commit", "변경사항 커밋"을 요청할 때 사용합니다. 변경사항을 논리적 단위로 분해하여 스마트 커밋을 수행합니다.
 ---
 
 # /commit - 스마트 커밋

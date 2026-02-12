@@ -1,14 +1,6 @@
 ---
 name: test
-description: 테스트 코드 생성 (단위/통합/슬라이스)
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
-  - name: type
-    description: "테스트 종류 (unit, integration, controller, all). 기본: all"
-    required: false
+description: 이 스킬은 사용자가 "테스트 생성", "test", "테스트 코드"를 요청할 때 사용합니다. 단위/통합/슬라이스 테스트 코드를 생성합니다.
 ---
 
 # /test - 테스트 생성

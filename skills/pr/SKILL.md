@@ -1,11 +1,6 @@
 ---
 name: pr
-description: PR 템플릿 생성 (dev 브랜치 기준)
-user_invocable: true
-arguments:
-  - name: title
-    description: PR 제목 (미지정 시 자동 생성)
-    required: false
+description: 이 스킬은 사용자가 "PR", "pr", "Pull Request", "풀 리퀘스트"를 요청할 때 사용합니다. dev 브랜치 기준으로 PR 템플릿을 생성합니다.
 ---
 
 # /pr - Pull Request 생성

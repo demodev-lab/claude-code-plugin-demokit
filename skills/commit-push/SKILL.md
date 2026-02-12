@@ -1,11 +1,6 @@
 ---
 name: commit-push
-description: 변경사항 커밋 후 원격에 푸시
-user_invocable: true
-arguments:
-  - name: message
-    description: 커밋 메시지 (지정 시 전체를 하나로 커밋)
-    required: false
+description: 이 스킬은 사용자가 "커밋 푸시", "commit-push", "커밋하고 푸시"를 요청할 때 사용합니다. 변경사항을 커밋한 후 원격 저장소에 푸시합니다.
 ---
 
 # /commit-push - 커밋 + 푸시

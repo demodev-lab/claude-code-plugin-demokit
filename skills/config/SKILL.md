@@ -1,11 +1,6 @@
 ---
 name: config
-description: Spring 설정 클래스 생성
-user_invocable: true
-arguments:
-  - name: type
-    description: "설정 종류 (jpa, web, cache, security, properties)"
-    required: false
+description: 이 스킬은 사용자가 "설정", "config", "JPA 설정", "Web 설정"을 요청할 때 사용합니다. Spring 설정 클래스를 생성합니다 (JPA, Web, Cache, Security, Properties 등).
 ---
 
 # /config - 설정 관리

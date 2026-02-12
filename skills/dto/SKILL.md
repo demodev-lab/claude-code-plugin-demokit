@@ -1,14 +1,6 @@
 ---
 name: dto
-description: Request/Response DTO 생성 (record)
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
-  - name: fields
-    description: "필드 정의"
-    required: false
+description: 이 스킬은 사용자가 "DTO 생성", "Request/Response", "dto"를 요청할 때 사용합니다. Java record 기반 Request/Response DTO를 생성합니다.
 ---
 
 # /dto - DTO 생성

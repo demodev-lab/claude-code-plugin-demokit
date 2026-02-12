@@ -1,14 +1,6 @@
 ---
 name: pdca
-description: PDCA 워크플로우 관리 (Plan → Design → Do → Analyze → Iterate → Report)
-user_invocable: true
-arguments:
-  - name: command
-    description: "하위 명령 (plan, design, do, analyze, iterate, report, status, next)"
-    required: true
-  - name: feature
-    description: 기능명 (kebab-case 권장, 예: user-management)
-    required: false
+description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdca do", "pdca analyze", "pdca iterate", "pdca report", "pdca status", "pdca next"를 요청할 때 사용합니다. PDCA 워크플로우 관리 (Plan → Design → Do → Analyze → Iterate → Report).
 ---
 
 # /pdca - PDCA 워크플로우

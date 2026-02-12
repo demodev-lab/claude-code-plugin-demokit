@@ -1,11 +1,6 @@
 ---
 name: security
-description: Spring Security 설정 (JWT/OAuth2)
-user_invocable: true
-arguments:
-  - name: type
-    description: "인증 방식 (jwt, oauth2, basic)"
-    required: false
+description: 이 스킬은 사용자가 "Security", "security", "JWT", "OAuth2", "인증"을 요청할 때 사용합니다. Spring Security 설정을 생성합니다 (JWT/OAuth2).
 ---
 
 # /security - Spring Security 설정

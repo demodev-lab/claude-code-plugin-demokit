@@ -1,11 +1,6 @@
 ---
 name: exception
-description: 도메인 예외 + GlobalExceptionHandler 생성
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
+description: 이 스킬은 사용자가 "예외 처리", "exception", "GlobalExceptionHandler"를 요청할 때 사용합니다. 도메인 예외 및 GlobalExceptionHandler를 생성합니다.
 ---
 
 # /exception - 예외 처리 설정

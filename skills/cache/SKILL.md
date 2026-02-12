@@ -1,11 +1,6 @@
 ---
 name: cache
-description: 캐싱 전략 설정 (Caffeine/Redis)
-user_invocable: true
-arguments:
-  - name: provider
-    description: "캐시 제공자 (caffeine, redis). 기본: caffeine"
-    required: false
+description: 이 스킬은 사용자가 "캐시", "cache", "Caffeine", "Redis 캐시"를 요청할 때 사용합니다. Caffeine 또는 Redis 기반 캐싱 전략을 설정합니다.
 ---
 
 # /cache - 캐싱 전략

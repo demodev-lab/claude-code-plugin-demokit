@@ -1,8 +1,6 @@
 ---
 name: cancel-loop
-description: 활성 루프를 즉시 취소
-user_invocable: true
-arguments: []
+description: 이 스킬은 사용자가 "루프 취소", "cancel-loop", "loop 중지"를 요청할 때 사용합니다. 활성화된 자율 반복 루프를 즉시 취소합니다.
 ---
 
 # /cancel-loop - 루프 취소

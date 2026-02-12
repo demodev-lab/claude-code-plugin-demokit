@@ -1,8 +1,6 @@
 ---
 name: push
-description: 현재 브랜치를 원격에 푸시
-user_invocable: true
-arguments: []
+description: 이 스킬은 사용자가 "push", "푸시", "원격 푸시"를 요청할 때 사용합니다. 현재 브랜치를 원격 저장소에 푸시합니다.
 ---
 
 # /push - 원격 푸시

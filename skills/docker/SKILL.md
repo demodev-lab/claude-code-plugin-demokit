@@ -1,14 +1,6 @@
 ---
 name: docker
-description: Docker/Docker Compose 설정 생성
-user_invocable: true
-arguments:
-  - name: type
-    description: "설정 종류 (dockerfile, compose, both). 기본: both"
-    required: false
-  - name: db
-    description: "데이터베이스 (postgres, mysql, mariadb). 기본: postgres"
-    required: false
+description: 이 스킬은 사용자가 "Docker", "docker-compose", "Dockerfile"을 요청할 때 사용합니다. Docker/Docker Compose 설정을 생성합니다.
 ---
 
 # /docker - Docker 설정

@@ -1,14 +1,6 @@
 ---
 name: crud
-description: 도메인 CRUD 일괄 생성 (Entity, Repository, Service, Controller, DTO)
-user_invocable: true
-arguments:
-  - name: domainName
-    description: 도메인명 (PascalCase, 예: User, Order, Product)
-    required: true
-  - name: fields
-    description: "필드 정의 (예: 'name:String, email:String, age:Integer')"
-    required: false
+description: 이 스킬은 사용자가 "CRUD 만들어줘", "crud 생성", "도메인 생성", "스캐폴딩"을 요청할 때 사용합니다. Entity, Repository, Service, Controller, DTO를 일괄 생성합니다.
 ---
 
 # /crud - 도메인 CRUD 일괄 생성

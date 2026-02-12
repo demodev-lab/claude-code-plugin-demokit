@@ -1,11 +1,6 @@
 ---
 name: init
-description: Spring Boot 프로젝트 감지 및 초기화
-user_invocable: true
-arguments:
-  - name: path
-    description: 프로젝트 경로 (기본값: 현재 디렉토리)
-    required: false
+description: 이 스킬은 사용자가 "프로젝트 초기화", "init", "프로젝트 분석"을 요청할 때 사용합니다. Spring Boot 프로젝트를 감지하고 초기화합니다.
 ---
 
 # /init - 프로젝트 초기화

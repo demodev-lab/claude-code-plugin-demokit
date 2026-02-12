@@ -1,14 +1,6 @@
 ---
 name: entity
-description: JPA Entity 생성
-user_invocable: true
-arguments:
-  - name: name
-    description: "Entity명 (PascalCase, 예: User, Order)"
-    required: true
-  - name: fields
-    description: "필드 정의 (예: 'name:String, email:String')"
-    required: false
+description: 이 스킬은 사용자가 "Entity 생성", "엔티티", "entity"를 요청할 때 사용합니다. JPA Entity를 생성합니다.
 ---
 
 # /entity - JPA Entity 생성

@@ -1,11 +1,6 @@
 ---
 name: review
-description: 코드 리뷰 (읽기 전용)
-user_invocable: true
-arguments:
-  - name: target
-    description: "리뷰 대상 (파일 경로, 도메인명, 또는 'all')"
-    required: false
+description: 이 스킬은 사용자가 "코드 리뷰", "review", "리뷰"를 요청할 때 사용합니다. 읽기 전용 모드로 코드 리뷰를 수행합니다.
 ---
 
 # /review - 코드 리뷰

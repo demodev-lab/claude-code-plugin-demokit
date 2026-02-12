@@ -1,14 +1,6 @@
 ---
 name: repository
-description: Spring Data JPA Repository 생성
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
-  - name: querydsl
-    description: "QueryDSL Custom Repository 포함 여부 (true/false)"
-    required: false
+description: 이 스킬은 사용자가 "Repository 생성", "레포지토리", "repository"를 요청할 때 사용합니다. Spring Data JPA Repository를 생성합니다.
 ---
 
 # /repository - Repository 생성

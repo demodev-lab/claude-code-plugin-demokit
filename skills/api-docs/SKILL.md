@@ -1,8 +1,6 @@
 ---
 name: api-docs
-description: API 문서화 설정 (SpringDoc/Swagger)
-user_invocable: true
-arguments: []
+description: 이 스킬은 사용자가 "API 문서", "Swagger", "SpringDoc", "api-docs"를 요청할 때 사용합니다. SpringDoc/Swagger 기반 API 문서화 설정을 생성합니다.
 ---
 
 # /api-docs - API 문서화

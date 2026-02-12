@@ -1,11 +1,6 @@
 ---
 name: controller
-description: REST Controller 생성
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
+description: 이 스킬은 사용자가 "Controller 생성", "컨트롤러", "controller"를 요청할 때 사용합니다. REST Controller를 생성합니다.
 ---
 
 # /controller - REST Controller 생성

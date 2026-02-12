@@ -1,14 +1,6 @@
 ---
 name: migration
-description: DB 마이그레이션 파일 생성 (Flyway/Liquibase)
-user_invocable: true
-arguments:
-  - name: tool
-    description: "마이그레이션 도구 (flyway, liquibase). 기본: flyway"
-    required: false
-  - name: description
-    description: "마이그레이션 설명 (예: 'create_users_table')"
-    required: true
+description: 이 스킬은 사용자가 "마이그레이션", "migration", "Flyway", "Liquibase"를 요청할 때 사용합니다. DB 마이그레이션 파일을 생성합니다.
 ---
 
 # /migration - DB 마이그레이션

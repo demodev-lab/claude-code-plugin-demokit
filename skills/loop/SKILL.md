@@ -1,17 +1,6 @@
 ---
 name: loop
-description: 자율 반복 루프 - 작업 완료까지 자동 반복 실행 (Ralph Wiggum 스타일)
-user_invocable: true
-arguments:
-  - name: prompt
-    description: 반복 실행할 작업 프롬프트
-    required: true
-  - name: max-iterations
-    description: 최대 반복 횟수 (기본값: 10)
-    required: false
-  - name: completion-promise
-    description: 완료 신호 문자열 (기본값: LOOP_DONE)
-    required: false
+description: 이 스킬은 사용자가 "loop", "자율 반복", "자동 반복"을 요청할 때 사용합니다. 작업 완료까지 자동으로 반복 실행하는 루프를 시작합니다.
 ---
 
 # /loop - 자율 반복 루프

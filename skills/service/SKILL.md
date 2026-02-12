@@ -1,11 +1,6 @@
 ---
 name: service
-description: Service 레이어 생성
-user_invocable: true
-arguments:
-  - name: name
-    description: "도메인명 (PascalCase, 예: User)"
-    required: true
+description: 이 스킬은 사용자가 "Service 생성", "서비스", "service"를 요청할 때 사용합니다. Service 레이어를 생성합니다.
 ---
 
 # /service - Service 레이어 생성
