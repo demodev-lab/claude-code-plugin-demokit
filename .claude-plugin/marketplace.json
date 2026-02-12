@@ -17,8 +17,8 @@
       "author": {
         "name": "demodev"
       },
-      "homepage": "https://github.com/demodev-lab/claude-code-plugin-be",
-      "repository": "https://github.com/demodev-lab/claude-code-plugin-be",
+      "homepage": "https://github.com/demodev-lab/claude-code-plugin-demokit",
+      "repository": "https://github.com/demodev-lab/claude-code-plugin-demokit",
       "license": "MIT",
       "keywords": ["spring-boot", "java", "backend", "pdca", "code-generation"],
       "category": "backend",

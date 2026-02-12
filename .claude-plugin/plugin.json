@@ -6,7 +6,7 @@
     "name": "demodev"
   },
   "license": "MIT",
-  "repository": "https://github.com/demodev-lab/claude-code-plugin-be",
+  "repository": "https://github.com/demodev-lab/claude-code-plugin-demokit",
   "keywords": [
     "spring-boot",
     "java",

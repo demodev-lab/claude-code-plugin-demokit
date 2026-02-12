@@ -9,7 +9,7 @@ Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 
 Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
 
 ```
-/plugin marketplace add demodev-lab/claude-code-plugin-be
+/plugin marketplace add demodev-lab/claude-code-plugin-demokit
 /plugin install demokit@demodev-plugins
 ```
 
@@ -25,7 +25,7 @@ Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
     "demodev-plugins": {
       "source": {
         "source": "github",
-        "repo": "demodev-lab/claude-code-plugin-be"
+        "repo": "demodev-lab/claude-code-plugin-demokit"
       }
     }
   },
@@ -38,9 +38,9 @@ Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
 ### 방법 2: 로컬 설치
 
 ```bash
-git clone https://github.com/demodev-lab/claude-code-plugin-be.git
+git clone https://github.com/demodev-lab/claude-code-plugin-demokit.git
 cd /path/to/my-spring-boot-project
-claude --plugin-dir /path/to/claude-code-plugin-be
+claude --plugin-dir /path/to/claude-code-plugin-demokit
 ```
 
 > **주의**: 플러그인 디렉토리가 아닌, 작업 대상 Spring Boot 프로젝트 디렉토리에서 실행해야 한다.
