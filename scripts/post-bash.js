@@ -43,11 +43,12 @@ async function main() {
   const compileErrors = output.match(/error:.*\n.*\.java:\d+/g);
   if (compileErrors && compileErrors.length > 0) {
     hints.push(`[빌드 실패] 컴파일 에러 ${compileErrors.length}건:`);
-    compileErrors.slice(0, 5).forEach(err => {
+    const MAX_DISPLAY = 5;
+    compileErrors.slice(0, MAX_DISPLAY).forEach(err => {
       hints.push(`  ${err.trim()}`);
     });
-    if (compileErrors.length > 5) {
-      hints.push(`  ... 외 ${compileErrors.length - 5}건`);
+    if (compileErrors.length > MAX_DISPLAY) {
+      hints.push(`  ... 외 ${compileErrors.length - MAX_DISPLAY}건`);
     }
   }
 

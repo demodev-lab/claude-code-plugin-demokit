@@ -197,10 +197,10 @@
       "infra-expert": "sonnet",
       "test-expert": "sonnet",
       "code-reviewer": "sonnet",
-      "spring-architect": "sonnet",
+      "spring-architect": "opus",
       "gap-detector": "sonnet",
       "pdca-iterator": "sonnet",
-      "report-generator": "sonnet"
+      "report-generator": "haiku"
     }
   },
   "testing": {

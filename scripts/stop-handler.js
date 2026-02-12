@@ -82,8 +82,8 @@ async function main() {
     return;
   }
 
-  // 외부에서 complete 처리된 경우
-  if (!loopState.active) {
+  // 외부에서 complete 처리된 경우 (최신 상태 재조회)
+  if (!loopStateMod.getState(projectRoot).active) {
     console.log(JSON.stringify({}));
     return;
   }

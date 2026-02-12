@@ -48,7 +48,7 @@ async function main() {
     const missing = [];
 
     for (const [type, relPath] of Object.entries(related)) {
-      if (type !== 'entity' && !fileExists(filePath, relPath)) {
+      if (type !== 'entity' && !fileExists(relPath)) {
         missing.push(type);
       }
     }
@@ -88,15 +88,15 @@ async function main() {
 }
 
 function getDomainBasePath(filePath, domainName) {
+  if (!domainName) return null;
   const normalized = filePath.replace(/\\/g, '/');
   const domainIdx = normalized.indexOf(`/domain/${domainName.toLowerCase()}/`);
   if (domainIdx === -1) return null;
   return normalized.substring(0, domainIdx + `/domain/${domainName.toLowerCase()}`.length);
 }
 
-function fileExists(refPath, relativePath) {
+function fileExists(relativePath) {
   try {
-    const fs = require('fs');
     return fs.existsSync(relativePath);
   } catch {
     return false;
