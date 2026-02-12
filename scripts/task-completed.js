@@ -15,7 +15,7 @@ async function main() {
 
   let hookData = {};
   try {
-    hookData = JSON.parse(input);
+    if (input && input.trim()) hookData = JSON.parse(input);
   } catch { /* ignore */ }
 
   const { platform, cache } = require(path.join(__dirname, '..', 'lib', 'core'));
@@ -28,42 +28,14 @@ async function main() {
 
   const hints = [];
 
-  // 1. context.md 저장
+  // 1. context.md 저장 (공통 상태 수집 사용)
   try {
-    const { writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
-    const gradle = cache.get('gradle');
-    const project = cache.get('project');
-    const level = cache.get('level');
-
-    let pdcaFeatures = [];
-    try {
-      const { status: pdcaStatus } = require(path.join(__dirname, '..', 'lib', 'pdca'));
-      pdcaFeatures = pdcaStatus.listFeatures(projectRoot);
-    } catch { /* ignore */ }
-
-    let loopState = { active: false };
-    try {
-      const loopMod = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
-      loopState = loopMod.getState(projectRoot);
-    } catch { /* ignore */ }
-
-    let domains = [];
-    try {
-      const { projectAnalyzer } = require(path.join(__dirname, '..', 'lib', 'spring'));
-      const projectInfo = projectAnalyzer.analyzeProject(projectRoot);
-      domains = projectInfo.domains || [];
-    } catch { /* ignore */ }
-
-    // 작업 설명 추출 (hook 데이터에서)
+    const { snapshot, writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
+    const state = snapshot.collectState(projectRoot, cache);
     const taskDesc = hookData.task_description || hookData.tool_name || '작업 완료';
 
     writer.saveContext(projectRoot, {
-      gradle,
-      project,
-      level,
-      pdcaFeatures,
-      loopState,
-      domains,
+      ...state,
       currentTask: {
         description: taskDesc,
         status: 'completed',
@@ -71,7 +43,6 @@ async function main() {
       recentChanges: [taskDesc],
     });
   } catch (err) {
-    // context 저장 실패해도 계속 진행
     process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 

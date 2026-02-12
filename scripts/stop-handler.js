@@ -18,11 +18,11 @@ async function main() {
 
   let hookData = {};
   try {
-    hookData = JSON.parse(input);
+    if (input && input.trim()) hookData = JSON.parse(input);
   } catch { /* stdin이 비어있을 수 있음 */ }
 
   const { platform, cache } = require(path.join(__dirname, '..', 'lib', 'core'));
-  const loopState = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
+  const loopStateMod = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
 
   const projectRoot = platform.findProjectRoot(process.cwd());
 
@@ -31,40 +31,19 @@ async function main() {
     return;
   }
 
-  const state = loopState.getState(projectRoot);
+  const loopState = loopStateMod.getState(projectRoot);
 
   // context.md에 현재 상태 스냅샷 저장 (루프 여부와 무관하게 항상)
   try {
-    const { writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
-    const gradle = cache.get('gradle');
-    const project = cache.get('project');
-    const level = cache.get('level');
-
-    let pdcaFeatures = [];
-    try {
-      const { status: pdcaStatus } = require(path.join(__dirname, '..', 'lib', 'pdca'));
-      pdcaFeatures = pdcaStatus.listFeatures(projectRoot);
-    } catch { /* ignore */ }
-
-    let domains = [];
-    try {
-      const { projectAnalyzer } = require(path.join(__dirname, '..', 'lib', 'spring'));
-      const projectInfo = projectAnalyzer.analyzeProject(projectRoot);
-      domains = projectInfo.domains || [];
-    } catch { /* ignore */ }
-
-    const stopReason = state.active ? '루프 반복 중' : '세션 종료';
+    const { snapshot, writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
+    const state = snapshot.collectState(projectRoot, cache);
+    const stopReason = loopState.active ? '루프 반복 중' : '세션 종료';
 
     writer.saveContext(projectRoot, {
-      gradle,
-      project,
-      level,
-      pdcaFeatures,
-      loopState: state,
-      domains,
+      ...state,
       currentTask: {
         description: stopReason,
-        status: state.active ? 'in_progress' : 'stopped',
+        status: loopState.active ? 'in_progress' : 'stopped',
       },
       recentChanges: [`세션 중단 (${stopReason})`],
     });
@@ -73,29 +52,29 @@ async function main() {
   }
 
   // Loop가 비활성이면 정상 종료
-  if (!state.active) {
+  if (!loopState.active) {
     console.log(JSON.stringify({}));
     return;
   }
 
   // completion promise 감지
   const transcript = hookData.transcript || hookData.stop_reason || hookData.content || '';
-  if (state.completionPromise && transcript.includes(state.completionPromise)) {
-    const iterations = state.currentIteration;
-    loopState.completeLoop(projectRoot);
+  if (loopState.completionPromise && transcript.includes(loopState.completionPromise)) {
+    const iterations = loopState.currentIteration;
+    loopStateMod.completeLoop(projectRoot);
 
     // loop-log.md 마무리
     try {
       const { writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
       writer.finalizeLoopLog(projectRoot, {
         totalIterations: iterations,
-        completionReason: `완료 신호 '${state.completionPromise}' 감지`,
+        completionReason: `완료 신호 '${loopState.completionPromise}' 감지`,
       });
     } catch { /* ignore */ }
 
     console.log(JSON.stringify({
       systemMessage: [
-        `[demokit] Loop 완료: '${state.completionPromise}' 감지`,
+        `[demokit] Loop 완료: '${loopState.completionPromise}' 감지`,
         `총 ${iterations}회 반복 후 완료.`,
         `결과: .demodev/loop-log.md 참조`,
       ].join('\n'),
@@ -104,28 +83,28 @@ async function main() {
   }
 
   // 외부에서 complete 처리된 경우
-  if (!state.active) {
+  if (!loopState.active) {
     console.log(JSON.stringify({}));
     return;
   }
 
   // max iterations 도달
-  if (loopState.isMaxReached(state)) {
-    loopState.completeLoop(projectRoot);
+  if (loopStateMod.isMaxReached(loopState)) {
+    loopStateMod.completeLoop(projectRoot);
 
     // loop-log.md 마무리
     try {
       const { writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
       writer.finalizeLoopLog(projectRoot, {
-        totalIterations: state.currentIteration,
-        completionReason: `최대 반복 횟수(${state.maxIterations}회) 도달`,
+        totalIterations: loopState.currentIteration,
+        completionReason: `최대 반복 횟수(${loopState.maxIterations}회) 도달`,
       });
     } catch { /* ignore */ }
 
     console.log(JSON.stringify({
       systemMessage: [
-        `[demokit] Loop 종료: 최대 반복 횟수(${state.maxIterations}회) 도달`,
-        `프롬프트: ${state.prompt.substring(0, 100)}...`,
+        `[demokit] Loop 종료: 최대 반복 횟수(${loopState.maxIterations}회) 도달`,
+        `프롬프트: ${loopState.prompt.substring(0, 100)}...`,
         `결과: .demodev/loop-log.md 참조`,
         `수동으로 계속하려면 /loop 를 다시 실행하세요.`,
       ].join('\n'),
@@ -134,7 +113,7 @@ async function main() {
   }
 
   // 반복 계속: iteration 증가
-  const newState = loopState.incrementIteration(projectRoot);
+  const newState = loopStateMod.incrementIteration(projectRoot);
 
   // loop-log.md에 이번 반복 결과 append
   try {
@@ -146,7 +125,7 @@ async function main() {
     writer.appendLoopLog(projectRoot, {
       iteration: newState.currentIteration,
       maxIterations: newState.maxIterations,
-      prompt: state.prompt,
+      prompt: loopState.prompt,
       result: resultSummary,
       nextAction: '자동 반복 계속',
     });
@@ -161,10 +140,10 @@ async function main() {
       ``,
       `이전 작업 결과를 확인하고, 아래 작업을 계속 진행하세요:`,
       ``,
-      state.prompt,
+      loopState.prompt,
       ``,
       `---`,
-      `작업이 완료되면 응답에 '${state.completionPromise}'를 포함하세요.`,
+      `작업이 완료되면 응답에 '${loopState.completionPromise}'를 포함하세요.`,
       `완료 전까지 자동으로 반복됩니다.`,
       `(루프 로그: .demodev/loop-log.md)`,
     ].join('\n'),
