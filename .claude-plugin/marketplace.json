@@ -1,0 +1,28 @@
+{
+  "name": "demodev-plugins",
+  "owner": {
+    "name": "demodev-lab",
+    "email": "demodev-lab@github.com"
+  },
+  "metadata": {
+    "description": "Spring Boot 백엔드 개발을 위한 Claude Code 플러그인 마켓플레이스",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "demodev-be",
+      "source": "./",
+      "description": "Spring Boot 백엔드 특화 플러그인 - PDCA 방법론 기반 체계적 개발 워크플로우",
+      "version": "1.0.0",
+      "author": {
+        "name": "demodev"
+      },
+      "homepage": "https://github.com/demodev-lab/claude-code-plugin-be",
+      "repository": "https://github.com/demodev-lab/claude-code-plugin-be",
+      "license": "MIT",
+      "keywords": ["spring-boot", "java", "backend", "pdca", "code-generation"],
+      "category": "backend",
+      "tags": ["spring-boot", "java", "backend", "pdca", "crud", "code-review"]
+    }
+  ]
+}
