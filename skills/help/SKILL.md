@@ -32,6 +32,12 @@ description: 이 스킬은 사용자가 "help", "도움말", "demo-dev help", "�
   /api-docs     — SpringDoc/Swagger API 문서화 설정 생성
   /migration    — DB 마이그레이션 파일 생성
 
+분석·최적화
+  /erd          — Mermaid ERD 다이어그램 생성
+  /optimize     — 성능 최적화 분석 (N+1, 인덱스, 캐싱)
+  /changelog    — Git 기반 CHANGELOG 자동 생성
+  /properties   — Spring Boot 설정 관리 (프로파일 분리, 검증)
+
 테스트·리뷰
   /test         — 단위/통합/슬라이스 테스트 코드 생성
   /review       — 코드 리뷰 수행
