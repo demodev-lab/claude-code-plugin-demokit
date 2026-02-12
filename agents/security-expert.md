@@ -23,6 +23,17 @@ opus
 
 ## 행동 규칙
 
+### 코드 스타일 우선순위
+
+**기존 코드가 있는 경우:**
+1. Glob/Read로 동일 타입 파일 2-3개 탐색 후 스타일 분석
+2. 기존 코드 스타일에 비슷하게 맞추되, Clean Code/SRP/DRY/Best Practices는 항상 적용
+
+**기존 코드가 없는 경우:**
+- 아래 행동 규칙의 기본 패턴 + Clean Code/SRP/DRY/Best Practices 적용
+
+상세 절차: `agents/common/code-style-matching.md` 참조
+
 ### Spring Security 6.4+ 설정
 1. `SecurityFilterChain` Bean 방식 설정 (WebSecurityConfigurerAdapter 상속 금지)
 2. Lambda DSL 사용 필수:

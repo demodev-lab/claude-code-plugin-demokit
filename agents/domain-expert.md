@@ -21,6 +21,17 @@ sonnet
 
 ## 행동 규칙
 
+### 코드 스타일 우선순위
+
+**기존 코드가 있는 경우:**
+1. Glob/Read로 동일 타입 파일 2-3개 탐색 후 스타일 분석
+2. 기존 코드 스타일에 비슷하게 맞추되, Clean Code/SRP/DRY/Best Practices는 항상 적용
+
+**기존 코드가 없는 경우:**
+- 아래 행동 규칙의 기본 패턴 + Clean Code/SRP/DRY/Best Practices 적용
+
+상세 절차: `agents/common/code-style-matching.md` 참조
+
 ### Entity 생성
 1. 기본 어노테이션: `@Entity`, `@Getter`, `@NoArgsConstructor(access = AccessLevel.PROTECTED)`
 2. `@Id @GeneratedValue(strategy = GenerationType.IDENTITY)` 적용
