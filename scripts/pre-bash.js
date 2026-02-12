@@ -14,7 +14,14 @@ async function main() {
     input += chunk;
   }
 
-  const hookData = JSON.parse(input);
+  let hookData = {};
+  try {
+    if (input && input.trim()) hookData = JSON.parse(input);
+  } catch (err) {
+    process.stderr.write(`[demokit] stdin 파싱 실패: ${err.message}\n`);
+    console.log(JSON.stringify({}));
+    return;
+  }
   const command = hookData.tool_input?.command || '';
 
   if (!command.trim()) {
@@ -33,6 +40,10 @@ async function main() {
     { pattern: /git\s+clean\s+-fd/, message: 'git clean 감지 (추적되지 않은 파일 삭제)' },
     { pattern: /truncate\s+table/i, message: 'DB 테이블 비우기 명령 감지' },
     { pattern: /:(){ :\|:& };:/, message: '포크 폭탄 감지' },
+    { pattern: /chmod\s+777/, message: 'chmod 777 감지 (보안 위험 - 최소 권한 원칙 위반)' },
+    { pattern: /curl\s+.*\|\s*(bash|sh)/, message: 'curl pipe to shell 감지 (원격 코드 실행 위험)' },
+    { pattern: /wget\s+.*\|\s*(bash|sh)/, message: 'wget pipe to shell 감지 (원격 코드 실행 위험)' },
+    { pattern: /docker\s+run\s+.*--privileged/, message: 'docker --privileged 감지 (호스트 권한 노출 위험)' },
   ];
 
   for (const { pattern, message } of dangerousPatterns) {
