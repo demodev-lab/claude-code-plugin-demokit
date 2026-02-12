@@ -183,8 +183,41 @@
       "architecture": "spring-architect",
       "gap-analysis": "gap-detector",
       "pdca-iteration": "pdca-iterator",
-      "report": "report-generator"
+      "report": "report-generator",
+      "erd": "domain-expert",
+      "optimize": "domain-expert",
+      "changelog": null,
+      "properties": "infra-expert"
+    },
+    "modelAssignment": {
+      "domain-expert": "sonnet",
+      "service-expert": "sonnet",
+      "api-expert": "sonnet",
+      "security-expert": "sonnet",
+      "infra-expert": "sonnet",
+      "test-expert": "sonnet",
+      "code-reviewer": "sonnet",
+      "spring-architect": "sonnet",
+      "gap-detector": "sonnet",
+      "pdca-iterator": "sonnet",
+      "report-generator": "sonnet"
     }
+  },
+  "testing": {
+    "framework": "JUnit 5 + Mockito",
+    "mockAnnotation": "@MockitoBean (Spring Boot 3.4+, @MockBean deprecated)",
+    "sliceTests": {
+      "repository": "@DataJpaTest",
+      "service": "@ExtendWith(MockitoExtension.class)",
+      "controller": "@WebMvcTest + @AutoConfigureMockMvc",
+      "integration": "@SpringBootTest + @ServiceConnection + Testcontainers"
+    },
+    "conventions": [
+      "테스트 클래스명: {ClassName}Test",
+      "테스트 메서드명: should_{기대결과}_when_{조건} 또는 한글 @DisplayName",
+      "Given-When-Then 패턴 준수",
+      "각 테스트는 독립적으로 실행 가능해야 함"
+    ]
   },
   "outputStyles": {
     "levelDefaults": {
