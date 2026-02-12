@@ -1,5 +1,5 @@
 {
-  "description": "demodev-be 플러그인 훅 - 컨벤션 검증, 의도 감지, 루프 제어",
+  "description": "demokit 플러그인 훅 - 컨벤션 검증, 의도 감지, 루프 제어",
   "hooks": {
     "SessionStart": [
       {

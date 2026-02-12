@@ -1,4 +1,4 @@
-# demodev-be
+# demokit
 
 Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 체계적인 개발 워크플로우를 제공한다.
 
@@ -10,7 +10,7 @@ Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
 
 ```
 /plugin marketplace add demodev-lab/claude-code-plugin-be
-/plugin install demodev-be@demodev-plugins
+/plugin install demokit@demodev-plugins
 ```
 
 > **비공개 레포 인증**: 사전에 `gh auth login`으로 GitHub 인증이 필요하다. 자동 업데이트를 위해 `GITHUB_TOKEN` 환경변수 설정을 권장한다.
@@ -30,7 +30,7 @@ Claude Code 대화창에서 다음 명령어를 순서대로 입력한다.
     }
   },
   "enabledPlugins": {
-    "demodev-be@demodev-plugins": true
+    "demokit@demodev-plugins": true
   }
 }
 ```
@@ -119,7 +119,7 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 ## 프로젝트 구조
 
 ```
-demodev-be/
+demokit/
 ├── .claude-plugin/
 │   ├── plugin.json            # 플러그인 메타데이터
 │   └── marketplace.json       # 마켓플레이스 카탈로그

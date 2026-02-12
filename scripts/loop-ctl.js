@@ -17,7 +17,7 @@ function main() {
   const projectRoot = platform.findProjectRoot(process.cwd());
 
   if (!projectRoot) {
-    console.error('[demodev-be] 프로젝트 루트를 찾을 수 없습니다.');
+    console.error('[demokit] 프로젝트 루트를 찾을 수 없습니다.');
     process.exit(1);
   }
 

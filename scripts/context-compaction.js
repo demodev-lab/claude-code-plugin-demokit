@@ -32,7 +32,7 @@ async function main() {
     return;
   }
 
-  const stateLines = ['[demodev-be] 컨텍스트 보존 상태:'];
+  const stateLines = ['[demokit] 컨텍스트 보존 상태:'];
 
   // 프로젝트 정보
   const project = cache.get('project');
@@ -120,7 +120,7 @@ async function main() {
       recentChanges: ['컨텍스트 압축 발생 - 상태 스냅샷 저장'],
     });
   } catch (err) {
-    process.stderr.write(`[demodev-be] context.md 저장 실패: ${err.message}\n`);
+    process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
   console.log(JSON.stringify({
@@ -129,6 +129,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] context-compaction 오류: ${err.message}`);
+  console.error(`[demokit] context-compaction 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

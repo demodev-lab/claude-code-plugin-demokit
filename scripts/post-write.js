@@ -73,7 +73,7 @@ async function main() {
 
   if (suggestions.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demodev-be]\n${suggestions.join('\n')}`,
+      systemMessage: `[demokit]\n${suggestions.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));
@@ -101,6 +101,6 @@ function capitalize(str) {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] post-write 오류: ${err.message}`);
+  console.error(`[demokit] post-write 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

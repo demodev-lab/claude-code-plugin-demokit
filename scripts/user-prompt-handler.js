@@ -30,7 +30,7 @@ async function main() {
 
   if (detected) {
     console.log(JSON.stringify({
-      systemMessage: `[demodev-be] 의도 감지: ${detected.description}\n추천 명령: ${detected.command}`,
+      systemMessage: `[demokit] 의도 감지: ${detected.description}\n추천 명령: ${detected.command}`,
     }));
   } else {
     console.log(JSON.stringify({}));
@@ -188,6 +188,6 @@ function detectIntent(prompt) {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] user-prompt-handler 오류: ${err.message}`);
+  console.error(`[demokit] user-prompt-handler 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

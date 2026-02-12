@@ -1,5 +1,5 @@
 {
-  "name": "demodev-be",
+  "name": "demokit",
   "version": "1.0.0",
   "description": "Spring Boot 백엔드 특화 Claude Code 플러그인 - PDCA 방법론 기반 체계적 개발 워크플로우",
   "author": {

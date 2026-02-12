@@ -72,7 +72,7 @@ async function main() {
     });
   } catch (err) {
     // context 저장 실패해도 계속 진행
-    process.stderr.write(`[demodev-be] context.md 저장 실패: ${err.message}\n`);
+    process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
   // 2. PDCA 진행 상태 확인
@@ -101,7 +101,7 @@ async function main() {
 
   if (hints.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demodev-be]\n${hints.join('\n')}`,
+      systemMessage: `[demokit]\n${hints.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));
@@ -109,6 +109,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] task-completed 오류: ${err.message}`);
+  console.error(`[demokit] task-completed 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

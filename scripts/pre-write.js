@@ -139,7 +139,7 @@ async function main() {
 
   if (hints.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demodev-be 컨벤션 힌트]\n${hints.join('\n')}`,
+      systemMessage: `[demokit 컨벤션 힌트]\n${hints.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));
@@ -190,6 +190,6 @@ function getPackageHint(filePath, layerType) {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] pre-write 오류: ${err.message}`);
+  console.error(`[demokit] pre-write 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

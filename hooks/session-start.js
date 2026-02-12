@@ -20,7 +20,7 @@ async function main() {
   if (!projectRoot) {
     // Spring Boot 프로젝트가 아님 - 최소한의 메시지만
     const result = {
-      systemMessage: '[demodev-be] Spring Boot 프로젝트가 감지되지 않았습니다. /init 으로 프로젝트를 초기화하세요.',
+      systemMessage: '[demokit] Spring Boot 프로젝트가 감지되지 않았습니다. /init 으로 프로젝트를 초기화하세요.',
     };
     console.log(JSON.stringify(result));
     return;
@@ -32,7 +32,7 @@ async function main() {
 
   if (!gradle) {
     const result = {
-      systemMessage: '[demodev-be] build.gradle 파싱 실패. Gradle 프로젝트인지 확인하세요.',
+      systemMessage: '[demokit] build.gradle 파싱 실패. Gradle 프로젝트인지 확인하세요.',
     };
     console.log(JSON.stringify(result));
     return;
@@ -55,7 +55,7 @@ async function main() {
 
   // 6. systemMessage 구성
   const lines = [
-    `[demodev-be] Spring Boot 프로젝트 감지`,
+    `[demokit] Spring Boot 프로젝트 감지`,
     `- Spring Boot: ${gradle.springBootVersion || '알 수 없음'}`,
     `- Java: ${gradle.javaVersion || '알 수 없음'}`,
     `- Base Package: ${project.basePackage || '알 수 없음'}`,
@@ -112,6 +112,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] session-start 오류: ${err.message}`);
-  console.log(JSON.stringify({ systemMessage: `[demodev-be] 초기화 오류: ${err.message}` }));
+  console.error(`[demokit] session-start 오류: ${err.message}`);
+  console.log(JSON.stringify({ systemMessage: `[demokit] 초기화 오류: ${err.message}` }));
 });

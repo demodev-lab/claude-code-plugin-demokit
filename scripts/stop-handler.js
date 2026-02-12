@@ -69,7 +69,7 @@ async function main() {
       recentChanges: [`세션 중단 (${stopReason})`],
     });
   } catch (err) {
-    process.stderr.write(`[demodev-be] context.md 저장 실패: ${err.message}\n`);
+    process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
   // Loop가 비활성이면 정상 종료
@@ -95,7 +95,7 @@ async function main() {
 
     console.log(JSON.stringify({
       systemMessage: [
-        `[demodev-be] Loop 완료: '${state.completionPromise}' 감지`,
+        `[demokit] Loop 완료: '${state.completionPromise}' 감지`,
         `총 ${iterations}회 반복 후 완료.`,
         `결과: .demodev/loop-log.md 참조`,
       ].join('\n'),
@@ -124,7 +124,7 @@ async function main() {
 
     console.log(JSON.stringify({
       systemMessage: [
-        `[demodev-be] Loop 종료: 최대 반복 횟수(${state.maxIterations}회) 도달`,
+        `[demokit] Loop 종료: 최대 반복 횟수(${state.maxIterations}회) 도달`,
         `프롬프트: ${state.prompt.substring(0, 100)}...`,
         `결과: .demodev/loop-log.md 참조`,
         `수동으로 계속하려면 /loop 를 다시 실행하세요.`,
@@ -151,13 +151,13 @@ async function main() {
       nextAction: '자동 반복 계속',
     });
   } catch (err) {
-    process.stderr.write(`[demodev-be] loop-log.md 저장 실패: ${err.message}\n`);
+    process.stderr.write(`[demokit] loop-log.md 저장 실패: ${err.message}\n`);
   }
 
   console.log(JSON.stringify({
     decision: 'block',
     systemMessage: [
-      `[demodev-be] Loop 반복 ${newState.currentIteration}/${newState.maxIterations}`,
+      `[demokit] Loop 반복 ${newState.currentIteration}/${newState.maxIterations}`,
       ``,
       `이전 작업 결과를 확인하고, 아래 작업을 계속 진행하세요:`,
       ``,
@@ -172,6 +172,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] stop-handler 오류: ${err.message}`);
+  console.error(`[demokit] stop-handler 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });

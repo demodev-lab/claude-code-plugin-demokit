@@ -53,7 +53,7 @@ async function main() {
 
   if (warnings.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demodev-be Bash 검증]\n${warnings.join('\n')}`,
+      systemMessage: `[demokit Bash 검증]\n${warnings.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));
@@ -61,6 +61,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error(`[demodev-be] pre-bash 오류: ${err.message}`);
+  console.error(`[demokit] pre-bash 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });
