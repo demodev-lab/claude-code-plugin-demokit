@@ -112,7 +112,7 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 
 ## 개요
 
-- **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy DSL)
+- **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy/Kotlin DSL)
 - **핵심 철학**: DRY 원칙, 클린 코드, SRP(단일 책임 원칙), Spring Boot 2025/2026 Best Practices
 - **자동화**: 코드 생성 → 컨벤션 검증 → 코드 리뷰 → Gap 분석 → 자동 수정까지 전 과정 자동화
 
@@ -128,7 +128,7 @@ demokit/
 ├── lib/                       # 핵심 라이브러리 모듈
 ├── output-styles/             # 출력 스타일 (Monolith / MSA / PDCA)
 ├── scripts/                   # 훅 실행 스크립트
-├── skills/                    # 25개 슬래시 커맨드
+├── skills/                    # 29개 슬래시 커맨드
 ├── templates/                 # 코드 및 문서 템플릿
 └── demodev.config.json        # 프로젝트 설정 및 Best Practices
 ```
@@ -174,12 +174,16 @@ demokit/
 | `/api-docs` | `/api-docs` | SpringDoc/Swagger API 문서화 설정 생성 |
 | `/migration` | `/migration {desc} [--type flyway\|liquibase]` | DB 마이그레이션 파일 생성 (Flyway 기본) |
 
-### 테스트/리뷰
+### 분석/리뷰
 
 | 커맨드 | 사용법 | 설명 |
 |--------|--------|------|
 | `/test` | `/test {Name} [unit\|integration\|controller\|all]` | 테스트 코드 생성 (all 기본) |
 | `/review` | `/review [target]` | 읽기 전용 코드 리뷰 (파일경로, 도메인명, all) |
+| `/erd` | `/erd [domain]` | Mermaid ERD 다이어그램 생성 |
+| `/optimize` | `/optimize [target] [--fix]` | N+1, 인덱스, 트랜잭션 등 성능 최적화 분석 |
+| `/changelog` | `/changelog [range]` | Git 이력 기반 CHANGELOG 생성 |
+| `/properties` | `/properties [action] [profile]` | application.yml 설정 분석/생성/프로파일 관리 |
 
 ### PDCA 워크플로우
 
@@ -216,15 +220,15 @@ demokit/
 
 | 에이전트 | 모델 | 역할 |
 |----------|------|------|
-| spring-architect | opus | 시스템 아키텍처 설계, PDCA Plan/Design 문서 작성 |
-| domain-expert | sonnet | JPA Entity, Repository, QueryDSL |
+| spring-architect | sonnet | 시스템 아키텍처 설계, PDCA Plan/Design 문서 작성 |
+| domain-expert | sonnet | JPA Entity, Repository, QueryDSL, ERD |
 | api-expert | sonnet | REST Controller, DTO, 예외 처리 |
 | service-expert | sonnet | 비즈니스 로직, 트랜잭션 관리 |
-| security-expert | opus | Spring Security, JWT, OAuth2 |
+| security-expert | sonnet | Spring Security, JWT, OAuth2 |
 | infra-expert | sonnet | Docker, Gradle, 설정 관리 |
 | test-expert | sonnet | 단위/통합/슬라이스 테스트 |
 | code-reviewer | sonnet | 읽기 전용 코드 리뷰 (9개 체크리스트) |
-| gap-detector | opus | PDCA Analyze - 설계-구현 Gap 분석 |
+| gap-detector | sonnet | PDCA Analyze - 설계-구현 Gap 분석 |
 | pdca-iterator | sonnet | Match Rate < 90% 시 자동 Gap 수정 반복 |
 | report-generator | haiku | PDCA 완료 보고서 생성 |
 
@@ -311,13 +315,14 @@ Plan → Design → Do → Analyze → Iterate (반복) → Report
 
 | 이벤트 | 동작 |
 |--------|------|
-| Session Start | 프로젝트 분석 (build.gradle 파싱, 레벨 감지, PDCA 상태 로드) |
-| Pre Write/Edit | Java 컨벤션 검증 (네이밍, 패키지 위치, 필수 어노테이션, 금지 패턴) |
+| Session Start | 프로젝트 분석 (build.gradle/kts 파싱, 레벨 감지, PDCA 상태 로드) |
+| Pre Write/Edit | Java 컨벤션 검증 (네이밍, 패키지, 어노테이션, 금지 패턴, N+1, @Valid, SQL Injection) |
 | Post Write/Edit | 관련 파일 생성 제안 |
-| Pre Bash | 위험 명령 경고 |
+| Pre Bash | 위험 명령 경고 (rm -rf, force push, chmod 777, curl\|bash, docker --privileged 등) |
 | Post Bash | 빌드/테스트 결과 파싱 및 에러 요약 |
 | User Prompt | 의도 감지 → Skill 자동 트리거 ("엔티티 만들어줘" → `/entity`) |
 | Stop | Loop 활성 시 종료 가로채기 → 작업 계속 |
+| Task Completed | PDCA 다음 단계 안내, Loop 상태 업데이트 |
 | Context Compaction | PDCA/Loop 상태 보존 |
 
 ## Output Styles
