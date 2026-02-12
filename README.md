@@ -28,6 +28,19 @@ claude --plugin-dir /path/to/claude-code-plugin-be
 
 ## 빠른 시작
 
+### 0. 도움말
+
+```
+/help
+```
+
+사용 가능한 전체 커맨드 목록을 카테고리별로 확인한다. 개별 커맨드의 상세 사용법은 `/{name} help`로 조회한다.
+
+```
+/crud help
+/pdca help
+```
+
 ### 1. 프로젝트 초기화
 
 Spring Boot 프로젝트 디렉토리에서 Claude Code를 실행하고 `/init`을 입력한다.
@@ -90,75 +103,87 @@ demodev-be/
 ├── lib/                       # 핵심 라이브러리 모듈
 ├── output-styles/             # 출력 스타일 (Monolith / MSA / PDCA)
 ├── scripts/                   # 훅 실행 스크립트
-├── skills/                    # 24개 슬래시 커맨드
+├── skills/                    # 25개 슬래시 커맨드
 ├── templates/                 # 코드 및 문서 템플릿
 └── demodev.config.json        # 프로젝트 설정 및 Best Practices
 ```
 
 ## Skills (슬래시 커맨드)
 
-자주 쓰는 작업을 커맨드 하나로 실행한다.
+자주 쓰는 작업을 커맨드 하나로 실행한다. 모든 커맨드는 `/{name} help`로 상세 사용법을 확인할 수 있다.
 
-### 코드 생성
+### 도움말
 
 | 커맨드 | 설명 |
 |--------|------|
-| `/crud {Domain}` | Entity, Repository, Service, Controller, DTO 일괄 생성 |
-| `/entity {Domain}` | JPA Entity 생성 (BaseEntity 상속, `create()`/`update()`) |
-| `/repository {Domain}` | Repository 생성 (default `getById()`, QueryDSL 선택) |
-| `/service {Domain}` | Service 생성 (CRUD 메서드, DRY 패턴) |
-| `/controller {Domain}` | REST Controller 생성 (POST→201, DELETE→204) |
-| `/dto {Domain}` | Request/Response DTO 생성 (`record` 필수) |
-| `/exception {Domain}` | 도메인 예외 + GlobalExceptionHandler (ProblemDetail) |
+| `/help` | 전체 커맨드 목록을 카테고리별로 조회 |
+| `/{name} help` | 개별 커맨드의 사용법, 파라미터, 옵션, 예시 조회 |
+
+### 프로젝트
+
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/init` | `/init [path]` | 프로젝트 감지 및 초기화 (구조 분석, 모던 패턴 체크) |
+
+### 도메인 CRUD
+
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/crud` | `/crud {Name} [fields]` | Entity, Repository, Service, Controller, DTO 일괄 생성 |
+| `/entity` | `/entity {Name} [fields]` | JPA Entity 생성 (BaseEntity 상속, `create()`/`update()`) |
+| `/repository` | `/repository {Name} [--querydsl]` | Repository 생성 (default `getById()`, QueryDSL 선택) |
+| `/service` | `/service {Name}` | Service 생성 (CRUD 메서드, DRY 패턴) |
+| `/controller` | `/controller {Name}` | REST Controller 생성 (POST→201, DELETE→204) |
+| `/dto` | `/dto {Name} [fields]` | Request/Response DTO 생성 (`record` 필수) |
 
 ### 설정/인프라
 
-| 커맨드 | 설명 |
-|--------|------|
-| `/init` | 프로젝트 감지 및 초기화 (구조 분석, 모던 패턴 체크) |
-| `/config {type}` | Spring 설정 클래스 생성 (JPA, Web, Cache, QueryDSL 등) |
-| `/security {type}` | Spring Security 설정 (JWT / OAuth2) |
-| `/gradle {action}` | Gradle 의존성 관리 (add, remove, check, update) |
-| `/docker` | Dockerfile + docker-compose.yml 생성 |
-| `/cache {type}` | 캐시 설정 생성 |
-| `/migration` | DB 마이그레이션 설정 |
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/exception` | `/exception {Name}` | 도메인 예외 + GlobalExceptionHandler (ProblemDetail) |
+| `/config` | `/config {type[,type2]}` | Spring 설정 클래스 생성 (jpa, web, cache, querydsl, webclient, properties) |
+| `/security` | `/security [jwt\|oauth2]` | Spring Security 설정 (JWT 기본, OAuth2 선택) |
+| `/cache` | `/cache [caffeine\|redis]` | 캐시 설정 생성 (Caffeine 기본, Redis 선택) |
+| `/gradle` | `/gradle {action} [dependency]` | Gradle 의존성 관리 (add, remove, check, update) |
+| `/docker` | `/docker` | Dockerfile + docker-compose.yml 생성 |
+| `/api-docs` | `/api-docs` | SpringDoc/Swagger API 문서화 설정 생성 |
+| `/migration` | `/migration {desc} [--type flyway\|liquibase]` | DB 마이그레이션 파일 생성 (Flyway 기본) |
 
-### 품질 관리
+### 테스트/리뷰
 
-| 커맨드 | 설명 |
-|--------|------|
-| `/test {Domain}` | 테스트 코드 생성 (unit, integration, controller) |
-| `/review` | 읽기 전용 코드 리뷰 (9개 체크리스트) |
-| `/api-docs` | API 문서 생성 |
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/test` | `/test {Name} [unit\|integration\|controller\|all]` | 테스트 코드 생성 (all 기본) |
+| `/review` | `/review [target]` | 읽기 전용 코드 리뷰 (파일경로, 도메인명, all) |
 
 ### PDCA 워크플로우
 
-| 커맨드 | 설명 |
-|--------|------|
-| `/pdca plan {feature}` | 요구사항 정의 + API/Entity 초안 |
-| `/pdca design {feature}` | DB 스키마 상세 + API 상세 + 패키지 구조 |
-| `/pdca do {feature}` | Entity → Repo → Service → Controller → DTO → Test 구현 |
-| `/pdca analyze {feature}` | 설계-구현 Gap 분석 + Match Rate 산출 |
-| `/pdca iterate {feature}` | Match Rate < 90% 시 자동 수정 반복 (최대 5회) |
-| `/pdca report {feature}` | 완료 보고서 생성 |
-| `/pdca status` | 현재 PDCA 상태 조회 |
-| `/pdca next` | 다음 단계 안내 |
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/pdca plan` | `/pdca plan {feature}` | 요구사항 정의 + API/Entity 초안 |
+| `/pdca design` | `/pdca design {feature}` | DB 스키마 상세 + API 상세 + 패키지 구조 |
+| `/pdca do` | `/pdca do {feature}` | Entity → Repo → Service → Controller → DTO → Test 구현 |
+| `/pdca analyze` | `/pdca analyze {feature}` | 설계-구현 Gap 분석 + Match Rate 산출 |
+| `/pdca iterate` | `/pdca iterate {feature}` | Match Rate < 90% 시 자동 수정 반복 (최대 5회) |
+| `/pdca report` | `/pdca report {feature}` | 완료 보고서 생성 |
+| `/pdca status` | `/pdca status` | 현재 PDCA 상태 조회 |
+| `/pdca next` | `/pdca next` | 다음 단계 안내 |
 
-### Git 운영
+### Git
 
-| 커맨드 | 설명 |
-|--------|------|
-| `/commit` | 변경사항 커밋 |
-| `/push` | 원격 푸시 |
-| `/commit-push` | 커밋 + 푸시 |
-| `/pr` | Pull Request 생성 |
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/commit` | `/commit [message]` | 변경사항을 논리적 단위로 스마트 커밋 |
+| `/commit-push` | `/commit-push [message]` | 커밋 후 원격 저장소에 푸시 |
+| `/push` | `/push` | 현재 브랜치를 원격 저장소에 푸시 |
+| `/pr` | `/pr [title]` | Pull Request 생성 (dev 브랜치 기준) |
 
-### 자율 반복
+### 워크플로우
 
-| 커맨드 | 설명 |
-|--------|------|
-| `/loop` | 자율 반복 루프 (완료 또는 max-iterations까지 반복) |
-| `/cancel-loop` | 루프 즉시 취소 |
+| 커맨드 | 사용법 | 설명 |
+|--------|--------|------|
+| `/loop` | `/loop {prompt} [--max-iterations N]` | 작업 완료까지 자동 반복 실행 |
+| `/cancel-loop` | `/cancel-loop` | 활성화된 자율 반복 루프 즉시 취소 |
 
 ## Agents (전문 에이전트)
 
@@ -282,48 +307,83 @@ Plan → Design → Do → Analyze → Iterate (반복) → Report
 
 ## 사용 예시
 
-### 1. 프로젝트 초기화
+### 도움말 확인
 
-```
-/init
-```
-
-build.gradle을 분석하여 프로젝트 정보(버전, 의존성, 패키지 구조)를 자동 감지한다.
-
-### 2. 도메인 CRUD 일괄 생성
-
-```
-/crud User
+```bash
+/help                  # 전체 커맨드 목록
+/crud help             # /crud 사용법, 파라미터, 예시
+/pdca help             # /pdca 하위 명령 목록
+/loop help             # /loop 옵션 설명
 ```
 
-User 도메인의 Entity, Repository, Service, Controller, DTO를 한 번에 생성한다.
+### 프로젝트 초기화
 
-### 3. PDCA 기반 기능 개발
-
-```
-/pdca plan 회원관리
-/pdca design 회원관리
-/pdca do 회원관리
-/pdca analyze 회원관리
-/pdca iterate 회원관리
-/pdca report 회원관리
+```bash
+/init                  # 현재 디렉토리의 Spring Boot 프로젝트 분석
+/init ./backend        # 특정 경로 지정
 ```
 
-### 4. 코드 리뷰
+### 도메인 CRUD 생성
 
+```bash
+/crud User                                          # 필드를 대화형으로 입력
+/crud User name:String, email:String, age:Integer   # 필드 직접 지정
+/entity User name:String, email:String              # Entity만 생성
+/repository User --querydsl                         # QueryDSL 포함
+/test User unit                                     # 단위 테스트만 생성
 ```
-/review
+
+### 설정/인프라
+
+```bash
+/config jpa,web,cache          # 여러 설정 동시 생성
+/security jwt                  # JWT 인증 설정
+/cache redis                   # Redis 캐시 설정
+/gradle add spring-boot-starter-validation
+/docker                        # Dockerfile + docker-compose.yml
+/migration create_users_table  # Flyway 마이그레이션
 ```
 
-9개 체크리스트(아키텍처, Entity, Repository, Service, Controller/DTO, 보안, Best Practices, DRY, 클린 코드/SRP)를 기반으로 리뷰한다.
+### PDCA 기반 기능 개발
 
-### 5. 자율 반복 루프
-
+```bash
+/pdca plan 회원관리       # 요구사항 정의 + API/Entity 초안
+/pdca design 회원관리     # DB 스키마 + API 상세 설계
+/pdca do 회원관리         # 코드 구현
+/pdca analyze 회원관리    # 설계-구현 Gap 분석
+/pdca iterate 회원관리    # Match Rate < 90% 시 자동 수정
+/pdca report 회원관리     # 완료 보고서
+/pdca status              # 전체 PDCA 상태 조회
+/pdca next                # 다음 단계 안내
 ```
+
+### 코드 리뷰
+
+```bash
+/review                # 전체 프로젝트 리뷰
+/review User           # User 도메인만 리뷰
+/review src/main/java/com/example/domain/user/  # 특정 경로
+```
+
+### 자율 반복 루프
+
+```bash
 /loop 테스트 전부 통과시켜줘
+/loop Order API 전체 구현 --max-iterations 30
+/loop 인증 시스템 구현 --completion-promise "AUTH_COMPLETE"
+/cancel-loop           # 루프 즉시 취소
 ```
 
-테스트가 모두 통과할 때까지 자동으로 수정-실행을 반복한다.
+### Git 운영
+
+```bash
+/commit                              # 논리적 그룹별 자동 분류 커밋
+/commit "feat: User 엔티티 추가"     # 메시지 직접 지정
+/commit-push                         # 커밋 + 푸시
+/push                                # 원격 푸시
+/pr                                  # PR 자동 생성
+/pr "feat: User 도메인 CRUD 구현"    # PR 제목 지정
+```
 
 ## 패키지 구조
 
