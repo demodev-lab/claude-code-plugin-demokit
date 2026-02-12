@@ -44,6 +44,31 @@
 
 ---
 
+## 품질 체크리스트
+
+### DRY 패턴 적용
+- [ ] BaseEntity 상속 (createdAt/updatedAt)
+- [ ] Entity.create() 정적 팩토리
+- [ ] Entity.update() 비즈니스 메서드
+- [ ] Repository.getById() default 메서드
+- [ ] Response.from() 정적 팩토리
+
+### Clean Code / SRP
+- [ ] 메서드 15줄 이내
+- [ ] 중첩 depth 2단계 이내
+- [ ] 매직 넘버/문자열 → 상수/Enum
+- [ ] Controller: HTTP 처리만 / Service: 비즈니스 로직만
+
+### Spring Boot 3.5 Best Practices
+- [ ] DTO → record
+- [ ] 에러 응답 → ProblemDetail (RFC 9457)
+- [ ] HTTP 클라이언트 → WebClient
+- [ ] @MockitoBean (not @MockBean)
+- [ ] @SQLRestriction (not @Where)
+- [ ] @Transactional(readOnly = true) 조회 메서드에 적용
+
+---
+
 ## 구현 로그
 
 {{#logs}}

@@ -33,6 +33,14 @@
 {{/missingItems}}
 {{/gaps}}
 
+### Gap 우선순위
+
+| 우선순위 | 카테고리 | 설계 항목 | 구현 상태 | 자동 수정 |
+|----------|----------|----------|----------|----------|
+{{#prioritizedGaps}}
+| {{priority}} | {{category}} | {{designItem}} | {{implStatus}} | {{autoFixable}} |
+{{/prioritizedGaps}}
+
 ---
 
 ## 권장 조치
