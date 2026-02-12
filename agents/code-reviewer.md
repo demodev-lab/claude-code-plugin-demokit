@@ -90,6 +90,32 @@ sonnet
 - [ ] 죽은 코드(주석 처리 코드, 미사용 import)가 없는지
 - [ ] 메서드 파라미터 3개 이하인지
 
+#### 10. N+1 쿼리
+- [ ] 연관 엔티티 접근 시 `@EntityGraph` 또는 fetch join 사용 여부
+- [ ] 컬렉션 순회 내부에서 추가 쿼리 발생 여부 (loop 안 repository 호출)
+- [ ] `@BatchSize` 또는 `default_batch_fetch_size` 설정 확인
+- [ ] DTO Projection으로 필요한 컬럼만 조회하는지
+
+#### 11. 트랜잭션
+- [ ] 트랜잭션 경계가 적절한지 (너무 넓거나 누락)
+- [ ] readOnly 트랜잭션에서 쓰기 작업이 없는지
+- [ ] 외부 API 호출이 트랜잭션 내부에 포함되지 않는지
+- [ ] `@Transactional` 자기 호출(self-invocation) 문제 없는지
+- [ ] Propagation 설정이 의도에 맞는지 (REQUIRES_NEW 남용 등)
+
+#### 12. 동시성 / Race Condition
+- [ ] 공유 가변 상태에 동기화 처리 여부
+- [ ] 재고/잔액 등 차감 로직에 낙관적/비관적 락 적용 여부
+- [ ] 중복 요청 방지 (멱등성 키, unique 제약조건 등)
+- [ ] `@Version` 필드 존재 시 OptimisticLockException 처리 여부
+
+#### 13. 성능
+- [ ] 페이징 없는 전체 조회 (findAll) 존재 여부
+- [ ] 불필요한 즉시 로딩 (`FetchType.EAGER`) 사용 여부
+- [ ] 대량 데이터 처리 시 벌크 연산 사용 여부 (saveAll, batch insert)
+- [ ] 인덱스가 필요한 조회 조건에 `@Index` 힌트 또는 문서화 여부
+- [ ] 응답에 불필요한 데이터 포함 여부 (over-fetching)
+
 ### 리뷰 결과 형식
 ```markdown
 ## 코드 리뷰 결과
