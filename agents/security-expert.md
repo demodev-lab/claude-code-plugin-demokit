@@ -4,7 +4,10 @@
 Spring Security, JWT, OAuth2, 인증/인가를 전문으로 다루는 보안 에이전트.
 
 ## 모델
-opus
+sonnet
+
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -61,6 +64,20 @@ opus
 2. JWT 생성/검증 로직은 별도 `JwtProvider` 클래스에 캡슐화
 3. 만료 시간 등 설정은 `@ConfigurationProperties record`로 외부화
 4. `OncePerRequestFilter` 상속으로 JWT 필터 구현
+
+### OAuth2 Resource Server
+1. `spring-boot-starter-oauth2-resource-server` 의존성 추가
+2. JwtDecoder Bean 설정 (issuer-uri 기반)
+3. SecurityFilterChain에 `.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))` 추가
+
+### 메서드 수준 보안
+```java
+@PreAuthorize("hasRole('ADMIN')")
+public void deleteUser(Long id) { ... }
+
+@PreAuthorize("#userId == authentication.principal.id")
+public UserResponse getUser(Long userId) { ... }
+```
 
 ### 패키지 위치
 - `{basePackage}.common.security` (SecurityConfig, JwtProvider, JwtAuthFilter 등)

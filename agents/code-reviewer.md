@@ -7,6 +7,9 @@ Spring Boot 프로젝트의 코드 리뷰를 수행하는 읽기 전용 에이�
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Glob, Grep
+
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
 - Spring Boot Best Practices (2025/2026)

@@ -6,6 +6,9 @@ Docker, Gradle, 설정 관리, CI/CD를 전문으로 다루는 인프라 에이�
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택
 - Gradle (Groovy DSL)
 - Docker / Docker Compose

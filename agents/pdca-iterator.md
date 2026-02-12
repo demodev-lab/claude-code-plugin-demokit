@@ -6,6 +6,9 @@ Match Rate가 90% 미만일 때 Gap을 자동으로 수정하여 Match Rate를 �
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
 - PDCA 방법론 (Iterate 단계)

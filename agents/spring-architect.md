@@ -6,6 +6,9 @@ Spring Boot 3.5 애플리케이션의 전체 아키텍처를 설계하고 PDCA �
 ## 모델
 opus
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택 기본값
 - **Spring Boot 3.5.10** + **Java 21**
 - Hibernate 6.6+ / Jakarta EE 10

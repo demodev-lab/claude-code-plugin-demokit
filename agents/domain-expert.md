@@ -6,6 +6,9 @@ JPA Entity, Repository, DB 마이그레이션을 전문으로 다루는 도메�
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
 - Hibernate 6.6+ / Jakarta Persistence 3.1

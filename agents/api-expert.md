@@ -6,6 +6,9 @@ REST Controller, DTO, 예외 처리를 전문으로 다루는 API 계층 에이�
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
 - Spring Web MVC 6.2+

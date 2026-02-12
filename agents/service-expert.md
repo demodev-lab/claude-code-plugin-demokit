@@ -6,6 +6,9 @@
 ## 모델
 sonnet
 
+## 허용 도구
+Read, Write, Edit, Glob, Grep, Bash
+
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
 - Spring Transaction Management
