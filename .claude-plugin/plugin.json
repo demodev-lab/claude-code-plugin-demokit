@@ -2,55 +2,16 @@
   "name": "demodev-be",
   "version": "1.0.0",
   "description": "Spring Boot 백엔드 특화 Claude Code 플러그인 - PDCA 방법론 기반 체계적 개발 워크플로우",
-  "author": "demodev",
-  "license": "MIT",
-  "engine": "claude-code >= 1.0.0",
-  "entry": {
-    "hooks": "hooks/hooks.json",
-    "config": "demodev.config.json"
+  "author": {
+    "name": "demodev"
   },
-  "agents": [
-    "agents/spring-architect.md",
-    "agents/domain-expert.md",
-    "agents/api-expert.md",
-    "agents/service-expert.md",
-    "agents/security-expert.md",
-    "agents/infra-expert.md",
-    "agents/test-expert.md",
-    "agents/code-reviewer.md",
-    "agents/gap-detector.md",
-    "agents/pdca-iterator.md",
-    "agents/report-generator.md"
-  ],
-  "skills": [
-    "skills/init",
-    "skills/crud",
-    "skills/entity",
-    "skills/repository",
-    "skills/service",
-    "skills/controller",
-    "skills/dto",
-    "skills/exception",
-    "skills/security",
-    "skills/config",
-    "skills/migration",
-    "skills/docker",
-    "skills/cache",
-    "skills/test",
-    "skills/api-docs",
-    "skills/review",
-    "skills/gradle",
-    "skills/pdca",
-    "skills/loop",
-    "skills/cancel-loop",
-    "skills/commit",
-    "skills/push",
-    "skills/commit-push",
-    "skills/pr"
-  ],
-  "outputStyles": [
-    "output-styles/demodev-monolith.md",
-    "output-styles/demodev-msa.md",
-    "output-styles/demodev-pdca-guide.md"
+  "license": "MIT",
+  "repository": "https://github.com/demodev-lab/claude-code-plugin-be",
+  "keywords": [
+    "spring-boot",
+    "java",
+    "backend",
+    "pdca",
+    "code-generation"
   ]
 }
