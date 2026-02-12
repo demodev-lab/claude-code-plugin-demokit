@@ -2,6 +2,77 @@
 
 Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 체계적인 개발 워크플로우를 제공한다.
 
+## 설치
+
+### Marketplace에서 설치
+
+Claude Code 실행 후 슬래시 커맨드로 설치한다.
+
+```
+/plugin install demodev-be@claude-code-marketplace
+```
+
+### 로컬 설치 (개발/테스트)
+
+플러그인 저장소를 클론한 뒤 `--plugin-dir` 옵션으로 직접 로드한다.
+
+```bash
+git clone https://github.com/demodev-lab/claude-code-plugin-be.git
+cc --plugin-dir /path/to/claude-code-plugin-be
+```
+
+### 요구사항
+
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) >= 1.0.0
+- Node.js (hooks/scripts 실행용)
+
+## 빠른 시작
+
+### 1. 프로젝트 초기화
+
+Spring Boot 프로젝트 디렉토리에서 Claude Code를 실행하고 `/init`을 입력한다.
+
+```
+/init
+```
+
+`build.gradle`을 분석하여 프로젝트 정보(Spring Boot 버전, Java 버전, 의존성, 패키지 구조)를 자동 감지한다.
+
+### 2. 도메인 CRUD 일괄 생성
+
+```
+/crud User
+```
+
+User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 따라 한 번에 생성한다.
+
+### 3. 코드 리뷰
+
+```
+/review
+```
+
+9개 체크리스트(아키텍처, Entity, Repository, Service, Controller/DTO, 보안, Best Practices, DRY, 클린 코드/SRP) 기반으로 리뷰한다.
+
+### 4. PDCA 기반 기능 개발
+
+```
+/pdca plan 회원관리
+/pdca design 회원관리
+/pdca do 회원관리
+/pdca analyze 회원관리
+```
+
+설계 → 구현 → Gap 분석 → 자동 수정까지 체계적으로 진행한다.
+
+### 5. 자율 반복 루프
+
+```
+/loop 테스트 전부 통과시켜줘
+```
+
+테스트가 모두 통과할 때까지 자동으로 수정-실행을 반복한다.
+
 ## 개요
 
 - **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy DSL)
