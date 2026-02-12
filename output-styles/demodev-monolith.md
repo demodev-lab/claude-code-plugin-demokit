@@ -281,9 +281,54 @@ public record UserSearchCondition(String name, String email) {}
 // src/main/java/com/example/demo/controller/UserController.java
 ```
 
+### @Transactional 관리 전략
+
+**기본 원칙**: Service 레이어에서만 사용, Controller/Repository 금지
+
+| 규칙 | 설명 |
+|------|------|
+| Service 전용 | `@Transactional`은 Service 레이어에서만 선언 |
+| readOnly 분리 | 조회 메서드는 `@Transactional(readOnly = true)` 필수 |
+| Controller 금지 | Controller에 `@Transactional` 선언 금지 |
+| 범위 최소화 | 트랜잭션 범위를 최소한으로 유지 |
+
+**패턴:**
+```java
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+
+    // 조회 → readOnly = true (Dirty Checking 비활성화, DB replica 활용)
+    @Transactional(readOnly = true)
+    public UserResponse getUser(Long id) {
+        var user = userRepository.getById(id);
+        return UserResponse.from(user);
+    }
+
+    // 변경 → 기본 @Transactional
+    @Transactional
+    public UserResponse createUser(CreateUserRequest request) {
+        var user = User.create(request.name(), request.email());
+        userRepository.save(user);
+        return UserResponse.from(user);
+    }
+}
+```
+
+**readOnly = true 효과:**
+- Hibernate Dirty Checking 비활성화 → 성능 향상
+- DB replica(읽기 전용 DB) 자동 라우팅 지원
+- 의도하지 않은 데이터 변경 방지
+
+**금지 패턴:**
+- ❌ Controller에 `@Transactional` → 트랜잭션 범위 과도
+- ❌ `@Transactional` 없이 여러 Repository 호출 → 데이터 정합성 위험
+- ❌ 조회 메서드에 `readOnly = true` 누락 → 불필요한 Dirty Checking
+
 ### 제안 패턴
 - 연관관계: 같은 DB이므로 JPA 연관관계 매핑 적극 활용
-- 트랜잭션: `@Transactional`로 서비스 단위 트랜잭션
+- 트랜잭션: `@Transactional`로 서비스 단위 트랜잭션 (조회는 readOnly)
 - 캐시: Spring Cache Abstraction + 로컬 캐시 (Caffeine) 우선
 - 테스트: `@SpringBootTest` + `@DataJpaTest` + `@WebMvcTest` + `@AutoConfigureMockMvc`
 
