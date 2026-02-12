@@ -8,17 +8,20 @@ description: 이 스킬은 사용자가 "Security", "security", "JWT", "OAuth2",
 ## 실행 절차
 
 ### JWT 인증 (기본)
-1. **SecurityConfig**: `common/security/SecurityConfig.java`
-   - SecurityFilterChain Bean (Lambda DSL)
-   - Stateless 세션, CSRF 비활성화
-2. **JwtProvider**: `common/security/JwtProvider.java`
-   - 토큰 생성/검증/파싱
-3. **JwtAuthFilter**: `common/security/JwtAuthFilter.java`
-   - OncePerRequestFilter 상속
-4. **JwtProperties**: `common/security/JwtProperties.java`
-   - `@ConfigurationProperties record` (secret, expiration 등)
-5. **AuthController**: `domain/auth/controller/AuthController.java` (선택)
-6. **의존성 안내**: `spring-boot-starter-security`, `jjwt`
+
+**Phase 1 — 병렬 파일 생성**
+다음 Task들을 **한 메시지에서 동시에 호출**한다:
+
+| Task # | 파일 | 위치 |
+|--------|------|------|
+| Task 1 | SecurityConfig | `common/security/SecurityConfig.java` |
+| Task 2 | JwtProvider | `common/security/JwtProvider.java` |
+| Task 3 | JwtAuthFilter | `common/security/JwtAuthFilter.java` |
+| Task 4 | JwtProperties | `common/security/JwtProperties.java` |
+| Task 5 | AuthController (선택) | `domain/auth/controller/AuthController.java` |
+
+**Phase 2 — 의존성 안내** (순차)
+- `spring-boot-starter-security`, `jjwt` 의존성 안내
 
 ### OAuth2 Resource Server
 1. SecurityConfig + OAuth2 Resource Server 설정

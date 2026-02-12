@@ -9,25 +9,19 @@ description: 이 스킬은 사용자가 "프로젝트 초기화", "init", "프�
 
 ## 실행 절차
 
-### 1. 프로젝트 감지
-- `build.gradle` 파일 탐색 (현재 디렉토리부터 상위로)
-- `build.gradle` 파싱: Spring Boot 버전, Java 버전, 의존성 목록 추출
-- 프로젝트 레벨 판별 (Monolith / MSA)
+### 1. 프로젝트 감지 + 구조 분석 (병렬)
+다음 Task들을 **한 메시지에서 동시에 호출**한다:
+- Task 1: `build.gradle` 파싱 — Spring Boot 버전, Java 버전, 의존성 목록 추출
+- Task 2: `@SpringBootApplication` 클래스에서 base package 감지 + 도메인 디렉토리 탐색
+- Task 3: 설정 파일 확인 (application.yml / application.properties)
 
-### 2. 구조 분석
-- `@SpringBootApplication` 클래스에서 base package 감지
-- 존재하는 레이어 디렉토리 확인 (domain, repository, service, controller, dto, config, exception, security)
-- 설정 파일 확인 (application.yml / application.properties)
-- 기존 도메인 목록 감지
+### 2. 모던 패턴 체크 (병렬)
+다음 Task들을 **한 메시지에서 동시에 호출**한다:
+- Task 1: Virtual Threads + ProblemDetail + open-in-view 설정 확인
+- Task 2: spring-boot-starter-validation 의존성 + record DTO 사용 여부 확인
+- Task 3: 프로젝트 레벨 판별 (Monolith / MSA)
 
-### 3. 모던 패턴 체크
-- Virtual Threads 활성화 여부 확인
-- ProblemDetail 활성화 여부 확인 (`spring.mvc.problemdetails.enabled`)
-- `spring.jpa.open-in-view` 설정 확인 (false 권장)
-- `spring-boot-starter-validation` 의존성 확인
-- record DTO 사용 여부 확인
-
-### 4. 결과 출력
+### 3. 결과 출력 (순차)
 아래 형식으로 프로젝트 정보를 요약:
 
 ```

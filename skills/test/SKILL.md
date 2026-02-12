@@ -21,7 +21,10 @@ description: 이 스킬은 사용자가 "테스트 생성", "test", "테스트 �
 - ProblemDetail 검증 포함
 
 ### all (기본)
-- 위 3개 모두 생성
+다음 3개 Task를 **한 메시지에서 동시에 호출**하여 병렬 생성:
+- Task 1 (test-expert): Service 단위 테스트 — {Name}ServiceTest.java
+- Task 2 (test-expert): Repository 통합 테스트 — {Name}RepositoryTest.java
+- Task 3 (test-expert): Controller 슬라이스 테스트 — {Name}ControllerTest.java
 
 ## 필수 패턴
 - `@MockitoBean` 사용 (`@MockBean` 금지, Spring Boot 3.4+)

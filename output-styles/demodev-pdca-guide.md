@@ -65,12 +65,17 @@
 ## 🔨 Do: {feature}
 
 ### 구현 순서
+Phase 1 (순차):
 1. ☐ Entity + BaseEntity 상속
 2. ☐ Repository + Custom (QueryDSL)
+
+Phase 2 (병렬 — 한 메시지에서 동시에 Task 호출):
 3. ☐ Service + 트랜잭션 경계
 4. ☐ DTO (record) + Response.from()
 5. ☐ Controller + @Valid
 6. ☐ 예외 처리 (ProblemDetail)
+
+Phase 3 (순차):
 7. ☐ 테스트
 
 ### 진행 상황

@@ -27,10 +27,12 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 **DB 스키마 상세 + API 상세 + 패키지 구조**
 
 1. Plan 문서 로드 및 확인
-2. spring-architect + domain-expert + api-expert 에이전트 협업
-3. Design 문서 생성 (`.pdca/{feature}/design.md`):
-   - DB 테이블 스키마 (컬럼, 타입, 제약조건, 인덱스)
-   - API 상세 스펙 (Request Body, Response Body, 상태 코드)
+2. **병렬 설계** — 다음 Task들을 한 메시지에서 동시에 호출:
+   - Task 1 (domain-expert): DB 스키마 상세 설계 (테이블, 컬럼, 제약조건, 인덱스)
+   - Task 2 (api-expert): API 상세 스펙 (Request/Response Body, 상태 코드)
+3. spring-architect가 결과를 통합하여 Design 문서 생성 (`.pdca/{feature}/design.md`):
+   - DB 테이블 스키마
+   - API 상세 스펙
    - Entity 관계도
    - 패키지별 클래스 목록
    - 구현 순서
@@ -40,11 +42,12 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 **Entity → Repo → Service → Controller → DTO → Test 구현**
 
 1. Design 문서 로드
-2. 구현 순서대로 코드 생성:
-   - Entity + Repository (domain-expert)
-   - Service (service-expert)
-   - Controller + DTO (api-expert)
-   - Test (test-expert)
+2. Phase별 병렬 구현:
+   **Phase 1 (순차)**: Entity + Repository (domain-expert)
+   **Phase 2 (병렬)** — 한 메시지에서 동시에 호출:
+   - Task 1 (service-expert): Service
+   - Task 2 (api-expert): Controller + DTO
+   **Phase 3 (순차)**: Test (test-expert)
 3. 각 단계 완료 시 상태 업데이트
 4. 상태 업데이트: do → completed
 
@@ -52,8 +55,11 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 **설계 vs 구현 Gap 분석**
 
 1. Design 문서와 실제 구현 코드 비교
-2. gap-detector 에이전트 호출
-3. Match Rate 산출:
+2. **병렬 Gap 분석** — 다음 Task들을 한 메시지에서 동시에 호출:
+   - Task 1: API 엔드포인트 + DTO 필드 일치율 분석
+   - Task 2: DB 스키마 + Entity 일치율 분석
+   - Task 3: 비즈니스 규칙 + 에러 처리 일치율 분석
+3. 결과 통합하여 Match Rate 산출:
    - API 엔드포인트 (30%): 설계된 엔드포인트가 모두 구현되었는지
    - DB 스키마 (25%): 설계된 테이블/컬럼이 Entity에 반영되었는지
    - DTO 필드 (15%): 설계된 Request/Response 필드가 DTO에 있는지

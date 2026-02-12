@@ -19,58 +19,34 @@ description: 이 스킬은 사용자가 "CRUD 만들어줘", "crud 생성", "도
 - fields가 없으면 사용자에게 필드 입력 요청
 - 필드별 타입 → JPA 컬럼 타입 매핑
 
-### 3. 파일 생성 순서
-아래 순서로 6개 파일을 생성:
+### 3. 파일 생성 (병렬 전략)
 
-모든 파일은 `domain/{domainName}/` 하위에 레이어별 패키지로 생성:
+**Phase 1 — 기반 생성 (순차)**
+BaseEntity, GlobalExceptionHandler가 없으면 먼저 생성한다.
 
-1. **Entity** (`domain/{domainName}/entity/{DomainName}.java`)
-   - BaseEntity 상속 (createdAt, updatedAt)
-   - @Entity, @Getter, @NoArgsConstructor(access = PROTECTED)
-   - 필드별 @Column 매핑
-   - `@Builder` private 생성자에 적용
+**Phase 2 — 독립 레이어 병렬 생성**
+다음 작업을 Task 도구로 **한 메시지에서 동시에 호출**한다:
 
-2. **Repository** (`domain/{domainName}/repository/{DomainName}Repository.java`)
-   - JpaRepository<{DomainName}, Long> 상속
-   - `@Repository` 어노테이션 불필요
-   - default 메서드로 `getById()` 패턴 제공
-   - Interface-based Projection 주석으로 가이드
+| Task # | 담당 | 생성 파일 |
+|--------|------|----------|
+| Task 1 | domain-expert | Entity (`domain/{domainName}/entity/{DomainName}.java`), Repository (`domain/{domainName}/repository/{DomainName}Repository.java`) |
+| Task 2 | api-expert | CreateRequest DTO (`domain/{domainName}/dto/Create{DomainName}Request.java`), UpdateRequest DTO (`domain/{domainName}/dto/Update{DomainName}Request.java`), Response DTO (`domain/{domainName}/dto/{DomainName}Response.java`) |
+| Task 3 | (선택) QueryDSL | CustomRepository, Impl, SearchCondition, QuerydslConfig |
 
-3. **Service** (`domain/{domainName}/service/{DomainName}Service.java`)
-   - @Service, @RequiredArgsConstructor
-   - 조회 메서드에 `@Transactional(readOnly = true)`
-   - 변경 메서드에 `@Transactional`
-   - CRUD: create, findById, findAll(Pageable), update, delete
-   - record DTO 사용
+각 파일의 상세 규칙:
 
-4. **Controller** (`domain/{domainName}/controller/{DomainName}Controller.java`)
-   - @RestController, @RequestMapping("/api/v1/{domains}")
-   - POST → 201 Created + Location header
-   - GET → 200 (직접 반환, ResponseEntity 미사용)
-   - PUT → 200 (직접 반환)
-   - DELETE → 204 No Content
-   - `@Valid` record DTO 검증
+- **Entity**: BaseEntity 상속, @Entity, @Getter, @NoArgsConstructor(access = PROTECTED), @Builder private 생성자
+- **Repository**: JpaRepository 상속, default 메서드 `getById()` 패턴
+- **Request DTO**: 반드시 Java `record`, Bean Validation 어노테이션 직접 선언
+- **Response DTO**: 반드시 Java `record`, `from()` 정적 메서드
 
-5. **Request DTO** (`domain/{domainName}/dto/Create{DomainName}Request.java`, `Update{DomainName}Request.java`)
-   - **반드시 Java `record`** 사용
-   - Bean Validation 어노테이션 직접 선언
-   ```java
-   public record CreateUserRequest(
-       @NotBlank String name,
-       @Email @NotBlank String email
-   ) {}
-   ```
+**Phase 3 — 의존 레이어 병렬 생성**
+Phase 2 완료 후, 다음 작업을 **한 메시지에서 동시에 호출**한다:
 
-6. **Response DTO** (`domain/{domainName}/dto/{DomainName}Response.java`)
-   - **반드시 Java `record`** 사용
-   - Entity → Response 변환 정적 메서드 `from()`
-   ```java
-   public record UserResponse(Long id, String name, String email, LocalDateTime createdAt) {
-       public static UserResponse from(User user) {
-           return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getCreatedAt());
-       }
-   }
-   ```
+| Task # | 담당 | 생성 파일 |
+|--------|------|----------|
+| Task 1 | service-expert | Service (`domain/{domainName}/service/{DomainName}Service.java`) — @Service, @RequiredArgsConstructor, @Transactional |
+| Task 2 | api-expert | Controller (`domain/{domainName}/controller/{DomainName}Controller.java`) — @RestController, REST 상태코드 매핑, @Valid |
 
 ### 4. QueryDSL Custom Repository (선택)
 복잡한 검색/동적 쿼리가 필요한 경우 함께 생성:

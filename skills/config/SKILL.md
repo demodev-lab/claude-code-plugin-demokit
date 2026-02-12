@@ -15,7 +15,8 @@ description: 이 스킬은 사용자가 "설정", "config", "JPA 설정", "Web �
    - `querydsl`: QuerydslConfig (JPAQueryFactory Bean)
    - `webclient`: WebClientConfig (Reactor Netty timeout)
    - `properties`: `@ConfigurationProperties record`
-3. **application.yml 설정 안내** 함께 제공
+3. **병렬 생성**: 여러 설정을 동시에 요청한 경우 (예: `/config jpa,web,cache`), 각 설정 파일을 Task 도구로 **한 메시지에서 동시에 호출**하여 병렬 생성한다.
+4. **application.yml 설정 안내** 함께 제공
 
 ## 관련 Agent
 - infra-expert (Phase 3)
