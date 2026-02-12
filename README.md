@@ -4,12 +4,22 @@ Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 
 
 ## 설치
 
-플러그인 저장소를 클론한 뒤 `--plugin-dir` 옵션으로 로드한다.
+### 1. 플러그인 저장소 클론
 
 ```bash
 git clone https://github.com/demodev-lab/claude-code-plugin-be.git
+```
+
+### 2. Spring Boot 프로젝트에서 플러그인 로드
+
+**Spring Boot 프로젝트 디렉토리**에서 `--plugin-dir`로 플러그인 경로를 지정하여 실행한다.
+
+```bash
+cd /path/to/my-spring-boot-project
 claude --plugin-dir /path/to/claude-code-plugin-be
 ```
+
+> **주의**: 플러그인 디렉토리가 아닌, 작업 대상 Spring Boot 프로젝트 디렉토리에서 실행해야 한다.
 
 ### 요구사항
 
