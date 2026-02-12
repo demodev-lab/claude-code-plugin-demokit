@@ -13,7 +13,14 @@ async function main() {
     input += chunk;
   }
 
-  const hookData = JSON.parse(input);
+  let hookData = {};
+  try {
+    if (input && input.trim()) hookData = JSON.parse(input);
+  } catch (err) {
+    process.stderr.write(`[demokit] stdin 파싱 실패: ${err.message}\n`);
+    console.log(JSON.stringify({}));
+    return;
+  }
   const command = hookData.tool_input?.command || '';
   const output = hookData.tool_result?.stdout || hookData.tool_result?.output || '';
   const exitCode = hookData.tool_result?.exit_code ?? hookData.tool_result?.exitCode ?? 0;

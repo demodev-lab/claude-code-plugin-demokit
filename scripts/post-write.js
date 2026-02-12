@@ -14,7 +14,14 @@ async function main() {
     input += chunk;
   }
 
-  const hookData = JSON.parse(input);
+  let hookData = {};
+  try {
+    if (input && input.trim()) hookData = JSON.parse(input);
+  } catch (err) {
+    process.stderr.write(`[demokit] stdin 파싱 실패: ${err.message}\n`);
+    console.log(JSON.stringify({}));
+    return;
+  }
   const filePath = hookData.tool_input?.file_path || hookData.tool_input?.filePath || '';
 
   if (!filePath.endsWith('.java')) {
@@ -49,7 +56,7 @@ async function main() {
     if (missing.length > 0) {
       suggestions.push(`[제안] ${domainName} Entity 생성됨. 관련 파일 생성을 권장합니다:`);
       missing.forEach(type => {
-        suggestions.push(`  - /$ {type} ${capitalize(domainName)}`);
+        suggestions.push(`  - /${type} ${capitalize(domainName)}`);
       });
       suggestions.push(`  또는 /crud ${capitalize(domainName)} 으로 일괄 생성`);
     }
