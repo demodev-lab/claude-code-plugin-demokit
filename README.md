@@ -4,21 +4,11 @@ Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 
 
 ## 설치
 
-### Marketplace에서 설치
-
-Claude Code 실행 후 슬래시 커맨드로 설치한다.
-
-```
-/plugin install demodev-be@claude-code-marketplace
-```
-
-### 로컬 설치 (개발/테스트)
-
-플러그인 저장소를 클론한 뒤 `--plugin-dir` 옵션으로 직접 로드한다.
+플러그인 저장소를 클론한 뒤 `--plugin-dir` 옵션으로 로드한다.
 
 ```bash
 git clone https://github.com/demodev-lab/claude-code-plugin-be.git
-cc --plugin-dir /path/to/claude-code-plugin-be
+claude --plugin-dir /path/to/claude-code-plugin-be
 ```
 
 ### 요구사항
