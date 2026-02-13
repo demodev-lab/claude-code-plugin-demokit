@@ -45,7 +45,9 @@ async function main() {
   // Entity 생성 시 관련 파일 제안
   if (layerType === 'entity') {
     const pascalName = capitalize(domainName);
-    const related = fileUtil.relatedFiles(pascalName, getDomainBasePath(filePath, domainName));
+    const basePath = getDomainBasePath(filePath, domainName);
+    if (!basePath) return; // 도메인 경로 탐지 실패 시 제안 스킵
+    const related = fileUtil.relatedFiles(pascalName, basePath);
     const missing = [];
 
     // relatedFiles 키 → 실제 스킬 커맨드 매핑
