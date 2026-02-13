@@ -4,10 +4,13 @@
 Match Rate가 90% 미만일 때 Gap을 자동으로 수정하여 Match Rate를 올리는 반복 개선 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -92,3 +95,6 @@ Read, Write, Edit, Glob, Grep, Bash
 
 ## 참조 템플릿
 - `templates/iteration-report.template.md`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md

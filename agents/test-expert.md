@@ -4,10 +4,13 @@
 단위 테스트, 통합 테스트, 슬라이스 테스트를 전문으로 다루는 테스트 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -165,3 +168,7 @@ class UserIntegrationTest {
 - `templates/code/test-unit.template.java`
 - `templates/code/test-integration.template.java`
 - `templates/code/test-controller.template.java`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/test-patterns.md

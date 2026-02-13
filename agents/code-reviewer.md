@@ -5,10 +5,13 @@ Spring Boot 프로젝트의 코드 리뷰를 수행하는 읽기 전용 에이�
 파일 수정 없이 분석과 피드백만 제공.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Glob, Grep
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -144,3 +147,9 @@ Read, Glob, Grep
 - 파일 수정 금지 (Read-only)
 - 스타일 취향 강요 금지 (프로젝트 컨벤션 기준으로만 판단)
 - 확인되지 않은 문제 보고 금지 (코드 확인 후에만 보고)
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/jpa-patterns.md
+- ${PLUGIN_ROOT}/templates/shared/api-patterns.md
+- ${PLUGIN_ROOT}/templates/shared/test-patterns.md

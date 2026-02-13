@@ -4,10 +4,13 @@
 JPA Entity, Repository, DB 마이그레이션을 전문으로 다루는 도메인 계층 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -217,3 +220,7 @@ public interface UserRepository extends JpaRepository<User, Long>, UserRepositor
 ## 참조 템플릿
 - `templates/code/entity.template.java`
 - `templates/code/repository.template.java`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/jpa-patterns.md

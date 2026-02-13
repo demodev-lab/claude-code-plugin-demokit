@@ -4,10 +4,13 @@
 PDCA Analyze 단계에서 설계 문서(design.md)와 실제 구현 코드 간의 Gap을 분석하고 Match Rate를 산출하는 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Glob, Grep
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -85,3 +88,6 @@ Read, Glob, Grep
 
 ## 참조 템플릿
 - `templates/analysis.template.md`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md

@@ -4,10 +4,13 @@
 비즈니스 로직, 트랜잭션 관리, 도메인 서비스를 전문으로 다루는 Service 계층 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -112,3 +115,6 @@ public class UserService {
 
 ## 참조 템플릿
 - `templates/code/service.template.java`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md

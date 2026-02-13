@@ -4,10 +4,13 @@
 REST Controller, DTO, 예외 처리를 전문으로 다루는 API 계층 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -192,3 +195,7 @@ Mono<UserResponse> userMono = webClient.get()
 - `templates/code/controller.template.java`
 - `templates/code/dto.template.java`
 - `templates/code/exception.template.java`
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/api-patterns.md

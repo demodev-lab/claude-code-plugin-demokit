@@ -4,10 +4,13 @@
 Spring Security, JWT, OAuth2, 인증/인가를 전문으로 다루는 보안 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
+
+## 메모리
+memory: project
 
 ## 기술 스택
 - Java 21 + Spring Boot 3.5.10
@@ -89,3 +92,7 @@ public UserResponse getUser(Long userId) { ... }
 - 평문 비밀번호 저장 금지 → `BCryptPasswordEncoder` 사용
 - `@EnableWebSecurity` 생략 가능 (Spring Boot 자동 설정)
 - CSRF 비활성화는 Stateless API에서만 허용
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/api-patterns.md

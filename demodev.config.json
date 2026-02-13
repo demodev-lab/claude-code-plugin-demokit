@@ -1,4 +1,37 @@
 {
+  "permissions": {
+    "Bash(rm -rf /*)": "deny",
+    "Bash(rm -rf \\*)": "deny",
+    "Bash(git push --force*)": "deny",
+    "Bash(git push -f*)": "deny",
+    "Bash(drop table*)": "deny",
+    "Bash(drop database*)": "deny",
+    "Bash(truncate table*)": "deny",
+    "Bash(git reset --hard*)": "ask",
+    "Bash(git clean -fd*)": "ask",
+    "Bash(chmod 777*)": "ask",
+    "Write(**/.env*)": "ask",
+    "Write(**/*secret*)": "ask",
+    "Write(**/*credential*)": "ask",
+    "Edit(**/.env*)": "ask",
+    "Edit(**/build.gradle)": "ask",
+    "Edit(**/application*.yml)": "ask",
+    "Edit(**/application*.properties)": "ask"
+  },
+  "taskClassification": {
+    "thresholds": {
+      "quickFix": 50,
+      "minorChange": 200,
+      "feature": 500,
+      "majorFeature": 1000
+    },
+    "labels": {
+      "quickFix": "Quick Fix",
+      "minorChange": "Minor Change",
+      "feature": "Feature (PDCA 권장)",
+      "majorFeature": "Major Feature (PDCA 필수)"
+    }
+  },
   "project": {
     "type": "spring-boot",
     "language": "java",
@@ -190,16 +223,16 @@
       "properties": "infra-expert"
     },
     "modelAssignment": {
-      "domain-expert": "sonnet",
-      "service-expert": "sonnet",
-      "api-expert": "sonnet",
-      "security-expert": "sonnet",
+      "domain-expert": "opus",
+      "service-expert": "opus",
+      "api-expert": "opus",
+      "security-expert": "opus",
       "infra-expert": "sonnet",
-      "test-expert": "sonnet",
-      "code-reviewer": "sonnet",
+      "test-expert": "opus",
+      "code-reviewer": "opus",
       "spring-architect": "opus",
-      "gap-detector": "sonnet",
-      "pdca-iterator": "sonnet",
+      "gap-detector": "opus",
+      "pdca-iterator": "opus",
       "report-generator": "haiku"
     }
   },
@@ -225,5 +258,25 @@
       "MSA": "demodev-msa"
     },
     "pdcaGuide": "demodev-pdca-guide"
+  },
+  "team": {
+    "enabled": true,
+    "ctoAgent": "spring-architect",
+    "maxTeammates": { "Monolith": 3, "MSA": 5 },
+    "orchestrationPatterns": ["leader", "council", "swarm"],
+    "phaseTeams": {
+      "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
+      "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
+      "do": { "lead": null, "members": ["domain-expert", "service-expert", "api-expert"], "pattern": "swarm" },
+      "analyze": { "lead": null, "members": ["gap-detector", "code-reviewer", "test-expert"], "pattern": "council" },
+      "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
+      "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
+    }
+  },
+  "contextEngineering": {
+    "enabled": true,
+    "cacheTtl": 30000,
+    "maxImportDepth": 5,
+    "sharedPatterns": ["spring-conventions.md", "jpa-patterns.md", "api-patterns.md", "test-patterns.md"]
   }
 }

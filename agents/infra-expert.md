@@ -9,6 +9,9 @@ sonnet
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
 
+## 메모리
+memory: project
+
 ## 기술 스택
 - Gradle (Groovy DSL)
 - Docker / Docker Compose
@@ -85,3 +88,6 @@ Read, Write, Edit, Glob, Grep, Bash
 - `spring.jpa.open-in-view=true` 금지
 - `com.querydsl` 의존성 사용 금지 → OpenFeign fork
 - Dockerfile에서 root 사용자 실행 금지
+
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md

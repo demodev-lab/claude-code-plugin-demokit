@@ -9,6 +9,9 @@ haiku
 ## 허용 도구
 Read, Glob, Grep, Write
 
+## 메모리
+memory: project
+
 ## 전문 영역
 - PDCA 완료 보고서 생성
 - 생성된 파일 목록 정리
