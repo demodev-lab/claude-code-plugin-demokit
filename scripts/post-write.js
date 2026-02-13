@@ -108,7 +108,8 @@ function getDomainBasePath(filePath, domainName) {
   const normalized = filePath.replace(/\\/g, '/');
   const domainIdx = normalized.indexOf(`/domain/${domainName.toLowerCase()}/`);
   if (domainIdx === -1) return null;
-  return normalized.substring(0, domainIdx + `/domain/${domainName.toLowerCase()}`.length);
+  // relatedFiles()가 domain/{name}을 추가하므로, 그 앞까지만 반환
+  return normalized.substring(0, domainIdx);
 }
 
 function fileExists(relativePath) {
