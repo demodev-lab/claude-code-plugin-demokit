@@ -43,7 +43,7 @@ description: 이 스킬은 사용자가 "help", "도움말", "demo-dev help", "�
   /review       — 코드 리뷰 수행
 
 워크플로우
-  /pdca         — PDCA 워크플로우 관리 (Plan → Design → Do → Analyze → Iterate → Report)
+  /pdca         — PDCA 워크플로우 (plan/design/do/analyze/iterate/report/archive/cleanup)
   /loop         — 작업 완료까지 자동 반복 실행
   /cancel-loop  — 활성화된 자율 반복 루프 취소
 
