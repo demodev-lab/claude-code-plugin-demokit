@@ -46,7 +46,10 @@ async function main() {
   if (layerType === 'entity') {
     const pascalName = capitalize(domainName);
     const basePath = getDomainBasePath(filePath, domainName);
-    if (!basePath) return; // 도메인 경로 탐지 실패 시 제안 스킵
+    if (!basePath) {
+      console.log(JSON.stringify({}));
+      return; // 도메인 경로 탐지 실패 시 제안 스킵
+    }
     const related = fileUtil.relatedFiles(pascalName, basePath);
     const missing = [];
 
