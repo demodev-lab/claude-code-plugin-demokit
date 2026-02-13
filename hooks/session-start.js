@@ -90,7 +90,8 @@ async function main() {
     const loop = loopState.getState(projectRoot);
     if (loop.active) {
       lines.push(`- Loop 활성: ${loop.currentIteration}/${loop.maxIterations}회 (완료 신호: '${loop.completionPromise}')`);
-      lines.push(`  프롬프트: ${loop.prompt.substring(0, 80)}${loop.prompt.length > 80 ? '...' : ''}`);
+      const promptText = loop.prompt || '(프롬프트 없음)';
+      lines.push(`  프롬프트: ${promptText.substring(0, 80)}${promptText.length > 80 ? '...' : ''}`);
     }
   } catch { /* loop 모듈 로드 실패 시 무시 */ }
 

@@ -128,7 +128,7 @@ async function main() {
     console.log(JSON.stringify({
       systemMessage: [
         `[demokit] Loop 종료: 최대 반복 횟수(${loopState.maxIterations}회) 도달`,
-        `프롬프트: ${loopState.prompt.substring(0, 100)}...`,
+        `프롬프트: ${(loopState.prompt || '').substring(0, 100)}...`,
         `결과: .demodev/loop-log.md 참조`,
         `수동으로 계속하려면 /loop 를 다시 실행하세요.`,
       ].join('\n'),
