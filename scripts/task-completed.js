@@ -118,12 +118,13 @@ async function main() {
     if (teamState.enabled) {
       const taskDesc = hookData.task_description || hookData.tool_name || '';
       // 완료 기록
+      let currentState = teamState;
       const matchedMember = teamState.members.find(m => m.status === 'active');
       if (matchedMember) {
-        stateWriter.recordTaskCompletion(projectRoot, matchedMember.id, taskDesc, 'completed');
+        currentState = stateWriter.recordTaskCompletion(projectRoot, matchedMember.id, taskDesc, 'completed');
       }
-      // 다음 작업 결정
-      const next = coordinator.getNextAssignment(teamState, taskDesc);
+      // 다음 작업 결정 (완료 처리 후 최신 상태 사용)
+      const next = coordinator.getNextAssignment(currentState, taskDesc);
       if (next) {
         hints.push(`[Team] 다음 작업: ${next.nextAgent} → ${next.nextTask}`);
       }
