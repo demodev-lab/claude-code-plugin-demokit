@@ -94,6 +94,25 @@ async function main() {
     }
   } catch { /* loop 모듈 로드 실패 시 무시 */ }
 
+  // Team 모드 감지/제안
+  try {
+    const { teamConfig, stateWriter } = require('../lib/team');
+    if (teamConfig.isTeamEnabled()) {
+      const prevTeamState = stateWriter.loadTeamState(projectRoot);
+      if (prevTeamState.enabled && prevTeamState.currentPhase) {
+        lines.push('');
+        lines.push(`[Team] 이전 세션 팀 상태 복원 가능: phase=${prevTeamState.currentPhase}, feature=${prevTeamState.feature || '?'}`);
+        const activeMembers = prevTeamState.members.filter(m => m.status === 'active' || m.status === 'paused');
+        if (activeMembers.length > 0) {
+          lines.push(`  멤버: ${activeMembers.map(m => `${m.id}(${m.status})`).join(', ')}`);
+        }
+      } else if (activeFeatures.length > 0) {
+        lines.push('');
+        lines.push('[Team] 팀 모드 사용 가능: PDCA 진행 중인 feature에 팀 에이전트를 활용할 수 있습니다.');
+      }
+    }
+  } catch { /* team 모듈 로드 실패 시 무시 */ }
+
   // 이전 세션 context.md 복원 안내
   try {
     const { writer } = require('../lib/context-store');
@@ -104,6 +123,17 @@ async function main() {
       lines.push('  이전 작업을 이어서 하려면 해당 파일을 참조하세요.');
     }
   } catch { /* ignore */ }
+
+  // Agent Memory 요약 주입
+  try {
+    const { storage: memStorage } = require('../lib/memory');
+    const memory = memStorage.loadMemory(projectRoot);
+    const summary = memStorage.summarizeMemory(memory);
+    if (summary) {
+      lines.push('');
+      lines.push(`🧠 프로젝트 메모리: ${summary}`);
+    }
+  } catch { /* memory 모듈 로드 실패 시 무시 */ }
 
   lines.push('');
   lines.push('사용 가능한 명령: /crud, /entity, /service, /controller, /pdca, /review, /test, /loop');

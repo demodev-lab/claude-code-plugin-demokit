@@ -5,6 +5,7 @@
  * lib/intent/trigger.js의 matchIntent()를 사용하여 중복 제거
  */
 const { matchIntent } = require('../lib/intent/trigger');
+const { classifyBySize } = require('../lib/task/classification');
 
 async function main() {
   let input = '';
@@ -27,11 +28,23 @@ async function main() {
     return;
   }
 
-  const detected = matchIntent(userPrompt);
+  const messages = [];
 
+  // 1. 의도 감지
+  const detected = matchIntent(userPrompt);
   if (detected) {
+    messages.push(`의도 감지: ${detected.description}\n추천 명령: ${detected.command}`);
+  }
+
+  // 2. 작업 규모 분류 → PDCA 제안
+  const sizeResult = classifyBySize(userPrompt);
+  if (sizeResult.suggestPdca) {
+    messages.push(`작업 규모: ${sizeResult.label} — /pdca 워크플로우를 권장합니다`);
+  }
+
+  if (messages.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demokit] 의도 감지: ${detected.description}\n추천 명령: ${detected.command}`,
+      systemMessage: `[demokit] ${messages.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));

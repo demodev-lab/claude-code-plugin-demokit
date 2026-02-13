@@ -51,6 +51,30 @@ async function main() {
     process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
+  // Team 상태 영속화
+  try {
+    const { stateWriter } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const teamState = stateWriter.loadTeamState(projectRoot);
+    if (teamState.enabled) {
+      // 활성 멤버 → paused로 변경
+      let changed = false;
+      for (const member of teamState.members) {
+        if (member.status === 'active') {
+          member.status = 'paused';
+          changed = true;
+        }
+      }
+      if (changed) {
+        teamState.history.push({
+          event: 'session_stopped',
+          timestamp: new Date().toISOString(),
+          pausedMembers: teamState.members.filter(m => m.status === 'paused').map(m => m.id),
+        });
+        stateWriter.saveTeamState(projectRoot, teamState);
+      }
+    }
+  } catch { /* team 모듈 로드 실패 시 무시 */ }
+
   // Loop가 비활성이면 정상 종료
   if (!loopState.active) {
     console.log(JSON.stringify({}));

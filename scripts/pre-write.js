@@ -19,10 +19,35 @@ async function main() {
     console.log(JSON.stringify({}));
     return;
   }
+  const toolName = hookData.tool_name === 'Edit' ? 'Edit' : 'Write';
   const filePath = hookData.tool_input?.file_path || hookData.tool_input?.filePath || '';
 
+  // Permission Hierarchy 체크 (모든 파일 대상)
+  const { checkPermission } = require('../lib/core/permission');
+  const perm = checkPermission(toolName, { file_path: filePath });
+
+  if (perm.action === 'deny') {
+    console.log(JSON.stringify({
+      decision: 'block',
+      reason: perm.message,
+    }));
+    return;
+  }
+
+  const permWarnings = [];
+  if (perm.action === 'ask') {
+    permWarnings.push(perm.message);
+  }
+
   if (!filePath.endsWith('.java')) {
-    console.log(JSON.stringify({}));
+    // Java 파일이 아니면 permission 경고만 전달
+    if (permWarnings.length > 0) {
+      console.log(JSON.stringify({
+        systemMessage: `[demokit 권한 검증]\n${permWarnings.join('\n')}`,
+      }));
+    } else {
+      console.log(JSON.stringify({}));
+    }
     return;
   }
 
@@ -79,9 +104,12 @@ async function main() {
     advanced.forEach(v => hints.push(`[검증] ${v}`));
   }
 
-  if (hints.length > 0) {
+  // permission 경고 + 컨벤션 힌트 통합
+  const allHints = [...permWarnings, ...hints];
+
+  if (allHints.length > 0) {
     console.log(JSON.stringify({
-      systemMessage: `[demokit 컨벤션 힌트]\n${hints.join('\n')}`,
+      systemMessage: `[demokit 컨벤션 힌트]\n${allHints.join('\n')}`,
     }));
   } else {
     console.log(JSON.stringify({}));
