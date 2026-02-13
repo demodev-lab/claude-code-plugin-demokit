@@ -7,6 +7,7 @@
  * - Service 생성 시 → Repository 존재 여부 확인
  */
 const path = require('path');
+const fs = require('fs');
 
 async function main() {
   let input = '';
@@ -30,7 +31,6 @@ async function main() {
   }
 
   const { file: fileUtil } = require('../lib/core');
-  const fs = require('fs');
 
   const layerType = fileUtil.detectLayerType(filePath);
   const domainName = fileUtil.extractDomainName(filePath);

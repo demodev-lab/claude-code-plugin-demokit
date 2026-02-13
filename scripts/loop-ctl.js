@@ -31,7 +31,7 @@ function main() {
         console.error('--prompt 필수');
         process.exit(1);
       }
-      const maxIterations = parseInt(getArg(args, '--max-iterations') || '10', 10);
+      const maxIterations = parseInt(getArg(args, '--max-iterations') || '10', 10) || 10;
       const completionPromise = getArg(args, '--completion-promise') || 'LOOP_DONE';
 
       const state = loopState.startLoop(projectRoot, { prompt, maxIterations, completionPromise });
