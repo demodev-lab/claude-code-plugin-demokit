@@ -68,9 +68,11 @@ async function main() {
 
     // entity 관련 작업 → domains 업데이트
     if (/entity|도메인/.test(taskDesc)) {
-      const domainMatch = taskDesc.match(/(\w+)\s*(entity|엔티티)/i) || taskDesc.match(/(entity|엔티티)\s*(\w+)/i);
+      const domainMatch1 = taskDesc.match(/(\w+)\s*(?:entity|엔티티)/i);
+      const domainMatch2 = taskDesc.match(/(?:entity|엔티티)\s*(\w+)/i);
+      const domainMatch = domainMatch1 || domainMatch2;
       if (domainMatch) {
-        const domainName = (domainMatch[1] || domainMatch[2]).toLowerCase();
+        const domainName = domainMatch[1].toLowerCase();
         if (domainName !== 'entity' && domainName !== '엔티티') {
           scope.updateMemory(projectRoot, `project.domains.${domainName}`, prev => ({
             ...prev,
