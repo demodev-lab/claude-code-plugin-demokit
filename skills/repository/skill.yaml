@@ -1,0 +1,7 @@
+name: repository
+argument-hint: "도메인명 (PascalCase, 예: User, Product)"
+agent: domain-expert
+next-skill: service
+pdca-phase: do
+task-template: "Create {domain} Repository"
+imports: shared/jpa-patterns.md

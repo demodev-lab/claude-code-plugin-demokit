@@ -1,0 +1,7 @@
+name: dto
+argument-hint: "도메인명 (PascalCase, 예: User, Product)"
+agent: api-expert
+next-skill: controller
+pdca-phase: do
+task-template: "Create {domain} DTO"
+imports: shared/api-patterns.md

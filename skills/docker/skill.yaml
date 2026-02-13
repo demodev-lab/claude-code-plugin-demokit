@@ -1,0 +1,5 @@
+name: docker
+argument-hint: "서비스 구성 (예: mysql, redis, full)"
+agent: infra-expert
+pdca-phase: do
+task-template: "Setup Docker Compose"

@@ -1,0 +1,7 @@
+name: entity
+argument-hint: "도메인명 (PascalCase, 예: User, Product, Order)"
+agent: domain-expert
+next-skill: repository
+pdca-phase: do
+task-template: "Create {domain} Entity"
+imports: shared/jpa-patterns.md

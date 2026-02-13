@@ -1,0 +1,7 @@
+name: service
+argument-hint: "도메인명 (PascalCase, 예: User, Product)"
+agent: service-expert
+next-skill: controller
+pdca-phase: do
+task-template: "Create {domain} Service"
+imports: shared/spring-conventions.md

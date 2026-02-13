@@ -22,6 +22,8 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
   report    완료 보고서 생성
   status    현재 PDCA 상태 조회
   next      다음 단계 안내
+  archive   완료된 feature 아카이브
+  cleanup   완료된 모든 feature 일괄 아카이브
 
 예시:
   /pdca plan user-management
@@ -29,6 +31,8 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
   /pdca do user-management
   /pdca status
   /pdca next
+  /pdca archive user-management
+  /pdca cleanup
 
 관련 명령:
   /crud — CRUD 일괄 생성
@@ -136,6 +140,20 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 - 필요한 선행 조건 확인
 - 실행 명령 제안
 
+### /pdca archive {feature}
+**완료된 feature 아카이브**
+
+1. feature의 status.json + 관련 문서를 `.pdca/_archive/{feature}_{timestamp}/`로 이동
+2. `listFeatures()`에서 제외되어 상태 조회 시 표시되지 않음
+3. 아카이브된 데이터는 삭제되지 않고 보관됨
+
+### /pdca cleanup
+**완료된 모든 feature 일괄 아카이브**
+
+1. report 단계가 completed인 모든 feature를 자동으로 아카이브
+2. 아카이브 결과 요약 출력
+3. `.pdca/` 디렉토리 정리
+
 ## Match Rate 가중치
 | 항목 | 가중치 |
 |------|--------|
@@ -161,3 +179,4 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 - `lib/pdca/status.js` - 상태 관리
 - `lib/pdca/phase.js` - Phase 전이 규칙
 - `lib/pdca/level.js` - 레벨별 가이드
+- `lib/pdca/archive.js` - 아카이브/클린업

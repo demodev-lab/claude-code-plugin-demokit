@@ -1,0 +1,7 @@
+name: controller
+argument-hint: "도메인명 (PascalCase, 예: User, Product)"
+agent: api-expert
+next-skill: test
+pdca-phase: do
+task-template: "Create {domain} Controller"
+imports: shared/api-patterns.md

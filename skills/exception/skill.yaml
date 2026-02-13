@@ -1,0 +1,7 @@
+name: exception
+argument-hint: "예외 유형 (예: global, domain-specific)"
+agent: api-expert
+next-skill: config
+pdca-phase: do
+task-template: "Setup Exception Handling"
+imports: shared/api-patterns.md

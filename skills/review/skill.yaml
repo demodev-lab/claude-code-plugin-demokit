@@ -1,0 +1,10 @@
+name: review
+argument-hint: "리뷰 대상 (파일 경로, 도메인명, 또는 전체)"
+agent: code-reviewer
+pdca-phase: analyze
+task-template: "Review {domain} Code"
+imports:
+  - shared/spring-conventions.md
+  - shared/jpa-patterns.md
+  - shared/api-patterns.md
+  - shared/test-patterns.md

@@ -1,0 +1,7 @@
+name: security
+argument-hint: "보안 유형 (예: jwt, oauth2, basic)"
+agent: security-expert
+next-skill: test
+pdca-phase: do
+task-template: "Setup Spring Security"
+imports: shared/api-patterns.md

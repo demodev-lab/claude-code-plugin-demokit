@@ -1,0 +1,5 @@
+name: config
+argument-hint: "설정 유형 (예: cors, swagger, querydsl)"
+agent: infra-expert
+pdca-phase: do
+task-template: "Setup {type} Configuration"

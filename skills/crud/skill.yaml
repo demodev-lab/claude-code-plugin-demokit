@@ -1,0 +1,10 @@
+name: crud
+argument-hint: "도메인명 (PascalCase, 예: User, Product)"
+agent: spring-architect
+next-skill: test
+pdca-phase: do
+task-template: "Scaffold {domain} CRUD"
+imports:
+  - shared/spring-conventions.md
+  - shared/jpa-patterns.md
+  - shared/api-patterns.md

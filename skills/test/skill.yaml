@@ -1,0 +1,7 @@
+name: test
+argument-hint: "대상 클래스명 또는 도메인명 (예: UserService, User)"
+agent: test-expert
+next-skill: review
+pdca-phase: do
+task-template: "Create {domain} Tests"
+imports: shared/test-patterns.md
