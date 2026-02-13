@@ -115,6 +115,7 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 - **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy/Kotlin DSL)
 - **핵심 철학**: DRY 원칙, 클린 코드, SRP(단일 책임 원칙), Spring Boot 2025/2026 Best Practices
 - **자동화**: 코드 생성 → 컨벤션 검증 → 코드 리뷰 → Gap 분석 → 자동 수정까지 전 과정 자동화
+- **멀티에이전트**: CTO(spring-architect) 기반 팀 오케스트레이션, 9개 에이전트 opus 모델
 
 ## 프로젝트 구조
 
@@ -125,12 +126,22 @@ demokit/
 │   └── marketplace.json       # 마켓플레이스 카탈로그
 ├── agents/                    # 11개 전문 에이전트
 ├── hooks/                     # 이벤트 훅 (세션 시작, 파일 검증 등)
-├── lib/                       # 핵심 라이브러리 모듈
+├── lib/
+│   ├── core/                  # 플랫폼, 설정, Permission, Skill Loader
+│   ├── import/                # 에이전트 프롬프트 import/공유 컨텍스트
+│   ├── intent/                # 사용자 의도 감지 (한/영)
+│   ├── loop/                  # 자율 반복 루프
+│   ├── memory/                # Agent Memory (프로젝트 수준)
+│   ├── pdca/                  # PDCA 상태, Phase, 아카이브
+│   ├── task/                  # 작업 분류, 컨텍스트, 체인 빌더
+│   └── team/                  # 팀 오케스트레이션 (CTO 조율)
 ├── output-styles/             # 출력 스타일 (Monolith / MSA / PDCA)
 ├── scripts/                   # 훅 실행 스크립트
-├── skills/                    # 29개 슬래시 커맨드
-├── templates/                 # 코드 및 문서 템플릿
-└── demodev.config.json        # 프로젝트 설정 및 Best Practices
+├── skills/                    # 29개 슬래시 커맨드 (+ skill.yaml 메타데이터)
+├── templates/
+│   ├── code/                  # 코드 생성 템플릿
+│   └── shared/                # 공유 컨벤션 (spring-conventions, jpa/api/test-patterns)
+└── demodev.config.json        # 프로젝트 설정, 권한, 팀, Best Practices
 ```
 
 ## Skills (슬래시 커맨드)
@@ -197,6 +208,8 @@ demokit/
 | `/pdca report` | `/pdca report {feature}` | 완료 보고서 생성 |
 | `/pdca status` | `/pdca status` | 현재 PDCA 상태 조회 |
 | `/pdca next` | `/pdca next` | 다음 단계 안내 |
+| `/pdca archive` | `/pdca archive {feature}` | 완료된 feature 아카이브 |
+| `/pdca cleanup` | `/pdca cleanup` | 완료된 모든 feature 일괄 아카이브 |
 
 ### Git
 
@@ -216,20 +229,20 @@ demokit/
 
 ## Agents (전문 에이전트)
 
-작업 유형에 따라 자동으로 전문 에이전트가 할당된다.
+작업 유형에 따라 자동으로 전문 에이전트가 할당된다. 설계/구현/분석 등 품질이 중요한 작업은 **opus**, 패턴 기반 경량 작업은 **sonnet**, 포맷팅 중심 작업은 **haiku**를 사용한다.
 
 | 에이전트 | 모델 | 역할 |
 |----------|------|------|
-| spring-architect | sonnet | 시스템 아키텍처 설계, PDCA Plan/Design 문서 작성 |
-| domain-expert | sonnet | JPA Entity, Repository, QueryDSL, ERD |
-| api-expert | sonnet | REST Controller, DTO, 예외 처리 |
-| service-expert | sonnet | 비즈니스 로직, 트랜잭션 관리 |
-| security-expert | sonnet | Spring Security, JWT, OAuth2 |
+| spring-architect | **opus** | 시스템 아키텍처 설계, PDCA Plan/Design, CTO (팀 모드) |
+| domain-expert | **opus** | JPA Entity, Repository, QueryDSL, ERD |
+| api-expert | **opus** | REST Controller, DTO, 예외 처리 |
+| service-expert | **opus** | 비즈니스 로직, 트랜잭션 관리 |
+| security-expert | **opus** | Spring Security, JWT, OAuth2 |
+| test-expert | **opus** | 단위/통합/슬라이스 테스트 |
+| code-reviewer | **opus** | 읽기 전용 코드 리뷰 (9개 체크리스트) |
+| gap-detector | **opus** | PDCA Analyze - 설계-구현 Gap 분석 |
+| pdca-iterator | **opus** | Match Rate < 90% 시 자동 Gap 수정 반복 |
 | infra-expert | sonnet | Docker, Gradle, 설정 관리 |
-| test-expert | sonnet | 단위/통합/슬라이스 테스트 |
-| code-reviewer | sonnet | 읽기 전용 코드 리뷰 (9개 체크리스트) |
-| gap-detector | sonnet | PDCA Analyze - 설계-구현 Gap 분석 |
-| pdca-iterator | sonnet | Match Rate < 90% 시 자동 Gap 수정 반복 |
 | report-generator | haiku | PDCA 완료 보고서 생성 |
 
 ## 코드 생성 원칙
@@ -308,6 +321,54 @@ Plan → Design → Do → Analyze → Iterate (반복) → Report
 - 목표 Match Rate: **90% 이상**
 - 최대 반복 횟수: **5회**
 - 산출물은 `.pdca/` 디렉토리에 저장
+- 완료된 feature는 `/pdca archive`로 아카이브 (`.pdca/_archive/`로 이동)
+
+## 팀 모드 (Team Orchestration)
+
+PDCA 워크플로우에서 **spring-architect(CTO)**가 전문 에이전트를 조율하는 멀티에이전트 오케스트레이션.
+
+| Phase | 패턴 | Lead | Members |
+|-------|------|------|---------|
+| Plan | leader | spring-architect | domain-expert |
+| Design | leader | spring-architect | api-expert, domain-expert |
+| Do | swarm | — | domain-expert, service-expert, api-expert |
+| Analyze | council | — | gap-detector, code-reviewer, test-expert |
+| Iterate | leader | — | pdca-iterator |
+| Report | leader | — | report-generator |
+
+**오케스트레이션 패턴:**
+
+- **leader**: Lead가 작업을 분배하고 결과를 통합
+- **council**: 멤버가 독립적으로 분석 후 결과를 종합
+- **swarm**: 의존성 순서에 따라 병렬/순차 분배
+
+팀 상태는 세션 간에 영속화되어, 중단 후 재개 시 이전 상태를 복원할 수 있다.
+
+## Context Engineering
+
+에이전트에게 정확한 컨텍스트를 전달하기 위한 시스템.
+
+### Import 시스템
+
+에이전트 `.md` 파일에 `## imports` 섹션을 선언하면, 해당 공유 템플릿이 에이전트 프롬프트에 자동 주입된다.
+
+```markdown
+## imports
+- ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
+- ${PLUGIN_ROOT}/templates/shared/jpa-patterns.md
+```
+
+### Agent Memory
+
+프로젝트 수준의 메모리를 자동으로 저장/조회한다. Entity 생성 시 도메인 정보, API 변경 시 엔드포인트 정보 등이 자동 기록되어 세션 시작 시 요약이 주입된다.
+
+### Skill Metadata (skill.yaml)
+
+각 스킬에 `skill.yaml` 메타데이터를 정의하여 next-skill 체인과 argument-hint를 제공한다. 작업 완료 시 다음 스킬을 자동 제안한다.
+
+### Permission Hierarchy
+
+`demodev.config.json`의 `permissions` 섹션에서 도구별 권한을 3단계(deny/ask/allow)로 관리한다. Hook에서 실행 전 자동 검증되어 위험 명령은 차단, 민감 파일 수정은 경고를 표시한다.
 
 ## Hooks (자동화)
 
@@ -315,14 +376,14 @@ Plan → Design → Do → Analyze → Iterate (반복) → Report
 
 | 이벤트 | 동작 |
 |--------|------|
-| Session Start | 프로젝트 분석 (build.gradle/kts 파싱, 레벨 감지, PDCA 상태 로드) |
-| Pre Write/Edit | Java 컨벤션 검증 (네이밍, 패키지, 어노테이션, 금지 패턴, N+1, @Valid, SQL Injection) |
+| Session Start | 프로젝트 분석, 팀 상태 복원, Agent Memory 요약 주입 |
+| Pre Write/Edit | Permission Hierarchy 검증 + Java 컨벤션 검증 (네이밍, 패키지, 어노테이션, 금지 패턴) |
 | Post Write/Edit | 관련 파일 생성 제안 |
-| Pre Bash | 위험 명령 경고 (rm -rf, force push, chmod 777, curl\|bash, docker --privileged 등) |
+| Pre Bash | Permission Hierarchy 기반 차단/경고 (deny→block, ask→경고) + 추가 휴리스틱 |
 | Post Bash | 빌드/테스트 결과 파싱 및 에러 요약 |
-| User Prompt | 의도 감지 → Skill 자동 트리거 ("엔티티 만들어줘" → `/entity`) |
-| Stop | Loop 활성 시 종료 가로채기 → 작업 계속 |
-| Task Completed | PDCA 다음 단계 안내, Loop 상태 업데이트 |
+| User Prompt | 의도 감지 (한/영) → Skill 자동 트리거 + 작업 규모 분류 → PDCA 제안 |
+| Stop | Loop 종료 가로채기, 팀 상태 영속화 (active → paused) |
+| Task Completed | Memory 자동 저장, next-skill 체인 제안, 팀 작업 할당, PDCA 안내 |
 | Context Compaction | PDCA/Loop 상태 보존 |
 
 ## Output Styles
@@ -385,6 +446,8 @@ Plan → Design → Do → Analyze → Iterate (반복) → Report
 /pdca report 회원관리     # 완료 보고서
 /pdca status              # 전체 PDCA 상태 조회
 /pdca next                # 다음 단계 안내
+/pdca archive 회원관리    # 완료된 feature 아카이브
+/pdca cleanup             # 완료된 모든 feature 일괄 아카이브
 ```
 
 ### 코드 리뷰
