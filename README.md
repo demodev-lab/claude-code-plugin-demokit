@@ -344,6 +344,18 @@ PDCA 워크플로우에서 **spring-architect(CTO)**가 전문 에이전트를 �
 
 팀 상태는 세션 간에 영속화되어, 중단 후 재개 시 이전 상태를 복원할 수 있다.
 
+### 팀 정리 정책(권장 운영값)
+
+- `team.cleanup.staleMemberMs`: 마지막 활동 기준으로 오래된 멤버를 정리하는 시간(밀리초). 기본값 `1800000`(30분)
+- `team.cleanup.clearTeamStateOnStopMode`
+  - `always`: 세션 완전 종료 시 팀 상태를 즉시 초기화
+  - `if_no_live`: active/working/idle 멤버가 없을 때만 초기화
+  - `never`: 초기화 안 함
+- `team.cleanup.pruneMembersOnStop`: true면 완전 종료 시 미작업 멤버(`paused`/`idle`/`failed` 등) 제거
+- `team.cleanup.forceClearOnStop`, `team.cleanup.clearOnStop`: 하위 호환용 강제 정리 플래그
+
+※ `clearTeamStateOnStop`(구버전 키)는 `clearTeamStateOnStopMode`로 정규화되어 처리됩니다.
+
 ## Context Engineering
 
 에이전트에게 정확한 컨텍스트를 전달하기 위한 시스템.
@@ -357,6 +369,11 @@ PDCA 워크플로우에서 **spring-architect(CTO)**가 전문 에이전트를 �
 - ${PLUGIN_ROOT}/templates/shared/spring-conventions.md
 - ${PLUGIN_ROOT}/templates/shared/jpa-patterns.md
 ```
+
+Import 해석 규칙:
+- `${...}` 변수 치환 후 상대 경로는 `fromFile` 기준 + `PROJECT_ROOT` + `PLUGIN_ROOT` + `cwd` 순으로 시도
+- 상대 경로에 확장자가 없으면 `.md`, `.markdown`를 보조로 확인
+- 외부 테스트/임시 프로젝트에서는 `process.cwd`가 바뀌어도 `fromFile` 기반 후보가 있으면 경로가 복원됩니다.
 
 ### Agent Memory
 
