@@ -1,0 +1,3 @@
+name: help
+argument-hint: "도움말 조회"
+next-skill: init

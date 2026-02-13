@@ -6,6 +6,7 @@
  */
 const { matchIntent } = require('../lib/intent/trigger');
 const { classifyBySize } = require('../lib/task/classification');
+const { detectAmbiguity } = require('../lib/intent/ambiguity');
 
 async function main() {
   let input = '';
@@ -40,6 +41,15 @@ async function main() {
   const sizeResult = classifyBySize(userPrompt);
   if (sizeResult.suggestPdca) {
     messages.push(`작업 규모: ${sizeResult.label} — /pdca 워크플로우를 권장합니다`);
+  }
+
+  // 3. 모호성 점검 → 명확화 가이드
+  const ambiguity = detectAmbiguity(userPrompt);
+  if (ambiguity) {
+    const suggestionText = ambiguity.suggestions && ambiguity.suggestions.length > 0
+      ? `\n권장: ${ambiguity.suggestions.join(', ')}`
+      : '';
+    messages.push(`요청이 모호할 수 있습니다. ${ambiguity.message}${suggestionText}`);
   }
 
   if (messages.length > 0) {

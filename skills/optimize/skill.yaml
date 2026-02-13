@@ -1,0 +1,3 @@
+name: optimize
+argument-hint: "최적화 대상 (예: n-plus-one, index)"
+agent: domain-expert

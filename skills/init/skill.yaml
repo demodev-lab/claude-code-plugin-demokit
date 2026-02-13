@@ -1,0 +1,3 @@
+name: init
+argument-hint: "[path]"
+next-skill: crud

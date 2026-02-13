@@ -97,13 +97,23 @@ async function main() {
 
   // Team 모드 감지/제안
   try {
-    const { teamConfig, stateWriter } = require('../lib/team');
+    const { teamConfig, stateWriter, orchestrator } = require('../lib/team');
     if (teamConfig.isTeamEnabled()) {
-      const prevTeamState = stateWriter.loadTeamState(projectRoot);
-      if (prevTeamState.enabled && prevTeamState.currentPhase) {
+      let teamState = stateWriter.loadTeamState(projectRoot);
+      if (teamState.enabled !== true && activeFeatures.length > 0) {
+        teamState.enabled = true;
+        stateWriter.saveTeamState(projectRoot, teamState);
+      }
+
+      const synced = orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
+      if (synced.state) {
+        teamState = synced.state;
+      }
+
+      if (teamState.enabled && teamState.currentPhase) {
         lines.push('');
-        lines.push(`[Team] 이전 세션 팀 상태 복원 가능: phase=${prevTeamState.currentPhase}, feature=${prevTeamState.feature || '?'}`);
-        const activeMembers = prevTeamState.members.filter(m => m.status === 'active' || m.status === 'paused');
+        lines.push(`[Team] 이전 세션 팀 상태 복원 가능: phase=${teamState.currentPhase}, feature=${teamState.feature || '?'}`);
+        const activeMembers = teamState.members.filter(m => m.status === 'active' || m.status === 'paused');
         if (activeMembers.length > 0) {
           lines.push(`  멤버: ${activeMembers.map(m => `${m.id}(${m.status})`).join(', ')}`);
         }

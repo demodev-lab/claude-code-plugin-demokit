@@ -1,0 +1,4 @@
+name: commit
+argument-hint: "[message]"
+next-skill: commit-push
+agent: spring-architect

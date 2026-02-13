@@ -1,0 +1,3 @@
+name: changelog
+argument-hint: "범위/태그 (예: v1.0.0..v1.1.0)"
+agent: infra-expert

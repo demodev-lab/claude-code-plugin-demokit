@@ -10,6 +10,30 @@
  */
 const path = require('path');
 
+const TEAM_CLEAR_MODE_ALWAYS = 'always';
+const TEAM_CLEAR_MODE_IF_NO_LIVE = 'if_no_live';
+const TEAM_CLEAR_MODE_NEVER = 'never';
+const TEAM_CLEAR_LIVE_STATUSES = new Set(['active', 'working', 'idle']);
+
+function hasLiveMembersForClear(teamState) {
+  if (!teamState || !Array.isArray(teamState.members)) return false;
+  return teamState.members.some(member => TEAM_CLEAR_LIVE_STATUSES.has(member.status));
+}
+
+function shouldClearTeamStateAtStop(clearMode, isCompleteStop, hasLiveMembers) {
+  if (!isCompleteStop) return false;
+
+  if (clearMode === TEAM_CLEAR_MODE_ALWAYS) {
+    return true;
+  }
+
+  if (clearMode === TEAM_CLEAR_MODE_IF_NO_LIVE) {
+    return !hasLiveMembers;
+  }
+
+  return false;
+}
+
 async function main() {
   let input = '';
   for await (const chunk of process.stdin) {
@@ -53,24 +77,87 @@ async function main() {
 
   // Team 상태 영속화
   try {
-    const { stateWriter } = require(path.join(__dirname, '..', 'lib', 'team'));
-    const teamState = stateWriter.loadTeamState(projectRoot);
+    const { stateWriter, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : null;
+    const isCompleteStop = !loopState.active && !loopState.completionPromise;
+    const clearMode = cleanupPolicy?.clearTeamStateOnStopMode || TEAM_CLEAR_MODE_NEVER;
+
+    const staleMs = Number(cleanupPolicy?.staleMemberMs);
+    let teamState = stateWriter.loadTeamState(projectRoot);
     if (teamState.enabled) {
+      const activeMembersAtStop = teamState.members
+        .filter(m => m.status === 'active')
+        .map(m => m.id)
+        .filter(Boolean);
+
       // 활성 멤버 → paused로 변경
-      let changed = false;
+      let pausedAny = false;
       for (const member of teamState.members) {
         if (member.status === 'active') {
           member.status = 'paused';
-          changed = true;
+          member.currentTask = null;
+          pausedAny = true;
         }
       }
-      if (changed) {
+      if (pausedAny) {
         teamState.history.push({
           event: 'session_stopped',
           timestamp: new Date().toISOString(),
           pausedMembers: teamState.members.filter(m => m.status === 'paused').map(m => m.id),
         });
         stateWriter.saveTeamState(projectRoot, teamState);
+      }
+
+      // 오랫동안 활동하지 않은 멤버 정리
+      let staleCleanup = { state: teamState, removedMemberIds: [] };
+      if (Number.isFinite(staleMs) && staleMs > 0) {
+        staleCleanup = stateWriter.cleanupStaleMembers(projectRoot, staleMs);
+        if (staleCleanup.removedMemberIds?.length > 0) {
+          teamState = staleCleanup.state;
+        }
+      }
+
+      // 완료되지 않은 active 멤버의 점유 작업 해제(세션 종료 시)
+      if (isCompleteStop) {
+        for (const memberId of activeMembersAtStop) {
+          stateWriter.releaseTaskAssignmentsForMember(projectRoot, memberId);
+        }
+      }
+
+      // stop 이벤트 단위 정리: 미작업 멤버 제거 옵션
+      if (isCompleteStop && cleanupPolicy?.pruneMembersOnStop) {
+        const stoppedState = stateWriter.loadTeamState(projectRoot);
+        const prunedMembers = stoppedState.members
+          .filter(m => m.status !== 'active')
+          .map(m => m.id)
+          .filter(Boolean);
+        if (prunedMembers.length > 0) {
+          stoppedState.members = stoppedState.members.filter(m => m.status === 'active');
+          stoppedState.history = stoppedState.history || [];
+          stoppedState.history.push({
+            event: 'members_pruned_on_stop',
+            at: new Date().toISOString(),
+            removedMembers: prunedMembers,
+          });
+          if (stoppedState.history.length > 100) {
+            stoppedState.history = stoppedState.history.slice(-100);
+          }
+          stateWriter.saveTeamState(projectRoot, stoppedState);
+        }
+      }
+
+      // 완전 종료 처리 정책: clearOnStop 플래그가 명시될 때만 세션 종료 시 정리
+      if (isCompleteStop) {
+        const latestTeamState = stateWriter.loadTeamState(projectRoot);
+        const hasLiveMembers = hasLiveMembersForClear(latestTeamState);
+        const clearStateAtStop = shouldClearTeamStateAtStop(clearMode, isCompleteStop, hasLiveMembers)
+          || cleanupPolicy.forceClearOnStop === true
+          || cleanupPolicy?.clearOnStop === true;
+
+        if (clearStateAtStop) {
+          stateWriter.clearTeamState(projectRoot);
+          return;
+        }
       }
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }

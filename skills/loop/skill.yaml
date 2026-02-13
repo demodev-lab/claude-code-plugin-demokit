@@ -1,0 +1,4 @@
+name: loop
+argument-hint: "실행할 작업 프롬프트"
+next-skill: cancel-loop
+agent: spring-architect

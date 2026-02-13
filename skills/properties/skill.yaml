@@ -1,0 +1,3 @@
+name: properties
+argument-hint: "동작 (analyze|generate|split) [profile]"
+agent: infra-expert

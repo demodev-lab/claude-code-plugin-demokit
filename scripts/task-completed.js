@@ -6,6 +6,48 @@
  * 3. Loop 활성이면 루프 상태 업데이트
  */
 const path = require('path');
+const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
+
+function extractAgentId(hookData) {
+  const resolved = resolveAgentIdFromHook(hookData);
+  return resolved ? resolved : null;
+}
+
+function extractCompletedTaskId(hookData, activeMember) {
+  return hookData.task_id
+    || hookData.tool_input?.task_id
+    || hookData.tool_name
+    || hookData.task_description
+    || hookData.tool_input?.prompt
+    || hookData.tool_input?.task_description
+    || activeMember?.currentTask
+    || '작업 완료';
+}
+
+function resolveTaskDoneMember(teamState, explicitAgentId, completedTaskId, coordinator) {
+  if (!teamState || !Array.isArray(teamState.members)) return null;
+  if (explicitAgentId) {
+    const matched = teamState.members.find(m => m.id === explicitAgentId);
+    if (matched) return matched;
+  }
+
+  const normalizedTaskId = typeof completedTaskId === 'string' ? completedTaskId.trim() : '';
+  if (!normalizedTaskId || !coordinator?.isMatchedTask) {
+    return teamState.members.find(m => m.status === 'active') || null;
+  }
+
+  const activeMembers = teamState.members.filter(m => m.status === 'active' && m.id);
+  const matchedByTask = activeMembers.filter((member) => coordinator.isMatchedTask({
+    id: member.currentTask || '',
+    subject: member.currentTask || '',
+    description: member.currentTask || '',
+  }, normalizedTaskId));
+
+  if (matchedByTask.length === 1) return matchedByTask[0];
+  if (matchedByTask.length > 1) return matchedByTask[0];
+
+  return activeMembers[0] || null;
+}
 
 async function main() {
   let input = '';
@@ -113,20 +155,39 @@ async function main() {
 
   // 5. Team 작업 할당
   try {
-    const { stateWriter, coordinator } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const { stateWriter, coordinator, orchestrator, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
     const teamState = stateWriter.loadTeamState(projectRoot);
     if (teamState.enabled) {
+      const staleResult = cleanupPolicy?.staleMemberMs
+        ? stateWriter.cleanupStaleMembers(projectRoot, cleanupPolicy.staleMemberMs)
+        : { state: null };
+
+      const currentTeamState = staleResult.state || teamState;
       const taskDesc = hookData.task_description || hookData.tool_name || '';
+      const explicitAgentId = extractAgentId(hookData);
+
       // 완료 기록
-      let currentState = teamState;
-      const matchedMember = teamState.members.find(m => m.status === 'active');
+      let finalState = currentTeamState;
+      const tentativeTaskId = extractCompletedTaskId(hookData) || taskDesc;
+      const matchedMember = resolveTaskDoneMember(currentTeamState, explicitAgentId, tentativeTaskId, coordinator);
+      const completedTaskId = extractCompletedTaskId(hookData, matchedMember) || taskDesc;
       if (matchedMember) {
-        currentState = stateWriter.recordTaskCompletion(projectRoot, matchedMember.id, taskDesc, 'completed');
+        finalState = stateWriter.recordTaskCompletion(projectRoot, matchedMember.id, completedTaskId, 'completed');
       }
+
+      const synced = orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
+      if (synced.state) {
+        finalState = synced.state;
+      }
+
       // 다음 작업 결정 (완료 처리 후 최신 상태 사용)
-      const next = coordinator.getNextAssignment(currentState, taskDesc);
+      const next = coordinator.getNextAssignment(finalState, completedTaskId);
       if (next) {
         hints.push(`[Team] 다음 작업: ${next.nextAgent} → ${next.nextTask}`);
+        if (next.nextTaskId) {
+          hints.push(`[Team] 다음 작업 ID: ${next.nextTaskId}`);
+        }
       }
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }

@@ -1,0 +1,3 @@
+name: gradle
+argument-hint: "작업 (add/remove/check) dependency"
+agent: infra-expert

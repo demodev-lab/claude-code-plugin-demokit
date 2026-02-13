@@ -271,6 +271,14 @@
       "analyze": { "lead": null, "members": ["gap-detector", "code-reviewer", "test-expert"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
       "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
+    },
+    "cleanup": {
+      "staleMemberMs": 1800000,
+      "clearTeamStateOnStop": false,
+      "clearTeamStateOnStopMode": "never",
+      "clearOnStop": false,
+      "forceClearOnStop": false,
+      "pruneMembersOnStop": false
     }
   },
   "contextEngineering": {
@@ -280,3 +288,4 @@
     "sharedPatterns": ["spring-conventions.md", "jpa-patterns.md", "api-patterns.md", "test-patterns.md"]
   }
 }
+

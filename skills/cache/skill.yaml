@@ -1,0 +1,3 @@
+name: cache
+argument-hint: "캐시 타입 (caffeine 또는 redis)"
+agent: infra-expert

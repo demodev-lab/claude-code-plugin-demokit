@@ -46,56 +46,62 @@ async function main() {
   if (layerType === 'entity') {
     const pascalName = capitalize(domainName);
     const basePath = getDomainBasePath(filePath, domainName);
-    if (!basePath) {
-      console.log(JSON.stringify({}));
-      return; // 도메인 경로 탐지 실패 시 제안 스킵
-    }
-    const related = fileUtil.relatedFiles(pascalName, basePath);
-    const missing = [];
+    if (basePath) {
+      const related = fileUtil.relatedFiles(pascalName, basePath);
+      // relatedFiles 키 → 실제 스킬 커맨드 매핑
+      const typeToSkill = {
+        repository: 'repository',
+        service: 'service',
+        controller: 'controller',
+        createRequest: 'dto',
+        updateRequest: 'dto',
+        response: 'dto',
+      };
 
-    // relatedFiles 키 → 실제 스킬 커맨드 매핑
-    const typeToSkill = {
-      repository: 'repository',
-      service: 'service',
-      controller: 'controller',
-      createRequest: 'dto',
-      updateRequest: 'dto',
-      response: 'dto',
-    };
-
-    const suggestedSkills = new Set();
-    for (const [type, relPath] of Object.entries(related)) {
-      if (type !== 'entity' && !fileExists(relPath)) {
-        const skill = typeToSkill[type];
-        if (skill && !suggestedSkills.has(skill)) {
-          suggestedSkills.add(skill);
-          missing.push(skill);
+      const suggestedSkills = new Set();
+      for (const [type, relPath] of Object.entries(fileUtil.relatedFiles(pascalName, basePath))) {
+        if (type === 'entity') continue;
+        if (!fileExists(relPath)) {
+          const skill = typeToSkill[type];
+          if (skill && !suggestedSkills.has(skill)) {
+            suggestedSkills.add(skill);
+          }
         }
       }
-    }
 
-    if (missing.length > 0) {
-      suggestions.push(`[제안] ${pascalName} Entity 생성됨. 관련 파일 생성을 권장합니다:`);
-      missing.forEach(skill => {
-        suggestions.push(`  - /${skill} ${pascalName}`);
-      });
-      suggestions.push(`  또는 /crud ${pascalName} 으로 일괄 생성`);
+      if (suggestedSkills.size > 0) {
+        suggestions.push(`[제안] ${pascalName} Entity 생성됨. 관련 파일 생성을 권장합니다:`);
+        Array.from(suggestedSkills).forEach(skill => {
+          suggestions.push(`  - /${skill} ${pascalName}`);
+        });
+        suggestions.push(`  또는 /crud ${pascalName} 으로 일괄 생성`);
+      }
     }
   }
 
   // Controller 생성 시 DTO 확인
   if (layerType === 'controller') {
-    const dtoDir = filePath.replace(/controller[/\\][^/\\]+$/, 'dto');
-    if (!fs.existsSync(dtoDir)) {
-      suggestions.push(`[제안] DTO가 없습니다. /dto ${capitalize(domainName)} 으로 생성하세요.`);
+    const basePath = getDomainBasePath(filePath, domainName);
+    if (basePath) {
+      const pascalName = capitalize(domainName);
+      const related = fileUtil.relatedFiles(pascalName, basePath);
+      const hasDto = ['createRequest', 'updateRequest', 'response'].some(type => fileExists(related[type]));
+
+      if (!hasDto) {
+        suggestions.push(`[제안] DTO가 없습니다. /dto ${pascalName} 으로 생성하세요.`);
+      }
     }
   }
 
   // Service 생성 시 Repository 확인
   if (layerType === 'service') {
-    const repoDir = filePath.replace(/service[/\\][^/\\]+$/, 'repository');
-    if (!fs.existsSync(repoDir)) {
-      suggestions.push(`[제안] Repository가 없습니다. /repository ${capitalize(domainName)} 으로 생성하세요.`);
+    const basePath = getDomainBasePath(filePath, domainName);
+    if (basePath) {
+      const pascalName = capitalize(domainName);
+      const related = fileUtil.relatedFiles(pascalName, basePath);
+      if (!fileExists(related.repository)) {
+        suggestions.push(`[제안] Repository가 없습니다. /repository ${pascalName} 으로 생성하세요.`);
+      }
     }
   }
 
@@ -111,15 +117,18 @@ async function main() {
 function getDomainBasePath(filePath, domainName) {
   if (!domainName) return null;
   const normalized = filePath.replace(/\\/g, '/');
-  const domainIdx = normalized.indexOf(`/domain/${domainName.toLowerCase()}/`);
+  const normalizedLower = normalized.toLowerCase();
+  const domainIdx = normalizedLower.indexOf(`/domain/${domainName.toLowerCase()}/`);
   if (domainIdx === -1) return null;
-  // relatedFiles()가 domain/{name}을 추가하므로, 그 앞까지만 반환
-  return normalized.substring(0, domainIdx);
+  const markerIdx = normalizedLower.indexOf('/domain/');
+  if (markerIdx === -1) return null;
+  // relatedFiles()에서 /domain/{name}을 재조립하므로 domain 바로 앞까지만 사용
+  return normalized.substring(0, markerIdx);
 }
 
 function fileExists(relativePath) {
   try {
-    return fs.existsSync(relativePath);
+    return fs.existsSync(path.normalize(relativePath));
   } catch {
     return false;
   }
