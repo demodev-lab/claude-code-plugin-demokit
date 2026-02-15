@@ -177,7 +177,8 @@ async function main() {
     }
 
     if (state.pdcaFeatures.length > 0) {
-      const activeFeature = state.pdcaFeatures.find(f => f.currentPhase && f.currentPhase !== 'report');
+      const activeFeature = state.pdcaFeatures.find(f => f.currentPhase && f.currentPhase !== 'report')
+        || state.pdcaFeatures[0];
       if (activeFeature) {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
         const snapshotPath = path.join(snapshotDir, `${activeFeature.feature}-${timestamp}.json`);
