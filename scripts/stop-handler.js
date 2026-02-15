@@ -162,6 +162,31 @@ async function main() {
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }
 
+  // Agent-specific stop dispatch
+  try {
+    const { context } = require(path.join(__dirname, '..', 'lib', 'task'));
+    const activeAgent = context.getActiveAgent();
+
+    if (activeAgent) {
+      const agentStopScripts = {
+        'gap-detector': './gap-detector-stop.js',
+        'pdca-iterator': './iterator-stop.js',
+        'cto-lead': './cto-stop.js',
+      };
+
+      const stopScript = agentStopScripts[activeAgent];
+      if (stopScript) {
+        const agentStop = require(path.join(__dirname, stopScript));
+        const agentHints = await agentStop.main(hookData);
+        if (agentHints && agentHints.length > 0) {
+          // agent hints는 별도 systemMessage로 전달하지 않고 context에 기록
+          process.stderr.write(`[demokit] agent-stop(${activeAgent}): ${agentHints.join('; ')}\n`);
+        }
+      }
+      context.clearActiveContext();
+    }
+  } catch { /* agent stop 실패 시 무시 */ }
+
   // Loop가 비활성이면 정상 종료
   if (!loopState.active) {
     console.log(JSON.stringify({}));

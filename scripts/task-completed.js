@@ -88,17 +88,49 @@ async function main() {
     process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
-  // 2. PDCA 진행 상태 확인
+  // 2. PDCA 진행 상태 확인 + 자동 전환
   try {
-    const { status: pdcaStatus, phase: pdcaPhase } = require(path.join(__dirname, '..', 'lib', 'pdca'));
+    const { status: pdcaStatus, phase: pdcaPhase, automation } = require(path.join(__dirname, '..', 'lib', 'pdca'));
     const features = pdcaStatus.listFeatures(projectRoot);
     const activeFeature = features.find(f => f.currentPhase && f.currentPhase !== 'report');
 
     if (activeFeature) {
-      const nextPhase = pdcaPhase.getNextPhase(activeFeature.currentPhase);
-      if (nextPhase) {
-        hints.push(`[PDCA] '${activeFeature.feature}' 현재 단계: ${activeFeature.currentPhase}`);
-        hints.push(`  다음 단계: /pdca ${nextPhase} ${activeFeature.feature}`);
+      const currentPhase = activeFeature.currentPhase;
+      const nextPhase = pdcaPhase.getNextPhase(currentPhase);
+
+      // 자동 전환 판단
+      const shouldAuto = nextPhase && automation.shouldAutoTransition(projectRoot, activeFeature.feature, currentPhase);
+
+      if (shouldAuto) {
+        // 현재 phase 완료 처리
+        pdcaStatus.updatePhaseStatus(projectRoot, activeFeature.feature, currentPhase, {
+          status: 'completed',
+          completedAt: new Date().toISOString(),
+        });
+        // 다음 phase로 전환
+        const fullStatus = pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
+        fullStatus.currentPhase = nextPhase;
+        fullStatus.phases[nextPhase].status = 'in-progress';
+        fullStatus.phases[nextPhase].startedAt = new Date().toISOString();
+        pdcaStatus.saveStatus(projectRoot, activeFeature.feature, fullStatus);
+
+        const summary = pdcaPhase.generatePhaseSummary(fullStatus);
+        hints.push(`[PDCA] '${activeFeature.feature}' 자동 전환: ${currentPhase} → ${nextPhase}`);
+        hints.push(`  ${summary}`);
+      } else if (nextPhase) {
+        // 수동 전환 제안 + deliverables 상태
+        hints.push(`[PDCA] '${activeFeature.feature}' 현재 단계: ${currentPhase}`);
+        try {
+          const deliverables = pdcaPhase.checkPhaseDeliverables(projectRoot, activeFeature.feature, currentPhase);
+          if (deliverables.complete) {
+            hints.push(`  산출물 완료. 다음 단계: /pdca ${nextPhase} ${activeFeature.feature}`);
+          } else {
+            hints.push(`  미완료 산출물: ${deliverables.missing.join(', ')}`);
+            hints.push(`  다음 단계: /pdca ${nextPhase} ${activeFeature.feature}`);
+          }
+        } catch {
+          hints.push(`  다음 단계: /pdca ${nextPhase} ${activeFeature.feature}`);
+        }
       }
     }
   } catch { /* pdca 모듈 로드 실패 시 무시 */ }
@@ -153,7 +185,30 @@ async function main() {
     }
   } catch { /* skill-loader 실패 시 무시 */ }
 
-  // 5. Team 작업 할당
+  // 5. Team Hooks - phase 완료 시 다음 phase 전환 안내
+  try {
+    const { status: pdcaStatusMod } = require(path.join(__dirname, '..', 'lib', 'pdca'));
+    const { hooks: teamHooks } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const features = pdcaStatusMod.listFeatures(projectRoot);
+    const activeFeature = features.find(f => f.currentPhase && f.currentPhase !== 'report');
+
+    if (activeFeature) {
+      const result = teamHooks.assignNextTeammateWork(
+        activeFeature.currentPhase,
+        activeFeature.feature,
+        activeFeature.level || 'Monolith'
+      );
+
+      if (result.nextPhase) {
+        hints.push(`[Team Hooks] 다음 phase: ${result.nextPhase} (패턴: ${result.team.pattern})`);
+        if (result.needsRecompose) {
+          hints.push(`[Team Hooks] 팀 재구성 필요`);
+        }
+      }
+    }
+  } catch { /* team hooks 실패 시 무시 */ }
+
+  // 6. Team 작업 할당
   try {
     const { stateWriter, coordinator, orchestrator, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));
     const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
@@ -192,7 +247,7 @@ async function main() {
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }
 
-  // 6. Loop 상태 확인
+  // 7. Loop 상태 확인
   try {
     const loopState = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
     const loop = loopState.getState(projectRoot);

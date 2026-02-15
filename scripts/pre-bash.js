@@ -61,12 +61,32 @@ async function main() {
     }
   }
 
-  // 3. 프로덕션 환경 관련 명령
+  // 3. QA agent 활성 시 추가 차단 패턴
+  try {
+    const { context } = require('../lib/task');
+    const activeAgent = context.getActiveAgent();
+    if (activeAgent && /qa|test|quality|gap-detector/i.test(activeAgent)) {
+      const qaPatterns = [
+        { pattern: /docker\s+.*--privileged/, message: '[차단] QA agent는 docker --privileged 실행 불가' },
+        { pattern: /kubectl\s+delete/, message: '[차단] QA agent는 kubectl delete 실행 불가' },
+        { pattern: /terraform\s+destroy/, message: '[차단] QA agent는 terraform destroy 실행 불가' },
+      ];
+
+      for (const { pattern, message } of qaPatterns) {
+        if (pattern.test(command)) {
+          console.log(JSON.stringify({ decision: 'block', reason: message }));
+          return;
+        }
+      }
+    }
+  } catch { /* task context 미로드 시 무시 */ }
+
+  // 4. 프로덕션 환경 관련 명령
   if (/--spring\.profiles\.active=prod/i.test(command) || /SPRING_PROFILES_ACTIVE=prod/i.test(command)) {
     warnings.push('[주의] 프로덕션 프로파일로 실행하려는 명령입니다');
   }
 
-  // 4. gradlew 실행 시 팁
+  // 5. gradlew 실행 시 팁
   if (command.includes('gradlew') && !command.includes('./gradlew') && !command.includes('.\\gradlew')) {
     warnings.push('[팁] gradlew는 ./gradlew (Unix) 또는 .\\gradlew (Windows) 로 실행하세요');
   }

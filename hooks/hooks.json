@@ -27,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pre-bash.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-bash-pre.js"
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-write.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-write-post.js"
           }
         ]
       },
@@ -48,6 +48,15 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-bash.js"
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js"
           }
         ]
       }
@@ -67,6 +76,10 @@
       {
         "matcher": "*",
         "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js"
+          },
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js"
