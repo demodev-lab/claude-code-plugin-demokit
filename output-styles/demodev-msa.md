@@ -1,3 +1,9 @@
+---
+name: demodev-msa
+description: MSA 아키텍처 기반 Spring Boot 개발 스타일
+triggers: msa, microservices, 마이크로서비스, multi-module
+---
+
 # demodev-msa Output Style
 
 > Spring Boot 3.5.10 + Java 21 + Gradle (Groovy DSL) + MSA

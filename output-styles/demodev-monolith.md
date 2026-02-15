@@ -1,3 +1,9 @@
+---
+name: demodev-monolith
+description: Monolith 아키텍처 기반 Spring Boot 개발 스타일
+triggers: monolith, 모놀리스, single-module
+---
+
 # demodev-monolith Output Style
 
 > Spring Boot 3.5.10 + Java 21 + Gradle (Groovy DSL)
