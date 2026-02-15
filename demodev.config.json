@@ -180,6 +180,7 @@
   },
   "pdca": {
     "documentPath": ".pdca",
+    "automationLevel": "semi-auto",
     "matchRateThreshold": 90,
     "maxIterations": 5,
     "matchRateWeights": {
@@ -263,10 +264,10 @@
     "enabled": true,
     "ctoAgent": "spring-architect",
     "maxTeammates": { "Monolith": 3, "MSA": 5 },
-    "orchestrationPatterns": ["leader", "council", "swarm"],
+    "orchestrationPatterns": ["leader", "council", "swarm", "pipeline"],
     "phaseTeams": {
-      "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
-      "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
+      "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "pipeline" },
+      "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "pipeline" },
       "do": { "lead": null, "members": ["domain-expert", "service-expert", "api-expert"], "pattern": "swarm" },
       "analyze": { "lead": null, "members": ["gap-detector", "code-reviewer", "test-expert"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },

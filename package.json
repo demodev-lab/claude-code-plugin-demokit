@@ -1,0 +1,13 @@
+{
+  "name": "claude-code-plugin-be",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "test:unit": "jest test/unit",
+    "test:integration": "jest test/integration"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
