@@ -1,4 +1,4 @@
-# demokit
+# demokit v1.0.1
 
 Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 체계적인 개발 워크플로우를 제공한다.
 
@@ -115,7 +115,7 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 - **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy/Kotlin DSL)
 - **핵심 철학**: DRY 원칙, 클린 코드, SRP(단일 책임 원칙), Spring Boot 2025/2026 Best Practices
 - **자동화**: 코드 생성 → 컨벤션 검증 → 코드 리뷰 → Gap 분석 → 자동 수정까지 전 과정 자동화
-- **멀티에이전트**: CTO(spring-architect) 기반 팀 오케스트레이션, 9개 에이전트 opus 모델
+- **멀티에이전트**: CTO(spring-architect) 기반 팀 오케스트레이션, 15개 전문 에이전트
 
 ## 프로젝트 구조
 
@@ -124,7 +124,7 @@ demokit/
 ├── .claude-plugin/
 │   ├── plugin.json            # 플러그인 메타데이터
 │   └── marketplace.json       # 마켓플레이스 카탈로그
-├── agents/                    # 11개 전문 에이전트
+├── agents/                    # 15개 전문 에이전트
 ├── hooks/                     # 이벤트 훅 (세션 시작, 파일 검증 등)
 ├── lib/
 │   ├── core/                  # 플랫폼, 설정, Permission, Skill Loader
@@ -137,7 +137,8 @@ demokit/
 │   └── team/                  # 팀 오케스트레이션 (CTO 조율)
 ├── output-styles/             # 출력 스타일 (Monolith / MSA / PDCA)
 ├── scripts/                   # 훅 실행 스크립트
-├── skills/                    # 29개 슬래시 커맨드 (+ skill.yaml 메타데이터)
+├── skills/                    # 32개 슬래시 커맨드 (+ skill.yaml 메타데이터)
+├── demokit-system/            # 시스템 아키텍처 문서 (Obsidian 그래프 뷰)
 ├── templates/
 │   ├── code/                  # 코드 생성 템플릿
 │   └── shared/                # 공유 컨벤션 (spring-conventions, jpa/api/test-patterns)
@@ -220,10 +221,13 @@ demokit/
 | `/push` | `/push` | 현재 브랜치를 원격 저장소에 푸시 |
 | `/pr` | `/pr [title]` | Pull Request 생성 (dev 브랜치 기준) |
 
-### 워크플로우
+### 고급 워크플로우
 
 | 커맨드 | 사용법 | 설명 |
 |--------|--------|------|
+| `/pipeline` | `/pipeline {feature}` | Spring Boot 9단계 개발 파이프라인 (init→plan→design→do→analyze→iterate→test→review→report) |
+| `/plan-plus` | `/plan-plus {feature}` | 6단계 브레인스토밍 강화 계획 수립 |
+| `/qa` | `/qa [build\|test\|log]` | Zero-Script QA — 빌드/테스트/로그 기반 품질 분석 |
 | `/loop` | `/loop {prompt} [--max-iterations N]` | 작업 완료까지 자동 반복 실행 |
 | `/cancel-loop` | `/cancel-loop` | 활성화된 자율 반복 루프 즉시 취소 |
 
@@ -242,8 +246,12 @@ demokit/
 | code-reviewer | **opus** | 읽기 전용 코드 리뷰 (9개 체크리스트) |
 | gap-detector | **opus** | PDCA Analyze - 설계-구현 Gap 분석 |
 | pdca-iterator | **opus** | Match Rate < 90% 시 자동 Gap 수정 반복 |
+| dba-expert | **opus** | DB 최적화, 인덱스 전략, N+1 해결 |
+| product-manager | sonnet | 요구사항 분석, 우선순위 결정, 사용자 스토리 |
+| devops-engineer | sonnet | CI/CD 파이프라인, Docker, Kubernetes 배포 |
 | infra-expert | sonnet | Docker, Gradle, 설정 관리 |
 | report-generator | haiku | PDCA 완료 보고서 생성 |
+| qa-monitor | haiku | 빌드/테스트/애플리케이션 로그 QA 모니터링 |
 
 ## 코드 생성 원칙
 
@@ -514,6 +522,29 @@ Import 해석 규칙:
         ├── repository/
         └── service/
 ```
+
+## 변경 이력
+
+### v1.0.1 (2026-02-18)
+
+**신규 기능**
+- 에이전트 4종 추가: `dba-expert`, `devops-engineer`, `product-manager`, `qa-monitor`
+- 스킬 3종 추가: `/pipeline` (9단계 개발 파이프라인), `/plan-plus` (브레인스토밍 강화 계획), `/qa` (Zero-Script QA)
+- `demokit-system/` 시스템 아키텍처 문서 추가
+
+**버그 수정 (27건)**
+- Race condition 방지를 위한 `withFileLock` 유틸리티 도입
+- PDCA iterate→report 탈출 조건 누락 수정
+- Gradle 파서 regex→brace-depth 블록 추출로 안정성 향상
+- Convention checker RestClient 오탐 방지, N+1 per-annotation 검사
+- Task ID 충돌 방지, chain-builder iterate phase 누락 수정
+- Context-fork conflict 감지, context-hierarchy 중복 항목 방지
+- Stop handler, post-bash 등 스크립트 로직 수정
+- 기타 TOCTOU race, atomic write, null guard 등 안정성 개선
+
+### v1.0.0
+
+- 최초 릴리즈
 
 ## 라이선스
 
