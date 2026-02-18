@@ -5,8 +5,8 @@ const {
 
 describe('Team Strategy', () => {
   describe('TEAM_STRATEGIES', () => {
-    it('Starter, Monolith, MSA 3개 전략 정의', () => {
-      expect(Object.keys(TEAM_STRATEGIES)).toEqual(['Starter', 'Monolith', 'MSA']);
+    it('Starter, SingleModule, MultiModule, Monolith, MSA 5개 전략 정의', () => {
+      expect(Object.keys(TEAM_STRATEGIES)).toEqual(['Starter', 'SingleModule', 'MultiModule', 'Monolith', 'MSA']);
     });
   });
 
@@ -94,12 +94,12 @@ describe('Team Strategy', () => {
       expect(getCtoAgent('Starter')).toBeNull();
     });
 
-    it('Monolith → cto-lead', () => {
-      expect(getCtoAgent('Monolith')).toBe('cto-lead');
+    it('Monolith → spring-architect', () => {
+      expect(getCtoAgent('Monolith')).toBe('spring-architect');
     });
 
-    it('MSA → cto-lead', () => {
-      expect(getCtoAgent('MSA')).toBe('cto-lead');
+    it('MSA → spring-architect', () => {
+      expect(getCtoAgent('MSA')).toBe('spring-architect');
     });
   });
 });

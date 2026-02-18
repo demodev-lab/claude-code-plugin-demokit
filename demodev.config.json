@@ -192,8 +192,11 @@
     }
   },
   "levelDetection": {
-    "monolith": {
-      "indicators": ["단일 build.gradle", "단일 src/main/java"]
+    "singleModule": {
+      "indicators": ["단일 build.gradle", "단일 src/main/java", "include 없음 또는 1개"]
+    },
+    "multiModule": {
+      "indicators": ["settings.gradle에 include 2개 이상", "MSA 의존성 없음", "멀티모듈 구조"]
     },
     "msa": {
       "indicators": ["settings.gradle에 include 다수", "spring-cloud 의존성", "멀티모듈 구조"],
@@ -221,7 +224,16 @@
       "erd": "domain-expert",
       "optimize": "domain-expert",
       "changelog": "infra-expert",
-      "properties": "infra-expert"
+      "properties": "infra-expert",
+      "planning": "product-manager",
+      "requirements": "product-manager",
+      "database": "dba-expert",
+      "db-optimization": "dba-expert",
+      "deployment": "devops-engineer",
+      "ci-cd": "devops-engineer",
+      "kubernetes": "devops-engineer",
+      "qa": "qa-monitor",
+      "qa-log": "qa-monitor"
     },
     "modelAssignment": {
       "domain-expert": "opus",
@@ -234,7 +246,11 @@
       "spring-architect": "opus",
       "gap-detector": "opus",
       "pdca-iterator": "opus",
-      "report-generator": "haiku"
+      "report-generator": "haiku",
+      "product-manager": "sonnet",
+      "dba-expert": "opus",
+      "devops-engineer": "sonnet",
+      "qa-monitor": "haiku"
     }
   },
   "testing": {
@@ -255,6 +271,8 @@
   },
   "outputStyles": {
     "levelDefaults": {
+      "SingleModule": "demodev-monolith",
+      "MultiModule": "demodev-monolith",
       "Monolith": "demodev-monolith",
       "MSA": "demodev-msa"
     },
@@ -263,11 +281,11 @@
   "team": {
     "enabled": true,
     "ctoAgent": "spring-architect",
-    "maxTeammates": { "Monolith": 3, "MSA": 5 },
-    "orchestrationPatterns": ["leader", "council", "swarm", "pipeline"],
+    "maxTeammates": { "SingleModule": 2, "MultiModule": 3, "Monolith": 3, "MSA": 5 },
+    "orchestrationPatterns": ["leader", "council", "swarm", "pipeline", "watchdog"],
     "phaseTeams": {
-      "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "pipeline" },
-      "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "pipeline" },
+      "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
+      "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
       "do": { "lead": null, "members": ["domain-expert", "service-expert", "api-expert"], "pattern": "swarm" },
       "analyze": { "lead": null, "members": ["gap-detector", "code-reviewer", "test-expert"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
@@ -281,6 +299,27 @@
       "forceClearOnStop": false,
       "pruneMembersOnStop": false
     }
+  },
+  "planPlus": {
+    "enabled": true,
+    "hardGate": true,
+    "stages": ["context-explore", "intent-discover", "alternatives", "yagni-review", "incremental-verify", "plan-generate"],
+    "relatedAgents": ["product-manager", "spring-architect", "domain-expert"],
+    "templatePath": "templates/plan-plus.template.md"
+  },
+  "developmentPipeline": {
+    "enabled": true,
+    "phases": [
+      { "id": 1, "name": "Schema", "agent": "dba-expert" },
+      { "id": 2, "name": "Convention", "agent": "spring-architect" },
+      { "id": 3, "name": "Infra", "agent": "infra-expert" },
+      { "id": 4, "name": "Feature", "agent": "domain-expert" },
+      { "id": 5, "name": "Integration", "agent": "service-expert" },
+      { "id": 6, "name": "Testing", "agent": "test-expert" },
+      { "id": 7, "name": "Performance", "agent": "dba-expert" },
+      { "id": 8, "name": "Review", "agent": "code-reviewer" },
+      { "id": 9, "name": "Deployment", "agent": "devops-engineer" }
+    ]
   },
   "contextEngineering": {
     "enabled": true,

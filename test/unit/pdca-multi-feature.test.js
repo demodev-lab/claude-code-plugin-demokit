@@ -24,6 +24,12 @@ describe('PDCA Multi-Feature', () => {
           if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
           fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
         },
+        writeFile: (filePath, content) => {
+          const dir = path.dirname(filePath);
+          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.writeFileSync(filePath, content, 'utf-8');
+        },
+        ensureDir: (dir) => fs.mkdirSync(dir, { recursive: true }),
         fileExists: (p) => fs.existsSync(p),
         listFiles: (dir, regex) => {
           if (!fs.existsSync(dir)) return [];
@@ -31,6 +37,7 @@ describe('PDCA Multi-Feature', () => {
             .filter(f => regex.test(f))
             .map(f => path.join(dir, f));
         },
+        withFileLock: (_filePath, fn) => fn(),
       },
       debug: { debug: () => {}, warn: () => {} },
     }));

@@ -59,7 +59,7 @@ async function main() {
       };
 
       const suggestedSkills = new Set();
-      for (const [type, relPath] of Object.entries(fileUtil.relatedFiles(pascalName, basePath))) {
+      for (const [type, relPath] of Object.entries(related)) {
         if (type === 'entity') continue;
         if (!fileExists(relPath)) {
           const skill = typeToSkill[type];

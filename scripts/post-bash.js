@@ -40,7 +40,7 @@ async function main() {
   const hints = [];
 
   // 컴파일 에러 추출
-  const compileErrors = output.match(/error:.*\n.*\.java:\d+/g);
+  const compileErrors = output.match(/\S+\.java:\d+:\s*error:[^\n]*/g);
   if (compileErrors && compileErrors.length > 0) {
     hints.push(`[빌드 실패] 컴파일 에러 ${compileErrors.length}건:`);
     const MAX_DISPLAY = 5;

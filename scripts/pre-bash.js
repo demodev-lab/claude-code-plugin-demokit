@@ -49,7 +49,7 @@ async function main() {
 
   // 2. 추가 휴리스틱 경고 (permission에 없는 패턴)
   const additionalPatterns = [
-    { pattern: /:(){ :\|:& };:/, message: '[경고] 포크 폭탄 감지' },
+    { pattern: /:\(\)\s*\{\s*:\|:&\s*\}\s*;\s*:/, message: '[경고] 포크 폭탄 감지' },
     { pattern: /curl\s+.*\|\s*(bash|sh)/, message: '[경고] curl pipe to shell 감지 (원격 코드 실행 위험)' },
     { pattern: /wget\s+.*\|\s*(bash|sh)/, message: '[경고] wget pipe to shell 감지 (원격 코드 실행 위험)' },
     { pattern: /docker\s+run\s+.*--privileged/, message: '[경고] docker --privileged 감지 (호스트 권한 노출 위험)' },

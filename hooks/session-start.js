@@ -4,7 +4,7 @@
  *
  * 1. build.gradle 파싱 (Spring Boot 버전, Java 버전, 의존성)
  * 2. 프로젝트 구조 분석 (base package, 레이어 디렉토리, 설정 파일)
- * 3. 레벨 감지 (Monolith vs MSA)
+ * 3. 레벨 감지 (SingleModule / MultiModule / MSA)
  * 4. PDCA 상태 초기화
  * 5. 세션 컨텍스트 systemMessage 출력
  */
@@ -113,7 +113,7 @@ async function main() {
       if (teamState.enabled && teamState.currentPhase) {
         lines.push('');
         lines.push(`[Team] 이전 세션 팀 상태 복원 가능: phase=${teamState.currentPhase}, feature=${teamState.feature || '?'}`);
-        const activeMembers = teamState.members.filter(m => m.status === 'active' || m.status === 'paused');
+        const activeMembers = (teamState.members || []).filter(m => m.status === 'active' || m.status === 'paused');
         if (activeMembers.length > 0) {
           lines.push(`  멤버: ${activeMembers.map(m => `${m.id}(${m.status})`).join(', ')}`);
         }
@@ -146,13 +146,48 @@ async function main() {
     }
   } catch { /* memory 모듈 로드 실패 시 무시 */ }
 
+  // Feature Usage Report
+  try {
+    const featureReport = buildFeatureUsageReport(levelResult.level, activeFeatures.length > 0);
+    if (featureReport) {
+      lines.push('');
+      lines.push(featureReport);
+    }
+  } catch { /* ignore */ }
+
   lines.push('');
-  lines.push('사용 가능한 명령: /crud, /entity, /service, /controller, /pdca, /review, /test, /loop');
+  lines.push('사용 가능한 명령: /crud, /entity, /service, /controller, /pdca, /review, /test, /loop, /plan-plus, /pipeline, /qa');
 
   const result = {
     systemMessage: lines.join('\n'),
   };
   console.log(JSON.stringify(result));
+}
+
+/**
+ * Feature Usage Report 생성
+ * @param {string} level - 프로젝트 레벨
+ * @param {boolean} hasPdca - PDCA 진행 중 여부
+ * @returns {string|null}
+ */
+function buildFeatureUsageReport(level, hasPdca) {
+  const features = [];
+
+  if (level === 'SingleModule' || level === 'Starter') {
+    features.push(`${level}: /crud, /entity, /pdca, /plan-plus`);
+  } else if (level === 'MultiModule' || level === 'Monolith') {
+    features.push(`${level}: /crud, /entity, /pdca, /pipeline, /plan-plus`);
+  } else if (level === 'MSA') {
+    features.push('MSA: /crud, /entity, /pdca, /pipeline, /plan-plus, /qa');
+  } else {
+    features.push(`${level}: /crud, /entity, /pdca, /plan-plus`);
+  }
+
+  if (hasPdca) {
+    features.push('PDCA 활성: /pipeline 으로 9단계 개발 파이프라인 사용 가능');
+  }
+
+  return features.length > 0 ? `[Feature] ${features.join(' | ')}` : null;
 }
 
 main().catch(err => {

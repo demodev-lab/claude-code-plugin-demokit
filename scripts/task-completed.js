@@ -109,10 +109,15 @@ async function main() {
         });
         // 다음 phase로 전환
         const fullStatus = pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
-        fullStatus.currentPhase = nextPhase;
-        fullStatus.phases[nextPhase].status = 'in-progress';
-        fullStatus.phases[nextPhase].startedAt = new Date().toISOString();
-        pdcaStatus.saveStatus(projectRoot, activeFeature.feature, fullStatus);
+        if (fullStatus && fullStatus.phases) {
+          fullStatus.currentPhase = nextPhase;
+          if (!fullStatus.phases[nextPhase]) {
+            fullStatus.phases[nextPhase] = {};
+          }
+          fullStatus.phases[nextPhase].status = 'in-progress';
+          fullStatus.phases[nextPhase].startedAt = new Date().toISOString();
+          pdcaStatus.saveStatus(projectRoot, activeFeature.feature, fullStatus);
+        }
 
         const summary = pdcaPhase.generatePhaseSummary(fullStatus);
         hints.push(`[PDCA] '${activeFeature.feature}' 자동 전환: ${currentPhase} → ${nextPhase}`);
@@ -196,7 +201,7 @@ async function main() {
       const result = teamHooks.assignNextTeammateWork(
         activeFeature.currentPhase,
         activeFeature.feature,
-        activeFeature.level || 'Monolith'
+        activeFeature.level || 'SingleModule'
       );
 
       if (result.nextPhase) {

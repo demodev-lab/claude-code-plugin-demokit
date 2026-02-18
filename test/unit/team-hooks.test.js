@@ -47,7 +47,7 @@ describe('Team Hooks', () => {
     it('MSA 레벨에서 do → analyze', () => {
       const result = assignNextTeammateWork('do', 'auth', 'MSA');
       expect(result.nextPhase).toBe('analyze');
-      expect(result.team.pattern).toBe('council');
+      expect(result.team.pattern).toBe('watchdog');
       expect(result.team.members.length).toBeGreaterThan(0);
     });
 

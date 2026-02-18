@@ -48,7 +48,7 @@ describe('Task Creator', () => {
       expect(meta.pdcaPhase).toBe('plan');
       expect(meta.pdcaOrder).toBe(0);
       expect(meta.feature).toBe('auth');
-      expect(meta.level).toBe('Monolith');
+      expect(meta.level).toBe('SingleModule');
       expect(meta.createdAt).toBeDefined();
     });
 

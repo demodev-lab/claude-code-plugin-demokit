@@ -79,7 +79,7 @@ async function main() {
   try {
     const { stateWriter, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));
     const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : null;
-    const isCompleteStop = !loopState.active && !loopState.completionPromise;
+    const isCompleteStop = !loopState.active;
     const clearMode = cleanupPolicy?.clearTeamStateOnStopMode || TEAM_CLEAR_MODE_NEVER;
 
     const staleMs = Number(cleanupPolicy?.staleMemberMs);
@@ -100,6 +100,7 @@ async function main() {
         }
       }
       if (pausedAny) {
+        teamState.history = teamState.history || [];
         teamState.history.push({
           event: 'session_stopped',
           timestamp: new Date().toISOString(),
@@ -151,12 +152,11 @@ async function main() {
         const latestTeamState = stateWriter.loadTeamState(projectRoot);
         const hasLiveMembers = hasLiveMembersForClear(latestTeamState);
         const clearStateAtStop = shouldClearTeamStateAtStop(clearMode, isCompleteStop, hasLiveMembers)
-          || cleanupPolicy.forceClearOnStop === true
+          || cleanupPolicy?.forceClearOnStop === true
           || cleanupPolicy?.clearOnStop === true;
 
         if (clearStateAtStop) {
           stateWriter.clearTeamState(projectRoot);
-          return;
         }
       }
     }
@@ -249,6 +249,7 @@ async function main() {
   }
 
   // 반복 계속: iteration 증가
+  const completedIteration = loopState.currentIteration;
   const newState = loopStateMod.incrementIteration(projectRoot);
 
   // loop-log.md에 이번 반복 결과 append
@@ -259,7 +260,7 @@ async function main() {
       : '(결과 요약 없음)';
 
     writer.appendLoopLog(projectRoot, {
-      iteration: newState.currentIteration,
+      iteration: completedIteration,
       maxIterations: newState.maxIterations,
       prompt: loopState.prompt,
       result: resultSummary,
