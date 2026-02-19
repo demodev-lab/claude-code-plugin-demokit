@@ -23,7 +23,7 @@ flowchart TB
     end
 
     subgraph Command[Command Layer]
-      SK[Skills\n33 commands]
+      SK[Skills<br/>33 commands]
       CMD[commands/*.md]
     end
 

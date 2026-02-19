@@ -70,6 +70,6 @@ flowchart TD
     D2 --> M
     D3 --> M
 
-    M -- true --> X[Single leader\nmaxParallel=1]
-    M -- false --> Y[Multi-agent pattern\nleader/council/swarm]
+    M -- true --> X[Single leader<br/>maxParallel=1]
+    M -- false --> Y[Multi-agent pattern<br/>leader/council/swarm]
 ```

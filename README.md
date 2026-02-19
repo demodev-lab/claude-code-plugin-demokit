@@ -23,10 +23,10 @@
 ```mermaid
 flowchart LR
     U[Developer / Team] --> C[Claude Code]
-    C --> S[Skills\n/commands]
-    S --> H[Hook Events\nPre/Post/Stop/TaskCompleted]
+    C --> S[Skills<br/>/commands]
+    S --> H[Hook Events<br/>Pre/Post/Stop/TaskCompleted]
     H --> X[scripts/*]
-    X --> L[Domain Libs\ncore · pdca · team · pipeline]
+    X --> L[Domain Libs<br/>core · pdca · team · pipeline]
 
     L --> F1[(.pdca/status.json)]
     L --> F2[(.pipeline/status.json)]
