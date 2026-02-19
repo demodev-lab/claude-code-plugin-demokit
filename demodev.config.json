@@ -183,6 +183,7 @@
     "automationLevel": "semi-auto",
     "matchRateThreshold": 90,
     "maxIterations": 5,
+    "doStickyCacheTtlMs": 15000,
     "matchRateWeights": {
       "apiEndpoints": 30,
       "dbSchema": 25,

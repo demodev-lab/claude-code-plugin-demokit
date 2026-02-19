@@ -8,6 +8,10 @@ describe('PDCA Phase', () => {
     it('6개 phase 정의', () => {
       expect(PHASES).toEqual(['plan', 'design', 'do', 'analyze', 'iterate', 'report']);
     });
+
+    it('do phase 담당 agent는 service-expert', () => {
+      expect(PHASE_INFO.do.agent).toBe('service-expert');
+    });
   });
 
   describe('isValidPhase', () => {
@@ -120,6 +124,38 @@ describe('PDCA Phase', () => {
         const second = checkPhaseDeliverables(tmpDir, 'feature', 'do');
         expect(second.complete).toBe(true);
       } finally {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    it('do sticky cache는 TTL 이후 만료되어 최신 상태를 반영', () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdca-phase-sticky-ttl-'));
+      try {
+        const entityDir = path.join(tmpDir, 'src', 'main', 'java', 'example', 'entity');
+        fs.mkdirSync(entityDir, { recursive: true });
+        const filePath = path.join(entityDir, 'A.java');
+        fs.writeFileSync(filePath, 'class A {}');
+
+        const feature = 'sticky-ttl-feature';
+        const first = checkPhaseDeliverables(tmpDir, feature, 'do');
+        expect(first.complete).toBe(true);
+
+        fs.rmSync(filePath, { force: true });
+
+        // TTL 구간 내에서는 sticky hit
+        jest.advanceTimersByTime(5000);
+        const withinTtl = checkPhaseDeliverables(tmpDir, feature, 'do');
+        expect(withinTtl.complete).toBe(true);
+
+        // 기본 TTL(15000ms) 이후에는 재평가되어 미완료 반영
+        jest.advanceTimersByTime(20000);
+        const expired = checkPhaseDeliverables(tmpDir, feature, 'do');
+        expect(expired.complete).toBe(false);
+      } finally {
+        jest.useRealTimers();
         fs.rmSync(tmpDir, { recursive: true, force: true });
       }
     });

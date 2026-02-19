@@ -128,6 +128,10 @@ async function main() {
           pdcaStatus.saveStatus(projectRoot, activeFeature.feature, fullStatus);
         }
 
+        if (activePdcaFeature) {
+          activePdcaFeature.currentPhase = nextPhase;
+        }
+
         const summary = pdcaPhase.generatePhaseSummary(fullStatus);
         hints.push(`[PDCA] '${activeFeature.feature}' 자동 전환: ${currentPhase} → ${nextPhase}`);
         hints.push(`  ${summary}`);

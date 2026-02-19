@@ -71,6 +71,10 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 - 데모/빠른 검증: `do`를 1인 + leader
 - 품질 우선 개발: `do`를 2인 이상 + swarm
 
+추가로 do 산출물 sticky cache TTL은 `pdca.doStickyCacheTtlMs`로 조정할 수 있습니다.
+- 기본값: `15000` (15초)
+- `0`으로 설정 시 sticky cache 비활성화
+
 ---
 
 ## 3) 훅 운영 가이드
