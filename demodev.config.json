@@ -283,11 +283,11 @@
     "enabled": true,
     "delegateMode": false,
     "ctoAgent": "spring-architect",
-    "maxTeammates": { "SingleModule": 2, "MultiModule": 3, "Monolith": 3, "MSA": 5 },
+    "maxTeammates": { "SingleModule": 3, "MultiModule": 3, "Monolith": 3, "MSA": 5 },
     "levelOverrides": {
       "SingleModule": {
         "delegateMode": false,
-        "maxTeammates": 2
+        "maxTeammates": 3
       },
       "MSA": {
         "delegateMode": false,
@@ -298,7 +298,7 @@
     "phaseTeams": {
       "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
       "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
-      "do": { "lead": null, "members": ["service-expert", "domain-expert"], "pattern": "swarm" },
+      "do": { "lead": null, "members": ["service-expert", "domain-expert", "api-expert"], "pattern": "swarm" },
       "analyze": { "lead": null, "members": ["gap-detector", "test-expert", "code-reviewer"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
       "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
@@ -306,13 +306,13 @@
     "performance": {
       "emitTransitionHints": false,
       "phaseMemberCap": {
-        "do": { "SingleModule": 2, "default": 2 }
+        "do": { "SingleModule": 3, "default": 2 }
       },
       "phasePatternOverride": {
         "do": { "SingleModule": "swarm" }
       },
       "phaseMaxParallel": {
-        "do": { "SingleModule": 2 }
+        "do": { "SingleModule": 3 }
       }
     },
     "cleanup": {
