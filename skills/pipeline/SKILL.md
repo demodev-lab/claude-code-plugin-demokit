@@ -41,6 +41,8 @@ description: 이 스킬은 사용자가 "pipeline", "파이프라인", "개발 �
 feature가 들어오면 아래 명령으로 파이프라인 상태를 시작/갱신한다.
 
 ```bash
+node scripts/pipeline-ctl.js start "{feature}"
+# 또는
 node scripts/pipeline-ctl.js start --feature "{feature}"
 ```
 

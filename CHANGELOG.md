@@ -23,6 +23,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
 - `skills/pipeline/SKILL.md`를 상태 파일 기반(`.pipeline/status.json`) status/next 자동 전이 흐름으로 강화.
 - `skills/pipeline/skill.yaml` argument-hint를 `feature|status|next` 형태로 갱신.
+- `scripts/pipeline-ctl.js`에서 `start user-management`(positional)도 지원하도록 개선.
+- `lib/pipeline/state.js`에서 완료된 파이프라인에 대한 반복 `next` 호출 시 history 중복 누적을 방지.
 - `demokit-system/_GRAPH-INDEX.md`의 에이전트 모델 표를 실제 설정(sonnet/opus)과 동기화.
 - `package.json`에 운영 스크립트 추가:
   - `validate:hooks`

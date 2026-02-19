@@ -4,6 +4,7 @@
  * /pipeline status|next 상태 전이를 위한 CLI
  *
  * Usage:
+ *   node scripts/pipeline-ctl.js start user-management [--reset]
  *   node scripts/pipeline-ctl.js start --feature user-management [--reset]
  *   node scripts/pipeline-ctl.js status
  *   node scripts/pipeline-ctl.js next
@@ -23,6 +24,7 @@ function hasFlag(args, name) {
 function printUsage() {
   console.error([
     '사용법: node scripts/pipeline-ctl.js <start|status|next> [options]',
+    '  start <feature> [--reset]            파이프라인 시작/초기화',
     '  start --feature <feature> [--reset]  파이프라인 시작/초기화',
     '  status                                현재 파이프라인 상태',
     '  next                                  현재 phase 완료 후 다음 phase 전이',
@@ -52,9 +54,10 @@ function main() {
   try {
     switch (command) {
       case 'start': {
-        const feature = getArg(args, '--feature');
+        const positionalFeature = args[1] && !args[1].startsWith('--') ? args[1] : null;
+        const feature = getArg(args, '--feature') || positionalFeature;
         if (!feature) {
-          console.error('--feature 필수 (예: --feature user-management)');
+          console.error('feature 필수 (예: start user-management 또는 --feature user-management)');
           process.exit(1);
         }
 

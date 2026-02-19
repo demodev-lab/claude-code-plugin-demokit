@@ -74,10 +74,14 @@ describe('pipeline state', () => {
       const state = pipelineState.loadStatus(projectRoot);
       expect(state.completedAt).toBeTruthy();
       expect(state.phases.every(p => p.status === 'completed')).toBe(true);
+      const historyLength = state.history.length;
 
       const last = pipelineState.advancePipeline(projectRoot);
       expect(last.completed).toBe(true);
       expect(last.advanced).toBe(false);
+
+      const after = pipelineState.loadStatus(projectRoot);
+      expect(after.history.length).toBe(historyLength);
     } finally {
       fs.rmSync(projectRoot, { recursive: true, force: true });
     }
