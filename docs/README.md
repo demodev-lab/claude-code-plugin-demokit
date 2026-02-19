@@ -12,6 +12,7 @@
 - [Config Reference](./reference-config.md)
 - [Troubleshooting](./troubleshooting.md)
 - [Migration from bkit](./migration-from-bkit.md)
+- [Compatibility Command Map](./compatibility-command-map.md)
 
 ## Scope
 

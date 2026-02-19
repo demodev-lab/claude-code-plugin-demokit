@@ -13,6 +13,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Hook 관련 신규 테스트 추가:
   - `test/unit/hook-runtime.test.js`
   - `test/unit/pipeline-phase-runtime.test.js` 보강
+- bkit 호환 명령 alias 확장 (`commands/*`):
+  - `/code-review`, `/zero-script-qa`, `/development-pipeline`
+  - `/starter`, `/dynamic`, `/enterprise`
+  - `/phase-1-schema` ~ `/phase-9-deployment`
+- 호환 명령 매핑 문서 추가: `docs/compatibility-command-map.md`
 
 ### Changed
 - 주요 hook 스크립트가 `hooks.runtime` 토글을 존중하도록 개선:

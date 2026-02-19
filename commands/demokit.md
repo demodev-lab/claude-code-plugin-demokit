@@ -55,6 +55,13 @@ allowed-tools:
 스타일/문서
   /output-style-setup        output style 설치/적용 안내
 
+호환 alias (bkit)
+  /code-review               = /review
+  /zero-script-qa            = /qa
+  /development-pipeline      = /pipeline
+  /starter /dynamic /enterprise
+  /phase-1-schema ... /phase-9-deployment
+
 권장 시작 순서
   1) /init
   2) /pdca plan <feature>

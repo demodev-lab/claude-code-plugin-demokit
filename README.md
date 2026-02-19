@@ -155,6 +155,16 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 
 > 개별 사용법은 `/{command} help`로 확인.
 
+### bkit 호환 alias 커맨드
+
+- `/code-review` -> `/review`
+- `/zero-script-qa` -> `/qa`
+- `/development-pipeline` -> `/pipeline`
+- `/starter`, `/dynamic`, `/enterprise` (프로파일 가이드)
+- `/phase-1-schema` ... `/phase-9-deployment` (phase 가이드)
+
+자세한 매핑: [`docs/compatibility-command-map.md`](./docs/compatibility-command-map.md)
+
 ---
 
 ## 멀티 에이전트/레벨 모델
