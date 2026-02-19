@@ -1,3 +1,11 @@
 name: pdca
 argument-hint: "pdca 명령 (plan|design|do|analyze|iterate|report|status|next|archive|cleanup)"
 agent: spring-architect
+agents:
+  default: spring-architect
+  plan: spring-architect
+  design: spring-architect
+  do: service-expert
+  analyze: gap-detector
+  iterate: pdca-iterator
+  report: report-generator

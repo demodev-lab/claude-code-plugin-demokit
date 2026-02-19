@@ -33,10 +33,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - SingleModule `do` phase 기본을 1인(`service-expert`) + `leader` + `maxParallel=1`로 최적화
   - `lib/team/team-config.js`가 `team.performance` 오버라이드를 반영하도록 개선
   - `lib/team/orchestrator.js`가 팀별 `maxParallel` 설정을 존중하도록 개선
+  - `skills/pdca/skill.yaml`에 phase별 agents 매핑을 명시하여 `do/analyze/iterate/report`에서 경량/전문 에이전트 우선 라우팅
 - `lib/pdca/phase.js` deliverables 탐색 최적화:
   - do phase 패턴을 `src/main/java/**/entity/*.java`로 좁혀 스캔 범위 축소
   - do phase 완료 후 sticky cache를 사용해 반복 체크 시 재스캔 최소화
   - 파일 탐색 시 skip 디렉토리(`build`, `target`, `node_modules` 등) 제외
+- `scripts/task-completed.js` 핫패스 최적화:
+  - 기본값으로 Team transition hint 계산 비활성화(`team.performance.emitTransitionHints=false`)
+  - PDCA active feature 컨텍스트를 재사용해 팀 sync 시 중복 상태 조회를 줄임
+- `lib/team/hooks.js`가 `strategy` 대신 `team-config` 기반 팀 구성을 사용하도록 변경(성능 오버라이드 반영 일관성 확보).
 - `demokit-system/_GRAPH-INDEX.md`의 에이전트 모델 표를 실제 설정(sonnet/opus)과 동기화.
 - `package.json`에 운영 스크립트 추가:
   - `validate:hooks`

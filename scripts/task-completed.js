@@ -70,6 +70,7 @@ async function main() {
   }
 
   const hints = [];
+  let activePdcaFeature = null;
 
   // 1. context.md 저장 (공통 상태 수집 사용)
   try {
@@ -97,6 +98,11 @@ async function main() {
     const activeFeature = features.find(f => f.currentPhase && f.currentPhase !== 'report');
 
     if (activeFeature) {
+      activePdcaFeature = {
+        feature: activeFeature.feature,
+        currentPhase: activeFeature.currentPhase,
+        level: core.cache.get('level') || 'SingleModule',
+      };
       const currentPhase = activeFeature.currentPhase;
       const nextPhase = pdcaPhase.getNextPhase(currentPhase);
       const activeFeatureStatus = pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
@@ -199,17 +205,15 @@ async function main() {
   } catch { /* skill-loader 실패 시 무시 */ }
 
   // 5. Team Hooks - phase 완료 시 다음 phase 전환 안내
-  try {
-    const { status: pdcaStatusMod } = require(path.join(__dirname, '..', 'lib', 'pdca'));
-    const { hooks: teamHooks } = require(path.join(__dirname, '..', 'lib', 'team'));
-    const features = pdcaStatusMod.listFeatures(projectRoot);
-    const activeFeature = features.find(f => f.currentPhase && f.currentPhase !== 'report');
-
-    if (activeFeature) {
+  // 기본값 off: 데모/핫패스 성능을 위해 불필요한 추가 계산을 생략
+  const emitTeamTransitionHints = core.config.getConfigValue('team.performance.emitTransitionHints', false);
+  if (emitTeamTransitionHints && activePdcaFeature) {
+    try {
+      const { hooks: teamHooks } = require(path.join(__dirname, '..', 'lib', 'team'));
       const result = teamHooks.assignNextTeammateWork(
-        activeFeature.currentPhase,
-        activeFeature.feature,
-        activeFeature.level || 'SingleModule'
+        activePdcaFeature.currentPhase,
+        activePdcaFeature.feature,
+        activePdcaFeature.level || 'SingleModule'
       );
 
       if (result.nextPhase) {
@@ -218,8 +222,8 @@ async function main() {
           hints.push(`[Team Hooks] 팀 재구성 필요`);
         }
       }
-    }
-  } catch { /* team hooks 실패 시 무시 */ }
+    } catch { /* team hooks 실패 시 무시 */ }
+  }
 
   // 6. Team 작업 할당
   try {
@@ -236,7 +240,25 @@ async function main() {
       const tentativeTaskId = extractCompletedTaskId(hookData) || taskDesc;
       const matchedMember = resolveTaskDoneMember(teamState, explicitAgentId, tentativeTaskId, coordinator);
       const completedTaskId = extractCompletedTaskId(hookData, matchedMember) || taskDesc;
-      const syncContext = orchestrator.buildTeamSyncContext ? orchestrator.buildTeamSyncContext(projectRoot) : null;
+      let syncContext = null;
+      if (activePdcaFeature && orchestrator.buildTeamContextForPhase) {
+        const teamContext = orchestrator.buildTeamContextForPhase(
+          activePdcaFeature.currentPhase,
+          activePdcaFeature.feature,
+          { level: activePdcaFeature.level || 'SingleModule' }
+        );
+        if (teamContext) {
+          syncContext = {
+            feature: activePdcaFeature.feature,
+            phase: activePdcaFeature.currentPhase,
+            pattern: teamContext.pattern,
+            taskQueue: teamContext.taskQueue,
+          };
+        }
+      } else if (orchestrator.buildTeamSyncContext) {
+        syncContext = orchestrator.buildTeamSyncContext(projectRoot);
+      }
+
       const completionResult = stateWriter.completeTaskAndSync(projectRoot, {
         memberId: matchedMember ? matchedMember.id : null,
         taskId: completedTaskId,

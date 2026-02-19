@@ -292,6 +292,7 @@
       "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
     },
     "performance": {
+      "emitTransitionHints": false,
       "phaseMemberCap": {
         "do": { "SingleModule": 1, "default": 2 }
       },

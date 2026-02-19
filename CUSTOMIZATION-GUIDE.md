@@ -52,6 +52,7 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 {
   "team": {
     "performance": {
+      "emitTransitionHints": false,
       "phaseMemberCap": {
         "do": { "SingleModule": 1, "default": 2 }
       },
