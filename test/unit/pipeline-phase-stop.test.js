@@ -65,6 +65,29 @@ describe('pipeline phase stop scripts', () => {
     }
   });
 
+  it('does not treat negative-completion phrases as completion signals', async () => {
+    const projectRoot = createTempProject();
+    try {
+      pipelineState.startPipeline(projectRoot, 'demo-feature', { reset: true });
+
+      const handler = createPhaseStopHandler({ phaseId: 1, phaseName: 'Schema' });
+
+      const koreanNegative = await handler({
+        projectRoot,
+        hookData: { task_description: 'schema 미완료 상태' },
+      });
+      expect(koreanNegative).toEqual({});
+
+      const englishNegative = await handler({
+        projectRoot,
+        hookData: { task_description: 'task is not complete yet' },
+      });
+      expect(englishNegative).toEqual({});
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
+  });
+
   it('returns empty object when phase does not match current pipeline phase', async () => {
     const projectRoot = createTempProject();
     try {

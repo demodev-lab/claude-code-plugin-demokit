@@ -90,7 +90,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `Stop` -> `pipeline-phase-stop.js`
   - `TaskCompleted` -> `pipeline-phase-transition.js`
 - `developmentPipeline.phaseScripts` 런타임 토글(`enabled`, `preEnabled`, `postEnabled`, `transitionEnabled`) 추가.
-- `pipeline-phase-stop-common.js` 완료 신호 정규식을 개선해 `incomplete` 같은 단어의 오탐을 방지.
+- `pipeline-phase-stop-common.js` 완료 신호 판정을 강화해 `incomplete`, `미완료`, `not complete` 류의 부정 표현 오탐을 방지.
+- `pipeline-phase-runtime.js` emit-once marker 키에 pipeline run id(`startedAt`)를 포함해 reset/start 이후 pre/post 힌트가 정상 재노출되도록 개선.
 - `lib/core/plugin-validator.js`에 hook timeout 검증 로직 추가 (누락/비정상값/의심 단위 경고).
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
 - `skills/pipeline/SKILL.md`를 상태 파일 기반(`.pipeline/status.json`) status/next 자동 전이 흐름으로 강화.

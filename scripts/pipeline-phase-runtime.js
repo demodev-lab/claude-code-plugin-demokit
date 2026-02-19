@@ -173,11 +173,23 @@ function saveRuntimeMarkers(projectRoot, markers) {
   fs.writeFileSync(markerPath, JSON.stringify(markers, null, 2), 'utf-8');
 }
 
-function markStageEmission(projectRoot, feature, phaseId, stage, emitOncePerPhase) {
+function markStageEmission(projectRoot, feature, runId, phaseId, stage, emitOncePerPhase) {
   if (!emitOncePerPhase) return true;
 
-  const markerKey = `${feature || 'unknown'}:${phaseId}:${stage}`;
+  const normalizedFeature = feature || 'unknown';
+  const normalizedRunId = runId || 'run';
+  const markerKey = `${normalizedFeature}:${normalizedRunId}:${phaseId}:${stage}`;
   const markers = loadRuntimeMarkers(projectRoot);
+
+  // 동일 feature의 이전 run marker는 정리해 재시작/리셋 후 힌트가 정상 재노출되도록 한다.
+  const featurePrefix = `${normalizedFeature}:`;
+  const currentRunPrefix = `${normalizedFeature}:${normalizedRunId}:`;
+  Object.keys(markers).forEach((key) => {
+    if (key.startsWith(featurePrefix) && !key.startsWith(currentRunPrefix)) {
+      delete markers[key];
+    }
+  });
+
   if (markers[markerKey]) {
     return false;
   }
@@ -211,6 +223,7 @@ function createPhaseActivityHandler({ phaseId, phaseName, stage }) {
     const shouldEmit = markStageEmission(
       context.projectRoot,
       state.feature,
+      state.startedAt,
       phaseId,
       stage,
       context.phaseScriptConfig?.emitOncePerPhase !== false,

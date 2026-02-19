@@ -7,6 +7,9 @@
 - `hooks.runtime.events.<EventName>`
 - `hooks.runtime.scripts.<ScriptKey>`
 
+> 주의: runtime 토글은 **hookRuntime.shouldRun**을 사용하는 스크립트에 적용됩니다.
+> (예: `task-completed`, `stop-handler`, `context-compaction`, `subagent/team-idle`, `pipeline-phase-*`)
+
 예시:
 
 ```json

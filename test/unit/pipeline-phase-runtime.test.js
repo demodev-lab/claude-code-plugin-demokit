@@ -1,3 +1,7 @@
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
 const runtime = require('../../scripts/pipeline-phase-runtime');
 
 describe('pipeline-phase-runtime helpers', () => {
@@ -62,5 +66,25 @@ describe('pipeline-phase-runtime helpers', () => {
   it('returns stage hint by phase/stage', () => {
     expect(runtime.getStageHint({ slug: 'feature' }, 'pre')).toBeTruthy();
     expect(runtime.getStageHint({ slug: 'feature' }, 'unknown')).toBeNull();
+  });
+
+  it('resets emit-once markers per pipeline run id', () => {
+    const projectRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'demokit-runtime-marker-'));
+    try {
+      const first = runtime.markStageEmission(projectRoot, 'feature-a', 'run-1', 1, 'pre', true);
+      const second = runtime.markStageEmission(projectRoot, 'feature-a', 'run-1', 1, 'pre', true);
+      const third = runtime.markStageEmission(projectRoot, 'feature-a', 'run-2', 1, 'pre', true);
+
+      expect(first).toBe(true);
+      expect(second).toBe(false);
+      expect(third).toBe(true);
+
+      const markerPath = path.join(projectRoot, '.pipeline', '.phase-runtime-markers.json');
+      const markers = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+      expect(Object.keys(markers).some(k => k.includes('run-1'))).toBe(false);
+      expect(Object.keys(markers).some(k => k.includes('run-2'))).toBe(true);
+    } finally {
+      fs.rmSync(projectRoot, { recursive: true, force: true });
+    }
   });
 });

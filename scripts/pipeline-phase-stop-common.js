@@ -5,6 +5,7 @@
  */
 const path = require('path');
 
+const NEGATIVE_SIGNAL_REGEX = /(미완료|미완성|not\s+complete(?:d)?|not\s+done|incomplete|unfinished|pending|todo|to-do|wip|진행\s*중|검토\s*중)/i;
 const COMPLETION_SIGNAL_REGEX = /((완료|완성|마무리|끝)|\b(done|complete(?:d)?|finish(?:ed)?|implemented|resolved|fixed)\b)/i;
 
 async function readHookDataFromStdin() {
@@ -36,7 +37,14 @@ function extractTaskText(hookData) {
 
 function isCompletionSignal(taskText) {
   if (!taskText) return false;
-  return COMPLETION_SIGNAL_REGEX.test(taskText);
+  const normalized = String(taskText).trim();
+  if (!normalized) return false;
+
+  if (NEGATIVE_SIGNAL_REGEX.test(normalized)) {
+    return false;
+  }
+
+  return COMPLETION_SIGNAL_REGEX.test(normalized);
 }
 
 function getNextPhase(state, currentPhaseId) {
