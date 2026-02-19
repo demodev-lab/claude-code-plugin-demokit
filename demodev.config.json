@@ -286,8 +286,8 @@
     "maxTeammates": { "SingleModule": 2, "MultiModule": 3, "Monolith": 3, "MSA": 5 },
     "levelOverrides": {
       "SingleModule": {
-        "delegateMode": true,
-        "maxTeammates": 1
+        "delegateMode": false,
+        "maxTeammates": 2
       },
       "MSA": {
         "delegateMode": false,
@@ -306,13 +306,13 @@
     "performance": {
       "emitTransitionHints": false,
       "phaseMemberCap": {
-        "do": { "SingleModule": 1, "default": 2 }
+        "do": { "SingleModule": 2, "default": 2 }
       },
       "phasePatternOverride": {
-        "do": { "SingleModule": "leader" }
+        "do": { "SingleModule": "swarm" }
       },
       "phaseMaxParallel": {
-        "do": { "SingleModule": 1 }
+        "do": { "SingleModule": 2 }
       }
     },
     "cleanup": {
