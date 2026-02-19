@@ -58,6 +58,14 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) >= 1.0.0
 - Node.js (hooks/scripts 실행용)
 
+## 운영 문서
+
+- 커스터마이징 가이드: `CUSTOMIZATION-GUIDE.md`
+- 변경 이력: `CHANGELOG.md`
+- 명령 허브: `commands/demokit.md`
+- 출력 스타일 가이드: `commands/output-style-setup.md`
+- 시스템 문서: `demokit-system/README.md`
+
 ## 빠른 시작
 
 ### 0. 도움말
