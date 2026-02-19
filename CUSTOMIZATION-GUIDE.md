@@ -79,19 +79,29 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 
 `demodev.config.json > team.levelOverrides`로 레벨별 팀 실행 전략을 바꿀 수 있습니다.
 
+또한 `team.levelProfileMap`으로 demokit 레벨을 bkit 스타일 프로파일(`Dynamic`, `Enterprise`)로 매핑해 호환 정책을 적용할 수 있습니다.
+
 예시:
 
 ```json
 {
   "team": {
     "delegateMode": false,
+    "levelProfileMap": {
+      "SingleModule": "Dynamic",
+      "MultiModule": "Dynamic",
+      "Monolith": "Dynamic",
+      "MSA": "Enterprise"
+    },
     "levelOverrides": {
       "SingleModule": {
-        "delegateMode": true,
-        "maxTeammates": 1
-      },
-      "MSA": {
         "delegateMode": false,
+        "maxTeammates": 3
+      },
+      "Dynamic": {
+        "maxTeammates": 3
+      },
+      "Enterprise": {
         "maxTeammates": 5
       }
     }
@@ -102,6 +112,7 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 동작:
 - `delegateMode=true`면 해당 레벨의 phase 실행이 단일 리더 중심(`leader`, `maxParallel=1`)으로 축소됩니다.
 - `phase.lead`가 있으면 우선 사용하고, 없으면 첫 번째 멤버를 delegate agent로 사용합니다.
+- level override는 `직접 레벨` -> `매핑 프로파일` -> `default` 순으로 fallback됩니다.
 
 ---
 
@@ -126,6 +137,27 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
   - 예: `DEMOKIT_SNAPSHOT_CACHE_TTL_MS=10000` (10초)
   - 예: `DEMOKIT_SNAPSHOT_CACHE_TTL_MS=0` (디스크 캐시 비활성화)
 
+### Pipeline Phase Scripts 토글
+
+`developmentPipeline.phaseScripts`에서 pre/post/transition hook 동작을 제어할 수 있습니다.
+
+```json
+{
+  "developmentPipeline": {
+    "phaseScripts": {
+      "enabled": true,
+      "preEnabled": false,
+      "postEnabled": false,
+      "transitionEnabled": true
+    }
+  }
+}
+```
+
+권장:
+- 데모/성능 우선: `pre=false`, `post=false`, `transition=true`
+- 상세 추적/분석: `pre=true`, `post=true`, `transition=true`
+
 ---
 
 ## 4) 업데이트 충돌 방지 전략
@@ -145,6 +177,8 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 
 ```bash
 npm run validate:plugin -- --verbose
+npm run validate:hooks
+npm run check:graph-index
 npm test -- --runInBand
 ```
 

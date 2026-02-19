@@ -283,7 +283,13 @@
     "enabled": true,
     "delegateMode": false,
     "ctoAgent": "spring-architect",
-    "maxTeammates": { "SingleModule": 3, "MultiModule": 3, "Monolith": 3, "MSA": 5 },
+    "maxTeammates": { "SingleModule": 3, "MultiModule": 3, "Monolith": 3, "MSA": 5, "Dynamic": 3, "Enterprise": 5 },
+    "levelProfileMap": {
+      "SingleModule": "Dynamic",
+      "MultiModule": "Dynamic",
+      "Monolith": "Dynamic",
+      "MSA": "Enterprise"
+    },
     "levelOverrides": {
       "SingleModule": {
         "delegateMode": false,
@@ -291,6 +297,12 @@
       },
       "MSA": {
         "delegateMode": false,
+        "maxTeammates": 5
+      },
+      "Dynamic": {
+        "maxTeammates": 3
+      },
+      "Enterprise": {
         "maxTeammates": 5
       }
     },
@@ -333,6 +345,12 @@
   },
   "developmentPipeline": {
     "enabled": true,
+    "phaseScripts": {
+      "enabled": true,
+      "preEnabled": false,
+      "postEnabled": false,
+      "transitionEnabled": true
+    },
     "phases": [
       { "id": 1, "name": "Schema", "agent": "dba-expert" },
       { "id": 2, "name": "Convention", "agent": "spring-architect" },

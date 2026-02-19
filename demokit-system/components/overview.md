@@ -9,9 +9,10 @@ demokit 플러그인의 전체 컴포넌트 현황.
 | Agents (에이전트) | 15개 |
 | Skills (스킬) | 33개 |
 | Hooks (이벤트) | 10개 |
-| Hook Commands | 15개 |
+| Hook Commands | 18개 |
 | Output Styles | 3개 |
 | Orchestration Patterns | 5개 |
+| Pipeline Phase Scripts | pre/post/stop/transition 지원 |
 
 ## Agents (15개)
 

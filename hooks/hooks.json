@@ -35,6 +35,16 @@
             "timeout": 5000
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-pre.js",
+            "timeout": 1500
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -65,6 +75,16 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js",
             "timeout": 5000
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-post.js",
+            "timeout": 1500
           }
         ]
       }
@@ -111,6 +131,11 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/task-completed.js",
             "timeout": 10000
+          },
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-transition.js",
+            "timeout": 3000
           }
         ]
       }

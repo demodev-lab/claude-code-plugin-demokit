@@ -14,11 +14,22 @@
 
 우선순위 (높음 → 낮음):
 
-1. `team.levelOverrides.<Level>`
-2. `team.performance`
-3. `team.phaseTeams`
-4. `team.maxTeammates`
-5. 기본값(`DEFAULT_PHASE_TEAMS`)
+1. `team.levelOverrides.<Level>` (직접 레벨)
+2. `team.levelOverrides.<Profile>` (호환 매핑 레벨)
+3. `team.performance`
+4. `team.phaseTeams`
+5. `team.maxTeammates`
+6. 기본값(`DEFAULT_PHASE_TEAMS`)
+
+## Level 호환 매핑
+
+`team.levelProfileMap`으로 demokit 레벨을 bkit 프로파일로 매핑할 수 있다.
+
+기본값:
+- `SingleModule -> Dynamic`
+- `MultiModule -> Dynamic`
+- `Monolith -> Dynamic`
+- `MSA -> Enterprise`
 
 ## Delegate Mode
 
@@ -39,13 +50,19 @@
 {
   "team": {
     "delegateMode": false,
+    "levelProfileMap": {
+      "SingleModule": "Dynamic",
+      "MSA": "Enterprise"
+    },
     "levelOverrides": {
       "SingleModule": {
-        "delegateMode": true,
-        "maxTeammates": 1
-      },
-      "MSA": {
         "delegateMode": false,
+        "maxTeammates": 3
+      },
+      "Dynamic": {
+        "maxTeammates": 3
+      },
+      "Enterprise": {
         "maxTeammates": 5
       }
     }

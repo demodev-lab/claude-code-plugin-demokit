@@ -18,22 +18,42 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `test/unit/graph-index-generator.test.js`
   - `test/unit/team-config-performance.test.js`
   - `test/unit/team-config-level-overrides.test.js`
+  - `test/unit/team-level-mapping.test.js`
+  - `test/unit/pipeline-phase-runtime.test.js`
   - `test/unit/pipeline-phase-stop.test.js`
   - `test/unit/pdca-phase.test.js` sticky-cache 케이스 보강
-- phase별 pipeline stop 스크립트 추가:
-  - `scripts/phase-1-schema-stop.js` ~ `scripts/phase-9-deployment-stop.js`
-  - `scripts/pipeline-phase-stop.js` (dispatcher)
-  - `scripts/pipeline-phase-stop-common.js` (공통 유틸)
+- phase별 pipeline 스크립트 추가:
+  - stop: `scripts/phase-1-schema-stop.js` ~ `scripts/phase-9-deployment-stop.js`
+  - pre/post: `scripts/phase-1-schema-pre.js` ~ `scripts/phase-9-deployment-post.js`
+  - dispatcher: `scripts/pipeline-phase-pre.js`, `scripts/pipeline-phase-post.js`, `scripts/pipeline-phase-stop.js`, `scripts/pipeline-phase-transition.js`
+  - common runtime: `scripts/pipeline-phase-runtime.js`, `scripts/pipeline-phase-stop-common.js`
 - 시스템 문서 확장:
   - `demokit-system/philosophy/architecture-principles.md`
   - `demokit-system/components/team-orchestration.md`
   - `demokit-system/components/pipeline-phase-scripts.md`
   - `demokit-system/scenarios/pdca-do-performance.md`
   - `demokit-system/scenarios/team-delegate-mode.md`
+- 운영 레퍼런스 문서 허브 추가 (`docs/*`):
+  - `docs/README.md`
+  - `docs/architecture-overview.md`
+  - `docs/team-orchestration-guide.md`
+  - `docs/pipeline-phase-scripts-guide.md`
+  - `docs/pdca-performance-guide.md`
+  - `docs/hook-runtime-control.md`
+  - `docs/reference-config.md`
+  - `docs/troubleshooting.md`
+  - `docs/migration-from-bkit.md`
+  - `docs/runbook-demo-vs-prod.md`
+  - `docs/performance-benchmark.md`
 
 ### Changed
 - `hooks/hooks.json` timeout 단위를 ms 기준으로 통일 (`5/10` → `5000/10000`).
-- `Stop` hook에 `pipeline-phase-stop.js`를 추가해 phase별 완료 힌트 처리를 분리.
+- Hook에 pipeline phase dispatcher를 추가해 stage별 처리 분리:
+  - `PreToolUse` -> `pipeline-phase-pre.js`
+  - `PostToolUse` -> `pipeline-phase-post.js`
+  - `Stop` -> `pipeline-phase-stop.js`
+  - `TaskCompleted` -> `pipeline-phase-transition.js`
+- `developmentPipeline.phaseScripts` 런타임 토글(`enabled`, `preEnabled`, `postEnabled`, `transitionEnabled`) 추가.
 - `pipeline-phase-stop-common.js` 완료 신호 정규식을 개선해 `incomplete` 같은 단어의 오탐을 방지.
 - `lib/core/plugin-validator.js`에 hook timeout 검증 로직 추가 (누락/비정상값/의심 단위 경고).
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
@@ -44,13 +64,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `lib/pipeline/state.js`의 start/next 전이를 파일 락 기반(`io.withFileLock`)으로 보호하여 동시 실행 시 상태 경합(race) 리스크 완화.
 - PDCA Do 오케스트레이션 성능 튜닝:
   - `demodev.config.json`에 `team.performance` 섹션 추가 (phase별 member cap/pattern/maxParallel override)
-  - SingleModule `do` phase 기본을 1인(`service-expert`) + `leader` + `maxParallel=1`로 최적화
+  - SingleModule `do` phase fan-out을 설정 기반으로 제어하도록 개선 (`phaseMemberCap/patternOverride/maxParallel`; 현재 기본 3인 멀티 실행)
   - `lib/team/team-config.js`가 `team.performance` 오버라이드를 반영하도록 개선
   - `lib/team/orchestrator.js`가 팀별 `maxParallel` 설정을 존중하도록 개선
   - `skills/pdca/skill.yaml`에 phase별 agents 매핑을 명시하여 `do/analyze/iterate/report`에서 경량/전문 에이전트 우선 라우팅
   - `lib/pdca/phase.js`의 `PHASE_INFO.do.agent`를 `service-expert`로 정렬해 문서/메타 불일치 제거
 - Team 레벨 제어 강화:
-  - `demodev.config.json`에 `team.delegateMode`, `team.levelOverrides` 추가
+  - `demodev.config.json`에 `team.delegateMode`, `team.levelOverrides`, `team.levelProfileMap` 추가
+  - demokit topology 레벨(`SingleModule/MultiModule/Monolith/MSA`)을 bkit 프로파일(`Dynamic/Enterprise`)로 호환 매핑하는 레이어(`lib/team/level-mapping.js`) 추가
   - `lib/team/team-config.js`가 레벨별 override + delegate mode를 반영하도록 확장
   - `lib/team/team-config.js`의 phase team 해석을 merge 방식으로 개선해 partial override(`pattern`만 override 등) 시 기본 members/lead 유지
   - delegate mode에서 phase를 단일 리더(`leader`, `maxParallel=1`)로 강제해 데모/핫패스 fan-out 축소

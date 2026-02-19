@@ -65,6 +65,7 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 - 명령 허브: `commands/demokit.md`
 - 출력 스타일 가이드: `commands/output-style-setup.md`
 - 시스템 문서: `demokit-system/README.md`
+- 운영/아키텍처 레퍼런스: `docs/README.md`
 
 ## 빠른 시작
 

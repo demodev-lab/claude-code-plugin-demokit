@@ -104,4 +104,32 @@ describe('team-config levelOverrides & delegateMode', () => {
     expect(result.pattern).toBe('leader');
     expect(result.members).toEqual(['service-expert', 'domain-expert']);
   });
+
+  it('falls back to mapped profile override when direct level override is absent', () => {
+    getPhaseExecutionPattern.mockReturnValue(undefined);
+
+    config.loadConfig.mockReturnValue({
+      team: {
+        delegateMode: false,
+        levelProfileMap: {
+          SingleModule: 'Dynamic',
+        },
+        maxTeammates: { Dynamic: 3 },
+        phaseTeams: {
+          do: { lead: null, members: ['service-expert', 'domain-expert', 'api-expert'], pattern: 'swarm' },
+        },
+        levelOverrides: {
+          Dynamic: {
+            phaseTeams: {
+              do: { pattern: 'leader', members: ['service-expert'] },
+            },
+          },
+        },
+      },
+    });
+
+    const result = teamConfig.getPhaseTeam('do', 'SingleModule');
+    expect(result.pattern).toBe('leader');
+    expect(result.members).toEqual(['service-expert']);
+  });
 });
