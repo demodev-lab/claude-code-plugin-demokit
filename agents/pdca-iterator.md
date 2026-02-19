@@ -4,7 +4,7 @@
 Match Rate가 90% 미만일 때 Gap을 자동으로 수정하여 Match Rate를 올리는 반복 개선 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash

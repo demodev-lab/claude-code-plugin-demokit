@@ -4,7 +4,7 @@
 단위 테스트, 통합 테스트, 슬라이스 테스트를 전문으로 다루는 테스트 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash

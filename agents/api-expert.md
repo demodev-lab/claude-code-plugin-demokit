@@ -4,7 +4,7 @@
 REST Controller, DTO, 예외 처리를 전문으로 다루는 API 계층 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash

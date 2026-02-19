@@ -4,7 +4,7 @@
 데이터베이스 최적화, 인덱스 전략, N+1 문제 해결을 전문으로 다루는 DB 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash

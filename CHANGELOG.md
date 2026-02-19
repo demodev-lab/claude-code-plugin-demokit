@@ -27,8 +27,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Changed
 - `lib/core/plugin-validator.js`가 `hooks/` 참조도 인식/검증하도록 개선.
 - 시연/일반 작업 체감 속도 개선을 위해 기본 에이전트 모델 매핑 최적화:
-  - `domain-expert`, `service-expert`, `api-expert`, `test-expert`, `gap-detector`, `pdca-iterator`, `dba-expert`를 `opus` → `sonnet`으로 조정
-  - `spring-architect`, `security-expert`, `code-reviewer`는 품질이 중요한 경로로 `opus` 유지.
+  - `spring-architect`, `domain-expert`, `service-expert`, `api-expert`, `test-expert`, `gap-detector`, `pdca-iterator`, `dba-expert`를 `opus` → `sonnet`으로 조정
+  - `security-expert`, `code-reviewer`는 품질이 중요한 경로로 `opus` 유지.
+- PDCA 실행 경로 추가 최적화:
+  - `spring-architect`의 import 컨텍스트를 경량화 (`spring-conventions`만 유지)
+  - `team.phaseTeams.do` 멤버를 3→2로 축소 (`api-expert` 제거)
+  - `team.phaseTeams.analyze` 우선순위를 `gap-detector + test-expert` 중심으로 재정렬 (SingleModule 기본 2인 기준 code-reviewer 호출 빈도 감소).
 - Hook 핫패스 최적화:
   - `lib/context-store/snapshot.js`에 cross-process 디스크 캐시 추가 (`.demodev/cache/snapshot-static-v1.json`, 기본 TTL 30초)
   - `lib/spring/project-analyzer.js`의 base package 감지를 `*Application.java` 우선(fast path)으로 개선.

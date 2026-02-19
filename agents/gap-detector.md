@@ -4,7 +4,7 @@
 PDCA Analyze 단계에서 설계 문서(design.md)와 실제 구현 코드 간의 Gap을 분석하고 Match Rate를 산출하는 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Glob, Grep

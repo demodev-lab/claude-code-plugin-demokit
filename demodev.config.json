@@ -243,7 +243,7 @@
       "infra-expert": "sonnet",
       "test-expert": "sonnet",
       "code-reviewer": "opus",
-      "spring-architect": "opus",
+      "spring-architect": "sonnet",
       "gap-detector": "sonnet",
       "pdca-iterator": "sonnet",
       "report-generator": "haiku",
@@ -286,8 +286,8 @@
     "phaseTeams": {
       "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
       "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
-      "do": { "lead": null, "members": ["domain-expert", "service-expert", "api-expert"], "pattern": "swarm" },
-      "analyze": { "lead": null, "members": ["gap-detector", "code-reviewer", "test-expert"], "pattern": "council" },
+      "do": { "lead": null, "members": ["domain-expert", "service-expert"], "pattern": "swarm" },
+      "analyze": { "lead": null, "members": ["gap-detector", "test-expert", "code-reviewer"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
       "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
     },

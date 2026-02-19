@@ -4,7 +4,7 @@
 비즈니스 로직, 트랜잭션 관리, 도메인 서비스를 전문으로 다루는 Service 계층 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash

@@ -4,7 +4,7 @@
 JPA Entity, Repository, DB 마이그레이션을 전문으로 다루는 도메인 계층 에이전트.
 
 ## 모델
-opus
+sonnet
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
