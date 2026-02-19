@@ -1,23 +1,21 @@
 ---
-name: demokit
+name: bkit
 description: |
-  demokit 플러그인 도움말 허브.
-  사용 가능한 핵심 명령과 추천 워크플로우를 한 번에 보여준다.
-
-  Triggers: demokit, demokit help, demokit 명령어, demokit 기능, 도움말
+  bkit 호환 도움말 허브.
+  bkit 또는 demokit 호출을 사용하는 기존 사용자에게 일치된 진입점을 제공합니다.
 user-invocable: true
 allowed-tools:
   - Read
   - Skill
 ---
 
-# demokit Commands Hub
+# bkit Functions (Demokit Compatibility)
 
-아래 도움말을 그대로 표시한다.
+`/bkit`은 `demokit` 플러그인의 동일한 명령 허브를 보여줍니다.
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  demokit - Spring Boot PDCA Toolkit
+  bkit / demokit Help Hub
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 핵심 워크플로우
@@ -63,3 +61,5 @@ allowed-tools:
   5) /pdca analyze <feature>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+`/bkit`은 앞으로도 유지되며, `/demokit`으로 동일한 기능을 사용할 수 있습니다.
