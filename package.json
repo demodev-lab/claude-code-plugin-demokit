@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "private": true,
   "scripts": {
-    "test": "jest",
+    "test": "jest --watchman=false",
     "test:unit": "jest test/unit",
     "test:integration": "jest test/integration",
     "validate:plugin": "node scripts/validate-plugin.js",
