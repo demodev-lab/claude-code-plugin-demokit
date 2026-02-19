@@ -1,4 +1,4 @@
-# demokit v1.0.1
+# demokit v1.0.2
 
 Spring Boot 백엔드 특화 Claude Code 플러그인. PDCA 방법론 기반의 체계적인 개발 워크플로우를 제공한다.
 
@@ -563,6 +563,27 @@ Import 해석 규칙:
 ```
 
 ## 변경 이력
+
+### v1.0.2 (2026-02-19)
+
+**성능 최적화**
+- PDCA 경로 에이전트 라우팅 재조정: `spring-architect`는 `opus` 유지, 실행 빈도가 높은 전문가 에이전트(`domain/service/api/test/gap/iterator/dba`)는 `sonnet`으로 조정
+- Hook 핫패스 최적화:
+  - snapshot static state cross-process 캐시 도입 (`.demodev/cache/snapshot-static-v1.json`)
+  - base package 감지 fast path (`*Application.java` 우선 탐색)
+  - `unified-bash-pre`의 task context 중복 로드 제거
+- Team phase 라우팅 최적화(Do/Analyze 경로 경량화)
+
+**안정성/품질 개선**
+- `hooks/hooks.json`에 schema/timeout/`SessionStart.once` 적용
+- `plugin-validator`가 `hooks/` 참조까지 검증하도록 확장
+- `validate-plugin`/`validate-hooks` 검증 경로 강화 및 경고 0 상태 정리
+- Plan-plus 라우팅/메타데이터 누락, 권한 glob escape edge case 수정
+
+**문서/운영 체계 강화**
+- 운영 문서 추가: `CUSTOMIZATION-GUIDE.md`, `commands/demokit.md`, `commands/output-style-setup.md`
+- 시스템 문서 레이어 확장: `demokit-system/scenarios`, `triggers`, `testing`
+- README 운영 문서 링크 및 최신 커맨드/팀모드 가이드 보강
 
 ### v1.0.1 (2026-02-18)
 
