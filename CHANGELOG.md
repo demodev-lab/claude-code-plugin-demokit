@@ -19,6 +19,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `CUSTOMIZATION-GUIDE.md`
   - `commands/demokit.md`
   - `commands/output-style-setup.md`
+- 시스템 문서 레이어 확장:
+  - `demokit-system/scenarios/*`
+  - `demokit-system/triggers/trigger-matrix.md`
+  - `demokit-system/testing/test-checklist.md`
 
 ### Changed
 - `lib/core/plugin-validator.js`가 `hooks/` 참조도 인식/검증하도록 개선.
