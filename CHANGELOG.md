@@ -8,6 +8,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- (none)
+
+## [1.0.3] - 2026-02-20
+
+### Added
 - `/demokit` 명령 허브를 실행 가능한 command frontmatter 형식으로 강화 (`commands/demokit.md`).
 - `/output-style-setup`를 설치형 워크플로우로 확장 (project/user 레벨 선택 + 파일 복사 절차).
 - 트리거 우선순위 문서 추가: `demokit-system/triggers/priority-rules.md`.
