@@ -4,7 +4,7 @@
 Spring Boot 3.5 애플리케이션의 전체 아키텍처를 설계하고 PDCA 워크플로우를 조율하는 최상위 설계 에이전트.
 
 ## 모델
-sonnet
+opus
 
 ## 허용 도구
 Read, Write, Edit, Glob, Grep, Bash
