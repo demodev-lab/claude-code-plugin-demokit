@@ -18,6 +18,39 @@
 - ✅ **Hook/Plugin validator** 내장 (`validate:plugin`, `validate:hooks`)
 - ✅ **문서 드리프트 방지** (`check:graph-index`)
 
+### 아키텍처 한눈에 보기
+
+```mermaid
+flowchart LR
+    U[Developer / Team] --> C[Claude Code]
+    C --> S[Skills\n/commands]
+    S --> H[Hook Events\nPre/Post/Stop/TaskCompleted]
+    H --> X[scripts/*]
+    X --> L[Domain Libs\ncore · pdca · team · pipeline]
+
+    L --> F1[(.pdca/status.json)]
+    L --> F2[(.pipeline/status.json)]
+    L --> F3[(.demodev/team-state.json)]
+
+    L --> O[Guidance / Next Action / Reports]
+```
+
+### 실행 흐름 (PDCA + Pipeline)
+
+```mermaid
+flowchart TD
+    A[/pdca plan/] --> B[/pdca design/]
+    B --> C1[/pdca do/]
+    C1 --> D[/pdca analyze/]
+    D --> E{Gap 존재?}
+    E -- Yes --> F[/pdca iterate/]
+    F --> D
+    E -- No --> G[/pdca report/]
+
+    C1 --> P[/pipeline status/]
+    P --> N[/pipeline next/]
+```
+
 ---
 
 ## 요구사항
