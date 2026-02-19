@@ -5,7 +5,8 @@
   "scripts": {
     "test": "jest",
     "test:unit": "jest test/unit",
-    "test:integration": "jest test/integration"
+    "test:integration": "jest test/integration",
+    "validate:plugin": "node scripts/validate-plugin.js"
   },
   "devDependencies": {
     "jest": "^29.7.0"
