@@ -44,8 +44,11 @@ description: 이 스킬은 사용자가 "help", "도움말", "demo-dev help", "�
 
 워크플로우
   /pdca         — PDCA 워크플로우 (plan/design/do/analyze/iterate/report/archive/cleanup)
+  /pipeline     — Spring Boot 9단계 개발 파이프라인
+  /plan-plus    — 브레인스토밍 강화 계획
   /loop         — 작업 완료까지 자동 반복 실행
   /cancel-loop  — 활성화된 자율 반복 루프 취소
+  /qa           — Zero-Script QA (빌드/테스트/로그 기반 품질 분석)
 
 Git
   /commit       — 변경사항을 논리적 단위로 스마트 커밋
