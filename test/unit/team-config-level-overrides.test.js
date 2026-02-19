@@ -79,4 +79,29 @@ describe('team-config levelOverrides & delegateMode', () => {
     expect(teamConfig.isDelegateMode('MSA')).toBe(false);
     expect(teamConfig.isDelegateMode('MultiModule')).toBe(false);
   });
+
+  it('merges partial phase team override with global phase team', () => {
+    getPhaseExecutionPattern.mockReturnValue(undefined);
+
+    config.loadConfig.mockReturnValue({
+      team: {
+        delegateMode: false,
+        maxTeammates: { SingleModule: 3 },
+        phaseTeams: {
+          do: { lead: null, members: ['service-expert', 'domain-expert'], pattern: 'swarm' },
+        },
+        levelOverrides: {
+          SingleModule: {
+            phaseTeams: {
+              do: { pattern: 'leader' },
+            },
+          },
+        },
+      },
+    });
+
+    const result = teamConfig.getPhaseTeam('do', 'SingleModule');
+    expect(result.pattern).toBe('leader');
+    expect(result.members).toEqual(['service-expert', 'domain-expert']);
+  });
 });

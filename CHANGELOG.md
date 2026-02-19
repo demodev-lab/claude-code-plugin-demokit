@@ -34,6 +34,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Changed
 - `hooks/hooks.json` timeout 단위를 ms 기준으로 통일 (`5/10` → `5000/10000`).
 - `Stop` hook에 `pipeline-phase-stop.js`를 추가해 phase별 완료 힌트 처리를 분리.
+- `pipeline-phase-stop-common.js` 완료 신호 정규식을 개선해 `incomplete` 같은 단어의 오탐을 방지.
 - `lib/core/plugin-validator.js`에 hook timeout 검증 로직 추가 (누락/비정상값/의심 단위 경고).
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
 - `skills/pipeline/SKILL.md`를 상태 파일 기반(`.pipeline/status.json`) status/next 자동 전이 흐름으로 강화.
@@ -51,6 +52,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Team 레벨 제어 강화:
   - `demodev.config.json`에 `team.delegateMode`, `team.levelOverrides` 추가
   - `lib/team/team-config.js`가 레벨별 override + delegate mode를 반영하도록 확장
+  - `lib/team/team-config.js`의 phase team 해석을 merge 방식으로 개선해 partial override(`pattern`만 override 등) 시 기본 members/lead 유지
   - delegate mode에서 phase를 단일 리더(`leader`, `maxParallel=1`)로 강제해 데모/핫패스 fan-out 축소
   - `lib/team/orchestrator.js`가 `delegateMode/delegateAgent` 메타를 팀 컨텍스트에 포함
   - `lib/team/hooks.js`가 `team-config` 기반 팀 구성을 일관되게 사용

@@ -5,7 +5,7 @@
  */
 const path = require('path');
 
-const COMPLETION_SIGNAL_REGEX = /(완료|완성|마무리|끝|done|complete|completed|finish|finished|implemented|resolved|fixed)/i;
+const COMPLETION_SIGNAL_REGEX = /((완료|완성|마무리|끝)|\b(done|complete(?:d)?|finish(?:ed)?|implemented|resolved|fixed)\b)/i;
 
 async function readHookDataFromStdin() {
   let input = '';
