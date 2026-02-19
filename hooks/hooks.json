@@ -1,13 +1,16 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-hooks.json",
   "description": "demokit 플러그인 훅 - 컨벤션 검증, 의도 감지, 루프 제어",
   "hooks": {
     "SessionStart": [
       {
         "matcher": "*",
+        "once": true,
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.js",
+            "timeout": 10
           }
         ]
       }
@@ -18,7 +21,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pre-write.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pre-write.js",
+            "timeout": 5
           }
         ]
       },
@@ -27,7 +31,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-bash-pre.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-bash-pre.js",
+            "timeout": 5
           }
         ]
       }
@@ -38,7 +43,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-write-post.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-write-post.js",
+            "timeout": 5
           }
         ]
       },
@@ -47,7 +53,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-bash.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-bash.js",
+            "timeout": 5
           }
         ]
       },
@@ -56,7 +63,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js",
+            "timeout": 5
           }
         ]
       }
@@ -67,7 +75,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/user-prompt-handler.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/user-prompt-handler.js",
+            "timeout": 5
           }
         ]
       }
@@ -78,11 +87,13 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js",
+            "timeout": 5
           },
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js",
+            "timeout": 5
           }
         ]
       }
@@ -93,7 +104,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/task-completed.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/task-completed.js",
+            "timeout": 10
           }
         ]
       }
@@ -103,7 +115,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-start-handler.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-start-handler.js",
+            "timeout": 5
           }
         ]
       }
@@ -113,7 +126,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js",
+            "timeout": 5
           }
         ]
       }
@@ -123,7 +137,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/team-idle-handler.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/team-idle-handler.js",
+            "timeout": 5
           }
         ]
       }
@@ -134,7 +149,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/context-compaction.js"
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/context-compaction.js",
+            "timeout": 10
           }
         ]
       }

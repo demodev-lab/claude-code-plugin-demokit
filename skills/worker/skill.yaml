@@ -1,0 +1,4 @@
+name: worker
+argument-hint: "[task]"
+agent: spring-architect
+task-template: "Execute worker protocol task"

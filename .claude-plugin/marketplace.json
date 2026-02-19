@@ -1,4 +1,6 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "version": 1,
   "name": "demodev-plugins",
   "owner": {
     "name": "demodev-lab",
