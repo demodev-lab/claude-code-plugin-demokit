@@ -21,6 +21,25 @@ function hasFlag(args, name) {
   return args.includes(name);
 }
 
+function parseStartFeature(args) {
+  const byOption = getArg(args, '--feature');
+  if (byOption) return byOption;
+
+  for (let i = 1; i < args.length; i += 1) {
+    const token = args[i];
+
+    if (!token.startsWith('--')) {
+      return token;
+    }
+
+    if (token === '--feature') {
+      i += 1; // skip value
+    }
+  }
+
+  return null;
+}
+
 function printUsage() {
   console.error([
     '사용법: node scripts/pipeline-ctl.js <start|status|next> [options]',
@@ -54,8 +73,7 @@ function main() {
   try {
     switch (command) {
       case 'start': {
-        const positionalFeature = args[1] && !args[1].startsWith('--') ? args[1] : null;
-        const feature = getArg(args, '--feature') || positionalFeature;
+        const feature = parseStartFeature(args);
         if (!feature) {
           console.error('feature 필수 (예: start user-management 또는 --feature user-management)');
           process.exit(1);
