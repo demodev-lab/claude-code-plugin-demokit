@@ -236,19 +236,19 @@
       "qa-log": "qa-monitor"
     },
     "modelAssignment": {
-      "domain-expert": "opus",
-      "service-expert": "opus",
-      "api-expert": "opus",
+      "domain-expert": "sonnet",
+      "service-expert": "sonnet",
+      "api-expert": "sonnet",
       "security-expert": "opus",
       "infra-expert": "sonnet",
-      "test-expert": "opus",
+      "test-expert": "sonnet",
       "code-reviewer": "opus",
       "spring-architect": "opus",
-      "gap-detector": "opus",
-      "pdca-iterator": "opus",
+      "gap-detector": "sonnet",
+      "pdca-iterator": "sonnet",
       "report-generator": "haiku",
       "product-manager": "sonnet",
-      "dba-expert": "opus",
+      "dba-expert": "sonnet",
       "devops-engineer": "sonnet",
       "qa-monitor": "haiku"
     }

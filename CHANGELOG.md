@@ -26,6 +26,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 - `lib/core/plugin-validator.js`가 `hooks/` 참조도 인식/검증하도록 개선.
+- 시연/일반 작업 체감 속도 개선을 위해 기본 에이전트 모델 매핑 최적화:
+  - `domain-expert`, `service-expert`, `api-expert`, `test-expert`, `gap-detector`, `pdca-iterator`, `dba-expert`를 `opus` → `sonnet`으로 조정
+  - `spring-architect`, `security-expert`, `code-reviewer`는 품질이 중요한 경로로 `opus` 유지.
 
 ### Fixed
 - `npm run validate:plugin -- --verbose` 경고 4건 제거:
