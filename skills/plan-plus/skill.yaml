@@ -1,0 +1,16 @@
+name: plan-plus
+argument-hint: "기능명 (예: user-management, order-payment)"
+pdca-phase: plan
+task-template: "Plan Plus {feature}"
+agents:
+  context-explore: spring-architect
+  intent-discover: product-manager
+  alternatives: spring-architect
+  yagni-review: product-manager
+  incremental-verify: spring-architect
+  plan-generate: product-manager
+  default: spring-architect
+imports:
+  - shared/spring-conventions.md
+  - shared/jpa-patterns.md
+  - shared/api-patterns.md
