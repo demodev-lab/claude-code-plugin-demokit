@@ -20,21 +20,21 @@ demokit 시스템의 전체 노드 인덱스.
 
 | 이름 | 모델 | 역할 |
 |------|------|------|
-| spring-architect | opus | 아키텍처 설계 |
-| domain-expert | sonnet | JPA Entity/Repository |
-| service-expert | sonnet | Service 비즈니스 로직 |
-| api-expert | sonnet | Controller/DTO/API |
-| security-expert | opus | 보안 설정 |
-| infra-expert | sonnet | Docker/Gradle/설정 |
-| test-expert | sonnet | 테스트 코드 |
-| code-reviewer | opus | 코드 리뷰 |
-| gap-detector | sonnet | Gap 분석 |
-| pdca-iterator | sonnet | PDCA 반복 수정 |
-| report-generator | haiku | 보고서 생성 |
-| product-manager | sonnet | 요구사항 분석 |
-| dba-expert | sonnet | DB 최적화 |
-| devops-engineer | sonnet | CI/CD/배포 |
-| qa-monitor | haiku | QA 모니터링 |
+| domain-expert | sonnet | JPA Entity, Repository, DB 마이그레이션을 전문으로 다루는 도메인 계층 에이전트. |
+| service-expert | sonnet | 비즈니스 로직, 트랜잭션 관리, 도메인 서비스를 전문으로 다루는 Service 계층 에이전트. |
+| api-expert | sonnet | REST Controller, DTO, 예외 처리를 전문으로 다루는 API 계층 에이전트. |
+| security-expert | opus | Spring Security, JWT, OAuth2, 인증/인가를 전문으로 다루는 보안 에이전트. |
+| infra-expert | sonnet | Docker, Gradle, 설정 관리, CI/CD를 전문으로 다루는 인프라 에이전트. |
+| test-expert | sonnet | 단위 테스트, 통합 테스트, 슬라이스 테스트를 전문으로 다루는 테스트 에이전트. |
+| code-reviewer | opus | Spring Boot 프로젝트의 코드 리뷰를 수행하는 읽기 전용 에이전트. 파일 수정 없이 분석과 피드백만 제공. |
+| spring-architect | opus | Spring Boot 3.5 애플리케이션의 전체 아키텍처를 설계하고 PDCA 워크플로우를 조율하는 최상위 설계 에이전트. |
+| gap-detector | sonnet | PDCA Analyze 단계에서 설계 문서(design.md)와 실제 구현 코드 간의 Gap을 분석하고 Match Rate를 산출하는 에이전트. |
+| pdca-iterator | sonnet | Match Rate가 90% 미만일 때 Gap을 자동으로 수정하여 Match Rate를 올리는 반복 개선 에이전트. |
+| report-generator | haiku | PDCA 완료 보고서를 생성하는 경량 에이전트. |
+| product-manager | sonnet | 요구사항 분석, 우선순위 결정, 사용자 스토리 작성을 전문으로 다루는 기획 에이전트. |
+| dba-expert | sonnet | 데이터베이스 최적화, 인덱스 전략, N+1 문제 해결을 전문으로 다루는 DB 에이전트. |
+| devops-engineer | sonnet | CI/CD 파이프라인, Docker 컨테이너화, Kubernetes 배포를 전문으로 다루는 인프라/배포 에이전트. |
+| qa-monitor | haiku | 빌드 로그, 테스트 결과, 애플리케이션 로그를 분석하는 경량 QA 모니터링 에이전트. |
 
 ## Skills (스킬)
 
@@ -87,3 +87,10 @@ demokit 시스템의 전체 노드 인덱스.
 | SubagentStop | 서브에이전트 종료 | 팀 멤버 해제 |
 | TeammateIdle | 팀원 유휴 | 다음 팀 작업 배정 |
 | PreCompact | 컨텍스트 압축 전 | 컨텍스트 보존 |
+
+## Triggers (트리거)
+
+| 문서 | 설명 |
+|------|------|
+| [[triggers/trigger-matrix]] | 상황별 우선 명령/후속 조치 매트릭스 |
+| [[triggers/priority-rules]] | hook/skill 충돌 시 우선순위 규칙 |

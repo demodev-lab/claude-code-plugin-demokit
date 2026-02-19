@@ -13,5 +13,8 @@
 
 ## 운영 원칙
 - 트리거는 짧고 명확하게 유지
-- 자동화는 항상 timeout 설정
+- 자동화는 항상 timeout(ms) 설정
 - 위험 작업은 ask/deny 정책 우선
+
+## 관련 문서
+- [[priority-rules]]

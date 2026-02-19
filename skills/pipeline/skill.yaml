@@ -1,5 +1,5 @@
 name: pipeline
-argument-hint: "feature 이름 (kebab-case, 예: user-management)"
+argument-hint: "{feature}|status|next (예: user-management, status, next)"
 agent: spring-architect
 pdca-phase: plan
 next-skill: pdca

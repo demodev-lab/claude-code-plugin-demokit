@@ -10,12 +10,24 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Added
 - `/demokit` 명령 허브를 실행 가능한 command frontmatter 형식으로 강화 (`commands/demokit.md`).
 - `/output-style-setup`를 설치형 워크플로우로 확장 (project/user 레벨 선택 + 파일 복사 절차).
+- 트리거 우선순위 문서 추가: `demokit-system/triggers/priority-rules.md`.
+- 파이프라인 상태 자동 전이 CLI 추가: `scripts/pipeline-ctl.js` (`start|status|next`).
+- 문서 드리프트 방지 스크립트 추가: `scripts/generate-graph-index.js`.
+- 신규 테스트 추가:
+  - `test/unit/pipeline-state.test.js`
+  - `test/unit/graph-index-generator.test.js`
 
 ### Changed
 - `hooks/hooks.json` timeout 단위를 ms 기준으로 통일 (`5/10` → `5000/10000`).
 - `lib/core/plugin-validator.js`에 hook timeout 검증 로직 추가 (누락/비정상값/의심 단위 경고).
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
+- `skills/pipeline/SKILL.md`를 상태 파일 기반(`.pipeline/status.json`) status/next 자동 전이 흐름으로 강화.
+- `skills/pipeline/skill.yaml` argument-hint를 `feature|status|next` 형태로 갱신.
 - `demokit-system/_GRAPH-INDEX.md`의 에이전트 모델 표를 실제 설정(sonnet/opus)과 동기화.
+- `package.json`에 운영 스크립트 추가:
+  - `validate:hooks`
+  - `sync:graph-index`
+  - `check:graph-index`
 
 ## [1.0.2] - 2026-02-19
 

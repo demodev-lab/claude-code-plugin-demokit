@@ -21,7 +21,8 @@ demokit-system/
 │   ├── qa-stabilization-flow.md       ← QA 안정화 시나리오
 │   └── recovery-playbook.md           ← 장애/중단 복구 플레이북
 ├── triggers/
-│   └── trigger-matrix.md              ← 트리거-대응 매트릭스
+│   ├── trigger-matrix.md              ← 트리거-대응 매트릭스
+│   └── priority-rules.md              ← 트리거 충돌 우선순위
 └── testing/
     └── test-checklist.md              ← 테스트 체크리스트
 ```
@@ -37,4 +38,5 @@ demokit-system/
 - [[scenarios/qa-stabilization-flow]] — QA 안정화 시나리오
 - [[scenarios/recovery-playbook]] — 장애/중단 복구
 - [[triggers/trigger-matrix]] — 트리거 매트릭스
+- [[triggers/priority-rules]] — 트리거/훅 충돌 우선순위
 - [[testing/test-checklist]] — 릴리즈 전 테스트 체크

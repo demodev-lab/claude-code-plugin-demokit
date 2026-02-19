@@ -4,6 +4,8 @@
 
 ## 기본
 - [ ] `npm run validate:plugin -- --verbose` 결과 errors 0
+- [ ] `npm run validate:hooks` 결과 errors 0
+- [ ] `npm run check:graph-index` 통과 (문서 드리프트 없음)
 - [ ] warnings 0 (또는 사유 문서화)
 - [ ] `npm test -- --runInBand` 통과
 
