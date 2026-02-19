@@ -1,27 +1,63 @@
-# /demokit
+---
+name: demokit
+description: |
+  demokit 플러그인 도움말 허브.
+  사용 가능한 핵심 명령과 추천 워크플로우를 한 번에 보여준다.
 
-`demokit` 기능 허브 커맨드 문서.
+  Triggers: demokit, demokit help, demokit 명령어, demokit 기능, 도움말
+user-invocable: true
+allowed-tools:
+  - Read
+  - Skill
+---
 
-## 빠른 시작
+# demokit Commands Hub
 
-1. `/help` — 전체 커맨드 목록
-2. `/init` — 프로젝트 초기화/분석
-3. `/crud User` — 도메인 CRUD 생성
-4. `/pdca plan feature-name` — PDCA 시작
+아래 도움말을 그대로 표시한다.
 
-## 자주 쓰는 커맨드
+```text
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  demokit - Spring Boot PDCA Toolkit
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-- 생성: `/crud`, `/entity`, `/repository`, `/service`, `/controller`, `/dto`
-- 품질: `/test`, `/review`, `/qa`, `/optimize`
-- 워크플로우: `/pdca`, `/pipeline`, `/loop`, `/plan-plus`
-- Git: `/commit`, `/commit-push`, `/push`, `/pr`
+핵심 워크플로우
+  /pdca plan <feature>       기능 계획 수립
+  /pdca design <feature>     설계 문서 생성
+  /pdca do <feature>         구현 가이드 / 실행
+  /pdca analyze <feature>    설계-구현 gap 분석
+  /pdca iterate <feature>    자동 개선 반복
+  /pdca report <feature>     완료 보고서 생성
+  /pdca status               현재 상태 조회
+  /pdca next                 다음 단계 제안
 
-## 추천 순서
+생성/개발
+  /crud <Domain>             CRUD 일괄 생성
+  /entity <Domain>
+  /repository <Domain>
+  /service <Domain>
+  /controller <Domain>
+  /dto <Domain>
 
-- 신규 기능: `/pdca plan -> /pdca design -> /pdca do -> /pdca analyze`
-- 단순 CRUD: `/crud {Domain}` 후 `/test`
-- 안정화: `/review` + `/qa`
+품질/안정화
+  /test <Domain|all>
+  /review <path|domain>
+  /qa [build|test|log]
+  /optimize <domain>
 
-## 참고
+운영
+  /pipeline <feature>        9단계 파이프라인 가이드
+  /plan-plus <feature>       브레인스토밍 강화 계획
+  /loop <task>               반복 실행
+  /cancel-loop               loop 중단
 
-출력 스타일 설정은 `/output-style-setup` 문서를 참고.
+스타일/문서
+  /output-style-setup        output style 설치/적용 안내
+
+권장 시작 순서
+  1) /init
+  2) /pdca plan <feature>
+  3) /pdca design <feature>
+  4) /pdca do <feature>
+  5) /pdca analyze <feature>
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```

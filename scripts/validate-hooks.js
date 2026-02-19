@@ -11,6 +11,9 @@
 const fs = require('fs');
 const path = require('path');
 
+const HOOK_TIMEOUT_MIN_MS = 100;
+const HOOK_TIMEOUT_MAX_MS = 120000;
+
 function parseHookScriptPath(command) {
   if (!command || typeof command !== 'string') return null;
 
@@ -44,10 +47,37 @@ function createResult(rootPath, hooksJsonPath) {
       valid: 0,
       invalid: 0,
       ignored: 0,
+      timeoutChecked: 0,
+      timeoutInvalid: 0,
     },
     errors: [],
     warnings: [],
   };
+}
+
+function validateHookTimeout(result, hook, location) {
+  result.stats.timeoutChecked += 1;
+
+  if (!Object.prototype.hasOwnProperty.call(hook, 'timeout')) {
+    result.warnings.push(`timeout missing: ${location} (expected ms, e.g. 5000)`);
+    return;
+  }
+
+  const timeout = hook.timeout;
+  if (typeof timeout !== 'number' || !Number.isFinite(timeout) || timeout <= 0) {
+    result.stats.timeoutInvalid += 1;
+    result.errors.push(`invalid timeout at ${location}: ${timeout}`);
+    return;
+  }
+
+  if (timeout < HOOK_TIMEOUT_MIN_MS) {
+    result.warnings.push(`timeout too small at ${location}: ${timeout} (possible seconds unit, expected ms)`);
+    return;
+  }
+
+  if (timeout > HOOK_TIMEOUT_MAX_MS) {
+    result.warnings.push(`timeout too large at ${location}: ${timeout}ms`);
+  }
 }
 
 function validateHooksRoot(rootPath = path.resolve(__dirname, '..')) {
@@ -84,18 +114,22 @@ function validateHooksRoot(rootPath = path.resolve(__dirname, '..')) {
       continue;
     }
 
-    for (const entry of entries) {
+    entries.forEach((entry, entryIndex) => {
       const hooks = entry?.hooks;
-      if (!Array.isArray(hooks)) continue;
+      if (!Array.isArray(hooks)) return;
 
-      for (const hook of hooks) {
+      hooks.forEach((hook, hookIndex) => {
+        if (!hook || typeof hook !== 'object') return;
+
         result.stats.commands += 1;
-        const command = hook?.command;
+        validateHookTimeout(result, hook, `${eventName}[${entryIndex}].hooks[${hookIndex}]`);
+
+        const command = hook.command;
         const scriptPath = parseHookScriptPath(command);
 
         if (!scriptPath) {
           result.stats.ignored += 1;
-          continue;
+          return;
         }
 
         result.stats.checked += 1;
@@ -106,8 +140,8 @@ function validateHooksRoot(rootPath = path.resolve(__dirname, '..')) {
           result.stats.invalid += 1;
           result.errors.push(`missing script for ${eventName}: ${scriptPath}`);
         }
-      }
-    }
+      });
+    });
   }
 
   result.valid = result.errors.length === 0;
@@ -128,6 +162,8 @@ function formatSummary(result) {
     `Valid:    ${result.stats.valid}`,
     `Invalid:  ${result.stats.invalid}`,
     `Ignored:  ${result.stats.ignored}`,
+    `Timeout checked: ${result.stats.timeoutChecked}`,
+    `Timeout invalid: ${result.stats.timeoutInvalid}`,
     '',
     `Warnings: ${result.warnings.length}`,
     `Errors:   ${result.errors.length}`,

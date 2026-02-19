@@ -21,18 +21,18 @@ demokit 시스템의 전체 노드 인덱스.
 | 이름 | 모델 | 역할 |
 |------|------|------|
 | spring-architect | opus | 아키텍처 설계 |
-| domain-expert | opus | JPA Entity/Repository |
-| service-expert | opus | Service 비즈니스 로직 |
-| api-expert | opus | Controller/DTO/API |
+| domain-expert | sonnet | JPA Entity/Repository |
+| service-expert | sonnet | Service 비즈니스 로직 |
+| api-expert | sonnet | Controller/DTO/API |
 | security-expert | opus | 보안 설정 |
 | infra-expert | sonnet | Docker/Gradle/설정 |
-| test-expert | opus | 테스트 코드 |
+| test-expert | sonnet | 테스트 코드 |
 | code-reviewer | opus | 코드 리뷰 |
-| gap-detector | opus | Gap 분석 |
-| pdca-iterator | opus | PDCA 반복 수정 |
+| gap-detector | sonnet | Gap 분석 |
+| pdca-iterator | sonnet | PDCA 반복 수정 |
 | report-generator | haiku | 보고서 생성 |
 | product-manager | sonnet | 요구사항 분석 |
-| dba-expert | opus | DB 최적화 |
+| dba-expert | sonnet | DB 최적화 |
 | devops-engineer | sonnet | CI/CD/배포 |
 | qa-monitor | haiku | QA 모니터링 |
 

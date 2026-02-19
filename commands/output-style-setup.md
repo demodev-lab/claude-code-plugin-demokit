@@ -1,31 +1,58 @@
-# /output-style-setup
+---
+name: output-style-setup
+description: |
+  demokit output style 파일을 프로젝트 또는 사용자 전역 디렉토리에 설치한다.
 
-demokit 출력 스타일 적용 가이드.
+  Triggers: output style setup, 스타일 설치, output-style-setup, 출력 스타일 설정
+user-invocable: true
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - Glob
+  - AskUserQuestion
+---
 
-## 목적
+# Output Style Setup
 
-작업 보고/설계 문서의 톤과 구조를 팀 표준에 맞추기.
+demokit output styles를 실제로 설치한다.
 
-## 스타일 위치
+## Available Styles
 
-- `output-styles/demodev-monolith.md`
-- `output-styles/demodev-msa.md`
-- `output-styles/demodev-pdca-guide.md`
+- `demodev-monolith`
+- `demodev-msa`
+- `demodev-pdca-guide`
 
-## 적용 방법
+## 설치 절차
 
-1. 프로젝트 특성에 맞는 스타일 파일 선택
-2. 초기 세션에서 다음과 같이 명시:
+1. 사용자에게 설치 위치를 질문한다 (AskUserQuestion)
+   - **Project level**: 현재 프로젝트에만 적용
+   - **User level**: 모든 프로젝트에 적용
+
+2. 선택에 따라 아래 명령을 실행한다.
+
+### Project level
+
+```bash
+mkdir -p .claude/output-styles
+cp ${CLAUDE_PLUGIN_ROOT}/output-styles/*.md .claude/output-styles/
+ls -1 .claude/output-styles
+```
+
+### User level
+
+```bash
+mkdir -p ~/.claude/output-styles
+cp ${CLAUDE_PLUGIN_ROOT}/output-styles/*.md ~/.claude/output-styles/
+ls -1 ~/.claude/output-styles
+```
+
+3. 설치 완료 후 안내한다.
+   - 설치된 파일 목록
+   - 추천 스타일
+     - SingleModule/Monolith: `demodev-monolith`
+     - MSA: `demodev-msa`
+     - PDCA 보고 중심: `demodev-pdca-guide`
+
+4. 마지막으로 아래처럼 사용하도록 안내한다.
    - "이번 작업은 demodev-monolith 스타일로 보고해줘"
-3. PDCA 리포트/리뷰 결과 생성 시 동일 스타일 유지 요청
-
-## 권장 매핑
-
-- 단일 모듈: `demodev-monolith.md`
-- MSA/멀티 서비스: `demodev-msa.md`
-- 프로세스 중심 문서: `demodev-pdca-guide.md`
-
-## 팁
-
-- 팀 위키에 스타일 1개를 기본값으로 고정하면 리뷰 속도가 빨라집니다.
-- 스타일 변경 시 `CHANGELOG.md`에 기준 변경 내역을 기록하세요.
