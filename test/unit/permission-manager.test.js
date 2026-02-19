@@ -9,6 +9,7 @@ jest.mock('../../lib/core/config', () => ({
   loadConfig: () => ({
     permissions: {
       'Bash(rm -rf **)': 'deny',
+      'Bash(rm -rf \\*)': 'deny',
       'Bash(rm -r **)': 'ask',
       'Bash(git push --force**)': 'deny',
       'Bash(git reset --hard**)': 'ask',
@@ -29,6 +30,12 @@ describe('Permission Manager', () => {
   describe('shouldBlock', () => {
     it('rm -rf / → blocked:true', () => {
       const result = shouldBlock('Bash', { command: 'rm -rf /' });
+      expect(result.blocked).toBe(true);
+      expect(result.permission).toBe('deny');
+    });
+
+    it('rm -rf * → blocked:true', () => {
+      const result = shouldBlock('Bash', { command: 'rm -rf *' });
       expect(result.blocked).toBe(true);
       expect(result.permission).toBe('deny');
     });
@@ -93,6 +100,11 @@ describe('Permission Manager', () => {
     it('* 패턴 매칭 (경로 미포함)', () => {
       expect(globMatch('rm -rf*', 'rm -rftemp')).toBe(true);
       expect(globMatch('rm -rf*', 'ls -la')).toBe(false);
+    });
+
+    it('\\* 이스케이프는 literal * 매칭', () => {
+      expect(globMatch('rm -rf \\*', 'rm -rf *')).toBe(true);
+      expect(globMatch('rm -rf \\*', 'rm -rf /tmp')).toBe(false);
     });
   });
 
