@@ -6,6 +6,7 @@
  * 3. Loop 활성이면 루프 상태 업데이트
  */
 const path = require('path');
+const core = require(path.join(__dirname, '..', 'lib', 'core'));
 const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
 
 function extractAgentId(hookData) {
@@ -50,6 +51,7 @@ function resolveTaskDoneMember(teamState, explicitAgentId, completedTaskId, coor
 }
 
 async function main() {
+  const hotPathStartMs = Date.now();
   let input = '';
   for await (const chunk of process.stdin) {
     input += chunk;
@@ -60,8 +62,7 @@ async function main() {
     if (input && input.trim()) hookData = JSON.parse(input);
   } catch { /* ignore */ }
 
-  const { platform, cache } = require(path.join(__dirname, '..', 'lib', 'core'));
-  const projectRoot = platform.findProjectRoot(process.cwd());
+  const projectRoot = core.platform.findProjectRoot(process.cwd());
 
   if (!projectRoot) {
     console.log(JSON.stringify({}));
@@ -73,7 +74,7 @@ async function main() {
   // 1. context.md 저장 (공통 상태 수집 사용)
   try {
     const { snapshot, writer } = require(path.join(__dirname, '..', 'lib', 'context-store'));
-    const state = snapshot.collectState(projectRoot, cache);
+    const state = snapshot.collectState(projectRoot, core.cache);
     const taskDesc = hookData.task_description || hookData.tool_name || '작업 완료';
 
     writer.saveContext(projectRoot, {
@@ -90,6 +91,7 @@ async function main() {
 
   // 2. PDCA 진행 상태 확인 + 자동 전환
   try {
+    const pdcaStartMs = Date.now();
     const { status: pdcaStatus, phase: pdcaPhase, automation } = require(path.join(__dirname, '..', 'lib', 'pdca'));
     const features = pdcaStatus.listFeatures(projectRoot);
     const activeFeature = features.find(f => f.currentPhase && f.currentPhase !== 'report');
@@ -97,18 +99,19 @@ async function main() {
     if (activeFeature) {
       const currentPhase = activeFeature.currentPhase;
       const nextPhase = pdcaPhase.getNextPhase(currentPhase);
+      const activeFeatureStatus = pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
 
       // 자동 전환 판단
-      const shouldAuto = nextPhase && automation.shouldAutoTransition(projectRoot, activeFeature.feature, currentPhase);
+      const shouldAuto = nextPhase && automation.shouldAutoTransition(projectRoot, activeFeature.feature, currentPhase, activeFeatureStatus);
 
       if (shouldAuto) {
         // 현재 phase 완료 처리
-        pdcaStatus.updatePhaseStatus(projectRoot, activeFeature.feature, currentPhase, {
+        const transitionedStatus = pdcaStatus.updatePhaseStatus(projectRoot, activeFeature.feature, currentPhase, {
           status: 'completed',
           completedAt: new Date().toISOString(),
         });
         // 다음 phase로 전환
-        const fullStatus = pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
+        const fullStatus = transitionedStatus || activeFeatureStatus || pdcaStatus.loadStatus(projectRoot, activeFeature.feature);
         if (fullStatus && fullStatus.phases) {
           fullStatus.currentPhase = nextPhase;
           if (!fullStatus.phases[nextPhase]) {
@@ -138,6 +141,11 @@ async function main() {
         }
       }
     }
+
+    core.debug.debug('task-completed', 'pdca hook elapsed', {
+      durationMs: Date.now() - pdcaStartMs,
+      hasActiveFeature: Boolean(activeFeature),
+    });
   } catch { /* pdca 모듈 로드 실패 시 무시 */ }
 
   // 3. Memory 자동 저장 (작업 유형 기반)
@@ -215,31 +223,37 @@ async function main() {
 
   // 6. Team 작업 할당
   try {
+    const teamStartMs = Date.now();
     const { stateWriter, coordinator, orchestrator, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));
     const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
     const teamState = stateWriter.loadTeamState(projectRoot);
     if (teamState.enabled) {
-      const staleResult = cleanupPolicy?.staleMemberMs
-        ? stateWriter.cleanupStaleMembers(projectRoot, cleanupPolicy.staleMemberMs)
-        : { state: null };
-
-      const currentTeamState = staleResult.state || teamState;
       const taskDesc = hookData.task_description || hookData.tool_name || '';
       const explicitAgentId = extractAgentId(hookData);
 
       // 완료 기록
-      let finalState = currentTeamState;
+      let finalState = teamState;
       const tentativeTaskId = extractCompletedTaskId(hookData) || taskDesc;
-      const matchedMember = resolveTaskDoneMember(currentTeamState, explicitAgentId, tentativeTaskId, coordinator);
+      const matchedMember = resolveTaskDoneMember(teamState, explicitAgentId, tentativeTaskId, coordinator);
       const completedTaskId = extractCompletedTaskId(hookData, matchedMember) || taskDesc;
-      if (matchedMember) {
-        finalState = stateWriter.recordTaskCompletion(projectRoot, matchedMember.id, completedTaskId, 'completed');
-      }
+      const syncContext = orchestrator.buildTeamSyncContext ? orchestrator.buildTeamSyncContext(projectRoot) : null;
+      const completionResult = stateWriter.completeTaskAndSync(projectRoot, {
+        memberId: matchedMember ? matchedMember.id : null,
+        taskId: completedTaskId,
+        result: 'completed',
+        staleMemberMs: cleanupPolicy?.staleMemberMs,
+        syncContext: syncContext || undefined,
+      });
+      finalState = completionResult.state || finalState;
 
-      const synced = orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
-      if (synced.state) {
-        finalState = synced.state;
-      }
+      core.debug.debug('task-completed', 'team completion path', {
+        memberId: matchedMember ? matchedMember.id : null,
+        completionApplied: completionResult.completionApplied || false,
+        changed: completionResult.changed,
+        taskQueueUpdated: completionResult.taskQueueUpdated || false,
+        removedMemberIds: completionResult.removedMemberIds || [],
+        durationMs: Date.now() - teamStartMs,
+      });
 
       // 다음 작업 결정 (완료 처리 후 최신 상태 사용)
       const next = coordinator.getNextAssignment(finalState, completedTaskId);
@@ -251,6 +265,11 @@ async function main() {
       }
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }
+
+  core.debug.debug('task-completed', 'task-completed hook elapsed', {
+    durationMs: Date.now() - hotPathStartMs,
+    projectRoot,
+  });
 
   // 7. Loop 상태 확인
   try {

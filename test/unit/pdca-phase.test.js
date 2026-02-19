@@ -1,4 +1,7 @@
 const { PHASES, PHASE_INFO, isValidPhase, getNextPhase, getPrevPhase, canTransition, PHASE_DELIVERABLES, checkPhaseDeliverables, generatePhaseSummary } = require('../../lib/pdca/phase');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 describe('PDCA Phase', () => {
   describe('PHASES', () => {
@@ -82,6 +85,23 @@ describe('PDCA Phase', () => {
       expect(Array.isArray(result.items)).toBe(true);
       expect(result.items[0]).toHaveProperty('name');
       expect(result.items[0]).toHaveProperty('found');
+    });
+
+    it('do phase에서는 entity 패턴 탐색이 1개 파일로 조기 종료', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdca-phase-test-'));
+      try {
+        const entityDir = path.join(tmpDir, 'src', 'main', 'java', 'example', 'entity');
+        fs.mkdirSync(entityDir, { recursive: true });
+        fs.writeFileSync(path.join(entityDir, 'A.java'), 'class A {}');
+        fs.writeFileSync(path.join(entityDir, 'B.java'), 'class B {}');
+
+        const result = checkPhaseDeliverables(tmpDir, 'feature', 'do');
+        expect(result.complete).toBe(true);
+        expect(result.items).toHaveLength(1);
+        expect(result.items[0].files).toHaveLength(1);
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      }
     });
   });
 
