@@ -60,6 +60,19 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 
 사용 가능한 전체 커맨드 목록을 카테고리별로 확인한다. 개별 커맨드의 상세 사용법은 `/{name} help`로 조회한다.
 
+### 0-b. 한눈에 보는 핵심 커맨드
+
+`/help` 기준으로 사용자 입장에서 자주 쓰는 명령어만 모아 정리했습니다.
+
+| 구분 | 한눈에 보기 |
+|---|---|
+| 프로젝트 | `/init` |
+| 도메인 CRUD | `/crud`, `/entity`, `/repository`, `/service`, `/controller`, `/dto` |
+| 설정/인프라 | `/exception`, `/config`, `/security`, `/cache`, `/gradle`, `/docker`, `/api-docs`, `/migration` |
+| 분석/리뷰 | `/test`, `/review`, `/erd`, `/optimize`, `/changelog`, `/properties` |
+| 워크플로우 | `/pdca`, `/pipeline`, `/plan-plus`, `/loop`, `/cancel-loop`, `/qa` |
+| Git | `/commit`, `/commit-push`, `/push`, `/pr` |
+
 ```
 /crud help
 /pdca help
@@ -115,7 +128,7 @@ User 도메인의 Entity, Repository, Service, Controller, DTO를 DRY 원칙에 
 - **기술 스택**: Spring Boot 3.5.10 + Java 21 + Gradle (Groovy/Kotlin DSL)
 - **핵심 철학**: DRY 원칙, 클린 코드, SRP(단일 책임 원칙), Spring Boot 2025/2026 Best Practices
 - **자동화**: 코드 생성 → 컨벤션 검증 → 코드 리뷰 → Gap 분석 → 자동 수정까지 전 과정 자동화
-- **멀티에이전트**: CTO(spring-architect) 기반 팀 오케스트레이션, 15개 전문 에이전트
+- **멀티에이전트**: CTO(spring-architect) 기반 팀 오케스트레이션, 16개 전문 에이전트
 
 ## 프로젝트 구조
 
@@ -124,7 +137,7 @@ demokit/
 ├── .claude-plugin/
 │   ├── plugin.json            # 플러그인 메타데이터
 │   └── marketplace.json       # 마켓플레이스 카탈로그
-├── agents/                    # 15개 전문 에이전트
+├── agents/                    # 16개 전문 에이전트
 ├── hooks/                     # 이벤트 훅 (세션 시작, 파일 검증 등)
 ├── lib/
 │   ├── core/                  # 플랫폼, 설정, Permission, Skill Loader
@@ -137,7 +150,7 @@ demokit/
 │   └── team/                  # 팀 오케스트레이션 (CTO 조율)
 ├── output-styles/             # 출력 스타일 (Monolith / MSA / PDCA)
 ├── scripts/                   # 훅 실행 스크립트
-├── skills/                    # 32개 슬래시 커맨드 (+ skill.yaml 메타데이터)
+├── skills/                    # 33개 슬래시 커맨드 (+ skill.yaml 메타데이터)
 ├── demokit-system/            # 시스템 아키텍처 문서 (Obsidian 그래프 뷰)
 ├── templates/
 │   ├── code/                  # 코드 생성 템플릿
