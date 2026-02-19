@@ -29,6 +29,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - 시연/일반 작업 체감 속도 개선을 위해 기본 에이전트 모델 매핑 최적화:
   - `domain-expert`, `service-expert`, `api-expert`, `test-expert`, `gap-detector`, `pdca-iterator`, `dba-expert`를 `opus` → `sonnet`으로 조정
   - `spring-architect`, `security-expert`, `code-reviewer`는 품질이 중요한 경로로 `opus` 유지.
+- Hook 핫패스 최적화:
+  - `lib/context-store/snapshot.js`에 cross-process 디스크 캐시 추가 (`.demodev/cache/snapshot-static-v1.json`, 기본 TTL 30초)
+  - `lib/spring/project-analyzer.js`의 base package 감지를 `*Application.java` 우선(fast path)으로 개선.
 
 ### Fixed
 - `npm run validate:plugin -- --verbose` 경고 4건 제거:

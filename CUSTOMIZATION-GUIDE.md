@@ -55,6 +55,16 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 
 장시간 훅이 필요하면, 동기 훅 대신 비동기 후처리 스크립트로 분리하세요.
 
+### Snapshot 캐시 (성능)
+
+`context-store/snapshot`은 cross-process 캐시를 사용합니다.
+
+- 캐시 파일: `.demodev/cache/snapshot-static-v1.json`
+- 기본 TTL: 30초
+- TTL 조정: `DEMOKIT_SNAPSHOT_CACHE_TTL_MS` 환경변수
+  - 예: `DEMOKIT_SNAPSHOT_CACHE_TTL_MS=10000` (10초)
+  - 예: `DEMOKIT_SNAPSHOT_CACHE_TTL_MS=0` (디스크 캐시 비활성화)
+
 ---
 
 ## 4) 업데이트 충돌 방지 전략
