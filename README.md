@@ -45,6 +45,14 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 
 > **주의**: 플러그인 디렉토리가 아닌, 작업 대상 Spring Boot 프로젝트 디렉토리에서 실행해야 한다.
 
+### demodev.config.json 위치
+
+`demodev.config.json`은 기본적으로 플러그인 루트에 둡니다. (`demokit/demodev.config.json`)
+
+동일 파일이 Spring Boot 작업 프로젝트 루트(`./demodev.config.json`)에 있으면, 프로젝트 루트 설정이 플러그인 설정보다 우선 적용됩니다.
+
+설정 우선순위: `project > session > user > plugin`입니다.
+
 ### 요구사항
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) >= 1.0.0
