@@ -94,6 +94,11 @@
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js",
             "timeout": 5000
+          },
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-stop.js",
+            "timeout": 3000
           }
         ]
       }

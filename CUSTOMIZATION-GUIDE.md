@@ -75,6 +75,34 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 - 기본값: `15000` (15초)
 - `0`으로 설정 시 sticky cache 비활성화
 
+### E. Team Level Override + Delegate Mode
+
+`demodev.config.json > team.levelOverrides`로 레벨별 팀 실행 전략을 바꿀 수 있습니다.
+
+예시:
+
+```json
+{
+  "team": {
+    "delegateMode": false,
+    "levelOverrides": {
+      "SingleModule": {
+        "delegateMode": true,
+        "maxTeammates": 1
+      },
+      "MSA": {
+        "delegateMode": false,
+        "maxTeammates": 5
+      }
+    }
+  }
+}
+```
+
+동작:
+- `delegateMode=true`면 해당 레벨의 phase 실행이 단일 리더 중심(`leader`, `maxParallel=1`)으로 축소됩니다.
+- `phase.lead`가 있으면 우선 사용하고, 없으면 첫 번째 멤버를 delegate agent로 사용합니다.
+
 ---
 
 ## 3) 훅 운영 가이드

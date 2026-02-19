@@ -9,12 +9,15 @@ demokit 시스템의 전체 노드 인덱스.
 | [[philosophy/core-mission]] | Spring Boot 전문 개발 플러그인 미션 |
 | [[philosophy/pdca-methodology]] | PDCA 6단계 + Check-Act 반복 루프 |
 | [[philosophy/context-engineering]] | 훅/스킬/에이전트 계층 구조 |
+| [[philosophy/architecture-principles]] | 도메인 우선/설정 우선/관측 가능성 설계 원칙 |
 
 ## Components (컴포넌트)
 
 | 노드 | 설명 |
 |------|------|
 | [[components/overview]] | 에이전트, 스킬, 훅 총괄 |
+| [[components/team-orchestration]] | level override/delegate 오케스트레이션 |
+| [[components/pipeline-phase-scripts]] | phase-1~9 전용 스크립트 구조 |
 
 ## Agents (에이전트)
 
@@ -71,6 +74,7 @@ demokit 시스템의 전체 노드 인덱스.
 | /cancel-loop | Loop 취소 |
 | /plan-plus | 브레인스토밍 강화 계획 |
 | /pipeline | 9단계 개발 파이프라인 |
+| /worker | 팀 워커 프로토콜 |
 | /qa | Zero-Script QA |
 
 ## Hooks (훅)
@@ -87,6 +91,16 @@ demokit 시스템의 전체 노드 인덱스.
 | SubagentStop | 서브에이전트 종료 | 팀 멤버 해제 |
 | TeammateIdle | 팀원 유휴 | 다음 팀 작업 배정 |
 | PreCompact | 컨텍스트 압축 전 | 컨텍스트 보존 |
+
+## Scenarios (시나리오)
+
+| 문서 | 설명 |
+|------|------|
+| [[scenarios/feature-delivery-flow]] | 기능 개발 표준 시나리오 |
+| [[scenarios/qa-stabilization-flow]] | QA 안정화 시나리오 |
+| [[scenarios/recovery-playbook]] | 장애/중단 복구 플레이북 |
+| [[scenarios/pdca-do-performance]] | PDCA do 성능 점검 플레이북 |
+| [[scenarios/team-delegate-mode]] | delegate 모드 운영 시나리오 |
 
 ## Triggers (트리거)
 

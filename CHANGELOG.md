@@ -17,10 +17,23 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `test/unit/pipeline-state.test.js`
   - `test/unit/graph-index-generator.test.js`
   - `test/unit/team-config-performance.test.js`
+  - `test/unit/team-config-level-overrides.test.js`
+  - `test/unit/pipeline-phase-stop.test.js`
   - `test/unit/pdca-phase.test.js` sticky-cache 케이스 보강
+- phase별 pipeline stop 스크립트 추가:
+  - `scripts/phase-1-schema-stop.js` ~ `scripts/phase-9-deployment-stop.js`
+  - `scripts/pipeline-phase-stop.js` (dispatcher)
+  - `scripts/pipeline-phase-stop-common.js` (공통 유틸)
+- 시스템 문서 확장:
+  - `demokit-system/philosophy/architecture-principles.md`
+  - `demokit-system/components/team-orchestration.md`
+  - `demokit-system/components/pipeline-phase-scripts.md`
+  - `demokit-system/scenarios/pdca-do-performance.md`
+  - `demokit-system/scenarios/team-delegate-mode.md`
 
 ### Changed
 - `hooks/hooks.json` timeout 단위를 ms 기준으로 통일 (`5/10` → `5000/10000`).
+- `Stop` hook에 `pipeline-phase-stop.js`를 추가해 phase별 완료 힌트 처리를 분리.
 - `lib/core/plugin-validator.js`에 hook timeout 검증 로직 추가 (누락/비정상값/의심 단위 경고).
 - `scripts/validate-hooks.js`에 hook timeout 검증/리포트 항목 추가.
 - `skills/pipeline/SKILL.md`를 상태 파일 기반(`.pipeline/status.json`) status/next 자동 전이 흐름으로 강화.
@@ -35,6 +48,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   - `lib/team/orchestrator.js`가 팀별 `maxParallel` 설정을 존중하도록 개선
   - `skills/pdca/skill.yaml`에 phase별 agents 매핑을 명시하여 `do/analyze/iterate/report`에서 경량/전문 에이전트 우선 라우팅
   - `lib/pdca/phase.js`의 `PHASE_INFO.do.agent`를 `service-expert`로 정렬해 문서/메타 불일치 제거
+- Team 레벨 제어 강화:
+  - `demodev.config.json`에 `team.delegateMode`, `team.levelOverrides` 추가
+  - `lib/team/team-config.js`가 레벨별 override + delegate mode를 반영하도록 확장
+  - delegate mode에서 phase를 단일 리더(`leader`, `maxParallel=1`)로 강제해 데모/핫패스 fan-out 축소
+  - `lib/team/orchestrator.js`가 `delegateMode/delegateAgent` 메타를 팀 컨텍스트에 포함
+  - `lib/team/hooks.js`가 `team-config` 기반 팀 구성을 일관되게 사용
 - `lib/pdca/phase.js` deliverables 탐색 최적화:
   - do phase 패턴을 `src/main/java/**/entity/*.java`로 좁혀 스캔 범위 축소
   - do phase 완료 후 sticky cache를 사용해 반복 체크 시 재스캔 최소화

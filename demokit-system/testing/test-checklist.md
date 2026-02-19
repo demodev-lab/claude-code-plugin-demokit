@@ -11,6 +11,9 @@
 
 ## 기능
 - [ ] 핵심 스킬 3종 동작 점검 (`/init`, `/pdca`, `/review`)
+- [ ] `/pipeline start|status|next` 상태 전이 확인
+- [ ] phase 전용 stop 스크립트(`phase-1~9-*-stop.js`) 동작 확인
+- [ ] team delegate mode (`team.levelOverrides`) 동작 확인
 - [ ] hooks timeout 누락 없음
 - [ ] SessionStart `once: true` 유지
 

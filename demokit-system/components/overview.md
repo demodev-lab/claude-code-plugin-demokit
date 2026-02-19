@@ -7,106 +7,87 @@ demokit 플러그인의 전체 컴포넌트 현황.
 | 카테고리 | 수량 |
 |---------|------|
 | Agents (에이전트) | 15개 |
-| Skills (스킬) | 32개 |
-| Hooks (훅) | 10개 |
+| Skills (스킬) | 33개 |
+| Hooks (이벤트) | 10개 |
+| Hook Commands | 15개 |
 | Output Styles | 3개 |
 | Orchestration Patterns | 5개 |
 
 ## Agents (15개)
 
-### 설계/아키텍처 (2)
+### 설계/기획
 | 에이전트 | 모델 | 역할 |
 |---------|------|------|
-| spring-architect | opus | 아키텍처 설계, 패키지 구조 |
-| product-manager | sonnet | 요구사항 분석, MoSCoW 우선순위 |
+| spring-architect | opus | 아키텍처 설계, PDCA 조율 |
+| product-manager | sonnet | 요구사항 분석, 우선순위 설계 |
 
-### 구현 (4)
+### 구현
 | 에이전트 | 모델 | 역할 |
 |---------|------|------|
-| domain-expert | opus | JPA Entity, Repository |
-| service-expert | opus | Service 비즈니스 로직 |
-| api-expert | opus | Controller, DTO, API |
-| dba-expert | opus | DB 최적화, 인덱스, N+1 |
+| domain-expert | sonnet | Entity/Repository/도메인 계층 |
+| service-expert | sonnet | Service 비즈니스 로직 |
+| api-expert | sonnet | Controller/DTO/API 계층 |
+| dba-expert | sonnet | DB 최적화, 인덱스, 쿼리 성능 |
 
-### 품질 (4)
+### 품질/분석
 | 에이전트 | 모델 | 역할 |
 |---------|------|------|
-| test-expert | opus | 테스트 코드 생성 |
-| code-reviewer | opus | 코드 리뷰 |
-| gap-detector | opus | 설계-구현 Gap 분석 |
+| test-expert | sonnet | 테스트 코드 생성 |
+| code-reviewer | opus | 코드 리뷰/리스크 점검 |
+| gap-detector | sonnet | 설계-구현 Gap 분석 |
+| pdca-iterator | sonnet | 반복 개선/갭 해소 |
+| report-generator | haiku | 보고서 생성 |
 | qa-monitor | haiku | 로그 기반 QA 모니터링 |
 
-### 인프라/배포 (2)
+### 인프라/보안
 | 에이전트 | 모델 | 역할 |
 |---------|------|------|
-| infra-expert | sonnet | Docker, Gradle, 설정 |
-| devops-engineer | sonnet | CI/CD, K8s, 배포 |
+| infra-expert | sonnet | Docker/Gradle/설정 |
+| devops-engineer | sonnet | CI/CD, 배포 |
+| security-expert | opus | Spring Security/JWT/OAuth |
 
-### 보안 (1)
-| 에이전트 | 모델 | 역할 |
-|---------|------|------|
-| security-expert | opus | Spring Security, JWT |
+## Skills (33개)
 
-### 자동화 (2)
-| 에이전트 | 모델 | 역할 |
-|---------|------|------|
-| pdca-iterator | opus | PDCA 반복 수정 |
-| report-generator | haiku | 완료 보고서 생성 |
+### 코드 생성
+`/crud`, `/entity`, `/service`, `/controller`, `/repository`, `/dto`, `/exception`, `/test`
 
-## Skills (32개)
+### 워크플로우
+`/pdca`, `/loop`, `/plan-plus`, `/pipeline`, `/worker`
 
-### 코드 생성 (8)
-/crud, /entity, /service, /controller, /repository, /dto, /exception, /test
+### 분석/품질
+`/review`, `/qa`, `/optimize`, `/erd`, `/api-docs`
 
-### 워크플로우 (4)
-/pdca, /loop, /plan-plus, /pipeline
+### 인프라/설정
+`/docker`, `/gradle`, `/security`, `/config`, `/properties`, `/migration`, `/cache`
 
-### 분석 (4)
-/review, /qa, /optimize, /erd
+### Git/운영
+`/commit`, `/push`, `/commit-push`, `/pr`, `/changelog`
 
-### 인프라 (7)
-/docker, /gradle, /security, /config, /properties, /migration, /cache
+### 기타
+`/init`, `/help`, `/cancel-loop`
 
-### Git (5)
-/commit, /push, /commit-push, /pr, /changelog
+## Hooks
 
-### 기타 (4)
-/init, /help, /api-docs, /cancel-loop
+| 이벤트 | 설명 |
+|------|------|
+| SessionStart | 프로젝트 감지/초기화 |
+| UserPromptSubmit | 의도 분석/라우팅 |
+| PreToolUse | 안전 검증 |
+| PostToolUse | 후처리/메타 동기화 |
+| Stop | 상태 저장/정리 |
+| TaskCompleted | 다음 작업 배정 |
+| SubagentStart | 팀 멤버 등록 |
+| SubagentStop | 팀 멤버 해제 |
+| TeammateIdle | 다음 팀 작업 배정 |
+| PreCompact | 컨텍스트 보존 |
 
-## Hooks (10개)
+## 팀 오케스트레이션 핵심
 
-| 훅 | 트리거 | 핵심 기능 |
-|------|--------|----------|
-| SessionStart | 세션 시작 | 프로젝트 감지, 레벨 판별 |
-| UserPromptSubmit | 프롬프트 제출 | 의도 분석, 모호성 감지 |
-| PreToolUse | 도구 사용 전 | 안전 검증 (Write/Edit, Bash) |
-| PostToolUse | 도구 사용 후 | 결과 후처리 (Write/Edit, Bash, Skill) |
-| Stop | 세션 종료 | 상태 저장/정리 |
-| TaskCompleted | 태스크 완료 | 다음 작업 배정 |
-| SubagentStart | 서브에이전트 시작 | 팀 멤버 등록 |
-| SubagentStop | 서브에이전트 종료 | 팀 멤버 해제 |
-| TeammateIdle | 팀원 유휴 | 다음 팀 작업 배정 |
-| PreCompact | 컨텍스트 압축 전 | 컨텍스트 보존 |
-
-## Orchestration Patterns (5개)
-
-| 패턴 | 설명 | 사용 시나리오 |
-|------|------|-------------|
-| leader | 리더가 순차 처리 | 단일 담당자 작업 |
-| council | 전원 병렬 분석 | Gap 분석, 코드 리뷰 |
-| swarm | 의존성 기반 병렬/순차 | 구현 (Entity→Service→Controller) |
-| pipeline | 순차 스테이지 | 설계 파이프라인 |
-| watchdog | 전원 전체 작업 모니터링 | MSA 품질 감시 |
-
-## Output Styles (3개)
-
-| 스타일 | 대상 |
-|--------|------|
-| demodev-monolith | SingleModule, MultiModule, Monolith |
-| demodev-msa | MSA |
-| demodev-pdca-guide | PDCA 가이드 |
+- `team.levelOverrides`로 레벨별 팀 정책 override
+- `team.delegateMode`로 단일 리더 중심 실행 전환
+- `team.performance`로 phase별 병렬도/멤버 수 제어
 
 ## 관련 문서
-- [[../philosophy/core-mission]] — 핵심 미션
-- [[../philosophy/pdca-methodology]] — PDCA 방법론
-- [[../philosophy/context-engineering]] — 컨텍스트 엔지니어링
+- [[team-orchestration]]
+- [[pipeline-phase-scripts]]
+- [[../philosophy/architecture-principles]]
