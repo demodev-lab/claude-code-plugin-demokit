@@ -4,15 +4,31 @@
 
 ## Quick Links
 
+### Architecture
 - [Architecture Overview](./architecture-overview.md)
 - [Team Orchestration Guide](./team-orchestration-guide.md)
 - [Pipeline Phase Scripts Guide](./pipeline-phase-scripts-guide.md)
+
+### Operations & Performance
 - [PDCA Performance Guide](./pdca-performance-guide.md)
 - [Hook Runtime Control](./hook-runtime-control.md)
 - [Config Reference](./reference-config.md)
+- [Config Recipes](./config-recipes.md)
+- [Incident Response Playbook](./incident-response-playbook.md)
 - [Troubleshooting](./troubleshooting.md)
+- [Performance Benchmark](./performance-benchmark.md)
+- [Runbook: Demo vs Prod](./runbook-demo-vs-prod.md)
+
+### Migration & Compatibility
 - [Migration from bkit](./migration-from-bkit.md)
 - [Compatibility Command Map](./compatibility-command-map.md)
+- [Command Cookbook](./command-cookbook.md)
+- [Glossary](./glossary.md)
+
+### ADRs
+- [ADR-001: Level Model](./adr-001-level-model.md)
+- [ADR-002: Phase Runtime Hooks](./adr-002-phase-runtime-hooks.md)
+- [ADR-003: Hook Runtime Toggle](./adr-003-hook-runtime-toggle.md)
 
 ## Scope
 
