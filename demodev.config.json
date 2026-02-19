@@ -286,10 +286,21 @@
     "phaseTeams": {
       "plan": { "lead": "spring-architect", "members": ["domain-expert"], "pattern": "leader" },
       "design": { "lead": "spring-architect", "members": ["api-expert", "domain-expert"], "pattern": "leader" },
-      "do": { "lead": null, "members": ["domain-expert", "service-expert"], "pattern": "swarm" },
+      "do": { "lead": null, "members": ["service-expert", "domain-expert"], "pattern": "swarm" },
       "analyze": { "lead": null, "members": ["gap-detector", "test-expert", "code-reviewer"], "pattern": "council" },
       "iterate": { "lead": null, "members": ["pdca-iterator"], "pattern": "leader" },
       "report": { "lead": null, "members": ["report-generator"], "pattern": "leader" }
+    },
+    "performance": {
+      "phaseMemberCap": {
+        "do": { "SingleModule": 1, "default": 2 }
+      },
+      "phasePatternOverride": {
+        "do": { "SingleModule": "leader" }
+      },
+      "phaseMaxParallel": {
+        "do": { "SingleModule": 1 }
+      }
     },
     "cleanup": {
       "staleMemberMs": 1800000,

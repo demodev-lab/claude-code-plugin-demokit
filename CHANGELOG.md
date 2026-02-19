@@ -16,6 +16,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - 신규 테스트 추가:
   - `test/unit/pipeline-state.test.js`
   - `test/unit/graph-index-generator.test.js`
+  - `test/unit/team-config-performance.test.js`
+  - `test/unit/pdca-phase.test.js` sticky-cache 케이스 보강
 
 ### Changed
 - `hooks/hooks.json` timeout 단위를 ms 기준으로 통일 (`5/10` → `5000/10000`).
@@ -26,6 +28,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `scripts/pipeline-ctl.js`에서 `start user-management`(positional) 지원 및 옵션 순서(`start --reset user-management`) 호환성 개선.
 - `lib/pipeline/state.js`에서 완료된 파이프라인에 대한 반복 `next` 호출 시 history 중복 누적을 방지.
 - `lib/pipeline/state.js`의 start/next 전이를 파일 락 기반(`io.withFileLock`)으로 보호하여 동시 실행 시 상태 경합(race) 리스크 완화.
+- PDCA Do 오케스트레이션 성능 튜닝:
+  - `demodev.config.json`에 `team.performance` 섹션 추가 (phase별 member cap/pattern/maxParallel override)
+  - SingleModule `do` phase 기본을 1인(`service-expert`) + `leader` + `maxParallel=1`로 최적화
+  - `lib/team/team-config.js`가 `team.performance` 오버라이드를 반영하도록 개선
+  - `lib/team/orchestrator.js`가 팀별 `maxParallel` 설정을 존중하도록 개선
+- `lib/pdca/phase.js` deliverables 탐색 최적화:
+  - do phase 패턴을 `src/main/java/**/entity/*.java`로 좁혀 스캔 범위 축소
+  - do phase 완료 후 sticky cache를 사용해 반복 체크 시 재스캔 최소화
+  - 파일 탐색 시 skip 디렉토리(`build`, `target`, `node_modules` 등) 제외
 - `demokit-system/_GRAPH-INDEX.md`의 에이전트 모델 표를 실제 설정(sonnet/opus)과 동기화.
 - `package.json`에 운영 스크립트 추가:
   - `validate:hooks`

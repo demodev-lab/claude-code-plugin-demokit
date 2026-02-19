@@ -103,6 +103,26 @@ describe('PDCA Phase', () => {
         fs.rmSync(tmpDir, { recursive: true, force: true });
       }
     });
+
+    it('do phase 완료 후에는 sticky cache로 반복 체크를 빠르게 반환', () => {
+      const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdca-phase-sticky-'));
+      try {
+        const entityDir = path.join(tmpDir, 'src', 'main', 'java', 'example', 'entity');
+        fs.mkdirSync(entityDir, { recursive: true });
+        const filePath = path.join(entityDir, 'A.java');
+        fs.writeFileSync(filePath, 'class A {}');
+
+        const first = checkPhaseDeliverables(tmpDir, 'feature', 'do');
+        expect(first.complete).toBe(true);
+
+        // 이후 파일이 일시적으로 사라져도 do 완료 판정은 유지(성능 최적화 목적)
+        fs.rmSync(filePath, { force: true });
+        const second = checkPhaseDeliverables(tmpDir, 'feature', 'do');
+        expect(second.complete).toBe(true);
+      } finally {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
+      }
+    });
   });
 
   describe('generatePhaseSummary', () => {

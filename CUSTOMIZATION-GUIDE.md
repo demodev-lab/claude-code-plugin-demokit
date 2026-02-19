@@ -42,6 +42,34 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 - 일반 백오피스: 85~90
 - 규제/금융/의료: 90~95
 
+### D. PDCA Do 속도 튜닝 (오케스트레이션)
+
+`demodev.config.json > team.performance`를 사용해 phase별 오케스트레이션 비용을 조절할 수 있습니다.
+
+예시:
+
+```json
+{
+  "team": {
+    "performance": {
+      "phaseMemberCap": {
+        "do": { "SingleModule": 1, "default": 2 }
+      },
+      "phasePatternOverride": {
+        "do": { "SingleModule": "leader" }
+      },
+      "phaseMaxParallel": {
+        "do": { "SingleModule": 1 }
+      }
+    }
+  }
+}
+```
+
+권장:
+- 데모/빠른 검증: `do`를 1인 + leader
+- 품질 우선 개발: `do`를 2인 이상 + swarm
+
 ---
 
 ## 3) 훅 운영 가이드
