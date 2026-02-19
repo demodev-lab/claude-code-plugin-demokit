@@ -365,6 +365,16 @@ PDCA 워크플로우에서 **spring-architect(CTO)**가 전문 에이전트를 �
 
 팀 상태는 세션 간에 영속화되어, 중단 후 재개 시 이전 상태를 복원할 수 있다.
 
+### 팀 모드 트리거 (실무용)
+
+특정 `/team` 명령은 없고, 아래 조건이 충족되면 자동으로 팀 모드가 사용된다.
+
+- **조건 1**: `demodev.config.json`의 `team.enabled`가 `true`
+- **조건 2**: 현재 작업이 `feature` 또는 `majorFeature` 규모로 판단됨
+- **조건 3**: `/pdca` 진행 중인 feature가 있거나 `/pipeline`/`/pdca`로 feature 워크플로우를 시작
+
+실행 순서는 보통 `/pdca plan <기능명>` → `/pdca design <기능명>` → `/pdca do <기능명>`로 시작합니다. 세션 재개 시에는 기존 팀 상태가 자동으로 복원되어 이어서 진행할 수 있습니다.
+
 ### 팀 정리 정책(권장 운영값)
 
 - `team.cleanup.staleMemberMs`: 마지막 활동 기준으로 오래된 멤버를 정리하는 시간(밀리초). 기본값 `1800000`(30분)
