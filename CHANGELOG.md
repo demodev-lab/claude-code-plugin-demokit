@@ -32,6 +32,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Hook 핫패스 최적화:
   - `lib/context-store/snapshot.js`에 cross-process 디스크 캐시 추가 (`.demodev/cache/snapshot-static-v1.json`, 기본 TTL 30초)
   - `lib/spring/project-analyzer.js`의 base package 감지를 `*Application.java` 우선(fast path)으로 개선.
+  - `scripts/unified-bash-pre.js`에서 task context 로드를 2회 → 1회로 축소.
 
 ### Fixed
 - `npm run validate:plugin -- --verbose` 경고 4건 제거:

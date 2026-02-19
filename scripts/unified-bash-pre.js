@@ -83,10 +83,11 @@ async function main() {
     }
   }
 
-  // 3. Agent 기반 추가 차단 패턴
+  // 3~4. Agent/Skill 기반 추가 차단 패턴 (task context 1회 로드)
   try {
     const { context } = require(path.join(__dirname, '..', 'lib', 'task'));
     const activeAgent = context.getActiveAgent();
+    const activeSkill = context.getActiveSkill();
 
     if (activeAgent) {
       // 등록된 agent guard 체크
@@ -115,12 +116,6 @@ async function main() {
         }
       }
     }
-  } catch { /* task context 미로드 시 무시 */ }
-
-  // 4. Skill 기반 추가 차단 패턴
-  try {
-    const { context } = require(path.join(__dirname, '..', 'lib', 'task'));
-    const activeSkill = context.getActiveSkill();
 
     if (activeSkill && SKILL_BASH_GUARDS[activeSkill]) {
       const guard = SKILL_BASH_GUARDS[activeSkill];
