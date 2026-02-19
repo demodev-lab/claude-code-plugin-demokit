@@ -13,10 +13,7 @@
   "plugins": [
     {
       "name": "demokit",
-      "source": {
-        "source": "url",
-        "url": "https://github.com/demodev-lab/claude-code-plugin-demokit.git"
-      },
+      "source": "./",
       "description": "Spring Boot 백엔드 특화 플러그인 - PDCA 방법론 기반 체계적 개발 워크플로우",
       "version": "1.0.3",
       "author": {
