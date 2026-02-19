@@ -26,4 +26,7 @@
 
 ## hooks
 
+- `hooks.runtime.events.*`
+- `hooks.runtime.scripts.*`
+
 런타임 설정은 hooks.json + validator 정책으로 관리.

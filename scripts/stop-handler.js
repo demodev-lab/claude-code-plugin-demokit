@@ -45,12 +45,23 @@ async function main() {
     if (input && input.trim()) hookData = JSON.parse(input);
   } catch { /* stdin이 비어있을 수 있음 */ }
 
-  const { platform, cache } = require(path.join(__dirname, '..', 'lib', 'core'));
+  const { platform, cache, hookRuntime } = require(path.join(__dirname, '..', 'lib', 'core'));
   const loopStateMod = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
 
   const projectRoot = platform.findProjectRoot(process.cwd());
 
   if (!projectRoot) {
+    console.log(JSON.stringify({}));
+    return;
+  }
+
+  const shouldRun = hookRuntime.shouldRun({
+    eventName: 'Stop',
+    scriptKey: 'stopHandler',
+    eventFallback: true,
+    scriptFallback: true,
+  });
+  if (!shouldRun) {
     console.log(JSON.stringify({}));
     return;
   }

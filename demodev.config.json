@@ -336,6 +336,34 @@
       "pruneMembersOnStop": false
     }
   },
+  "hooks": {
+    "runtime": {
+      "events": {
+        "UserPromptSubmit": true,
+        "PreToolUse": true,
+        "PostToolUse": true,
+        "Stop": true,
+        "TaskCompleted": true,
+        "SubagentStart": true,
+        "SubagentStop": true,
+        "TeammateIdle": true,
+        "PreCompact": true
+      },
+      "scripts": {
+        "userPromptHandler": true,
+        "taskCompleted": true,
+        "stopHandler": true,
+        "contextCompaction": true,
+        "subagentStartHandler": true,
+        "subagentStopHandler": true,
+        "teamIdleHandler": true,
+        "pipelinePhasePre": false,
+        "pipelinePhasePost": false,
+        "pipelinePhaseStop": true,
+        "pipelinePhaseTransition": true
+      }
+    }
+  },
   "planPlus": {
     "enabled": true,
     "hardGate": true,

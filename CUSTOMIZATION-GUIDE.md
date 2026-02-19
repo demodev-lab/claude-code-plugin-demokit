@@ -139,7 +139,7 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
 
 ### Pipeline Phase Scripts 토글
 
-`developmentPipeline.phaseScripts`에서 pre/post/transition hook 동작을 제어할 수 있습니다.
+`developmentPipeline.phaseScripts`에서 pre/post/stop/transition hook 동작을 제어할 수 있습니다.
 
 ```json
 {
@@ -148,15 +148,44 @@ demokit을 팀/프로젝트 상황에 맞게 커스터마이징하는 방법.
       "enabled": true,
       "preEnabled": false,
       "postEnabled": false,
-      "transitionEnabled": true
+      "stopEnabled": true,
+      "transitionEnabled": true,
+      "emitOncePerPhase": true
     }
   }
 }
 ```
 
 권장:
-- 데모/성능 우선: `pre=false`, `post=false`, `transition=true`
-- 상세 추적/분석: `pre=true`, `post=true`, `transition=true`
+- 데모/성능 우선: `pre=false`, `post=false`, `stop=true`, `transition=true`
+- 상세 추적/분석: `pre=true`, `post=true`, `stop=true`, `transition=true`
+
+### Hook Runtime 토글 (이벤트/스크립트)
+
+`hooks.runtime`에서 이벤트/스크립트별 실행 여부를 제어할 수 있습니다.
+
+```json
+{
+  "hooks": {
+    "runtime": {
+      "events": {
+        "TaskCompleted": true,
+        "PreToolUse": true,
+        "PostToolUse": true,
+        "Stop": true
+      },
+      "scripts": {
+        "taskCompleted": true,
+        "stopHandler": true,
+        "pipelinePhasePre": false,
+        "pipelinePhasePost": false,
+        "pipelinePhaseStop": true,
+        "pipelinePhaseTransition": true
+      }
+    }
+  }
+}
+```
 
 ---
 

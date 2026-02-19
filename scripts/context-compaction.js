@@ -18,10 +18,21 @@ async function main() {
     if (input && input.trim()) hookData = JSON.parse(input);
   } catch { /* ignore */ }
 
-  const { platform, cache } = require(path.join(__dirname, '..', 'lib', 'core'));
+  const { platform, cache, hookRuntime } = require(path.join(__dirname, '..', 'lib', 'core'));
   const projectRoot = platform.findProjectRoot(process.cwd());
 
   if (!projectRoot) {
+    console.log(JSON.stringify({}));
+    return;
+  }
+
+  const shouldRun = hookRuntime.shouldRun({
+    eventName: 'PreCompact',
+    scriptKey: 'contextCompaction',
+    eventFallback: true,
+    scriptFallback: true,
+  });
+  if (!shouldRun) {
     console.log(JSON.stringify({}));
     return;
   }

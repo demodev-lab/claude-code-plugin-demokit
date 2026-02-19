@@ -7,6 +7,7 @@
 const { matchIntent } = require('../lib/intent/trigger');
 const { classifyBySize } = require('../lib/task/classification');
 const { detectAmbiguity } = require('../lib/intent/ambiguity');
+const { hookRuntime } = require('../lib/core');
 
 async function main() {
   let input = '';
@@ -22,6 +23,18 @@ async function main() {
     console.log(JSON.stringify({}));
     return;
   }
+
+  const shouldRun = hookRuntime.shouldRun({
+    eventName: 'UserPromptSubmit',
+    scriptKey: 'userPromptHandler',
+    eventFallback: true,
+    scriptFallback: true,
+  });
+  if (!shouldRun) {
+    console.log(JSON.stringify({}));
+    return;
+  }
+
   const userPrompt = hookData.user_prompt || hookData.prompt || '';
 
   if (!userPrompt.trim()) {

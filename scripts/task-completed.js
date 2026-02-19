@@ -69,6 +69,17 @@ async function main() {
     return;
   }
 
+  const shouldRun = core.hookRuntime.shouldRun({
+    eventName: 'TaskCompleted',
+    scriptKey: 'taskCompleted',
+    eventFallback: true,
+    scriptFallback: true,
+  });
+  if (!shouldRun) {
+    console.log(JSON.stringify({}));
+    return;
+  }
+
   const hints = [];
   let activePdcaFeature = null;
 

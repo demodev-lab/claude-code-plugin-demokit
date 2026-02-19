@@ -29,11 +29,15 @@
 - `enabled`
 - `preEnabled`
 - `postEnabled`
+- `stopEnabled`
 - `transitionEnabled`
+- `emitOncePerPhase`
 
 기본 권장:
 - pre/post: `false`
+- stop: `true`
 - transition: `true`
+- emitOncePerPhase: `true`
 
 ## Phase Runtime Architecture
 

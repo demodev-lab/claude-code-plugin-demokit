@@ -19,11 +19,22 @@ async function main() {
     return;
   }
 
-  const { platform } = require(path.join(__dirname, '..', 'lib', 'core'));
+  const { platform, hookRuntime } = require(path.join(__dirname, '..', 'lib', 'core'));
   const { teamConfig, stateWriter } = require(path.join(__dirname, '..', 'lib', 'team'));
 
   const projectRoot = platform.findProjectRoot(process.cwd());
   if (!projectRoot || !teamConfig.isTeamEnabled()) {
+    console.log(JSON.stringify({}));
+    return;
+  }
+
+  const shouldRun = hookRuntime.shouldRun({
+    eventName: 'SubagentStop',
+    scriptKey: 'subagentStopHandler',
+    eventFallback: true,
+    scriptFallback: true,
+  });
+  if (!shouldRun) {
     console.log(JSON.stringify({}));
     return;
   }

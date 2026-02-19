@@ -1,5 +1,32 @@
 # Hook Runtime Control
 
+## Runtime Toggle (hooks.runtime)
+
+`demodev.config.json`에서 이벤트/스크립트 단위 on/off 제어 가능:
+
+- `hooks.runtime.events.<EventName>`
+- `hooks.runtime.scripts.<ScriptKey>`
+
+예시:
+
+```json
+{
+  "hooks": {
+    "runtime": {
+      "events": {
+        "TaskCompleted": true,
+        "PreToolUse": true
+      },
+      "scripts": {
+        "taskCompleted": true,
+        "pipelinePhasePre": false,
+        "pipelinePhasePost": false
+      }
+    }
+  }
+}
+```
+
 ## Timeout Policy
 
 모든 hook command는 ms 단위 timeout을 명시한다.

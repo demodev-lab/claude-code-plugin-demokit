@@ -8,7 +8,28 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
-- (none)
+- Hook 런타임 토글 헬퍼 추가: `lib/core/hook-runtime.js`
+- Hook 런타임 토글 확장: `demodev.config.json > hooks.runtime.events/scripts`
+- Hook 관련 신규 테스트 추가:
+  - `test/unit/hook-runtime.test.js`
+  - `test/unit/pipeline-phase-runtime.test.js` 보강
+
+### Changed
+- 주요 hook 스크립트가 `hooks.runtime` 토글을 존중하도록 개선:
+  - `scripts/user-prompt-handler.js`
+  - `scripts/task-completed.js`
+  - `scripts/stop-handler.js`
+  - `scripts/context-compaction.js`
+  - `scripts/subagent-start-handler.js`
+  - `scripts/subagent-stop-handler.js`
+  - `scripts/team-idle-handler.js`
+- `scripts/pipeline-phase-runtime.js` 고도화:
+  - stage별 hook/event/script 제어 (`pre/post/stop/transition`)
+  - `stopEnabled`, `emitOncePerPhase` 지원
+  - phase/stage 힌트 메시지 추가
+- `scripts/pipeline-phase-stop.js`를 runtime 기반으로 리팩터링해 stage 게이트/토글 일관성 확보
+- `developmentPipeline.phaseScripts`에 `stopEnabled`, `emitOncePerPhase` 반영
+- marketplace plugin source를 로컬(`./`)에서 URL 방식으로 전환 (`.claude-plugin/marketplace.json`)
 
 ## [1.0.3] - 2026-02-20
 
