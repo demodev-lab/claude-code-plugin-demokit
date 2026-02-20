@@ -10,6 +10,17 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Added
 - (none)
 
+## [1.0.5] - 2026-02-20
+
+### Added
+- `/superwork` 입력 파서 하드닝: `/superwork` 형식이 아닌 일반 문장은 제안 생성 대상에서 제외.
+- `/superwork` 엔진에 팀 비활성 진단 메시지 노출(`team.enabled=false`)을 추가해 병렬 오케스트레이션 제약 사전 안내.
+- `/superwork`와 `/pdca` 연동 시 생성 체크리스트 템플릿 결과에 팀 상태 메타(`enabled/reason`) 반영.
+
+### Fixed
+- 비정상 입력(커맨드 아님)으로 `buildSuperworkBlueprint`가 동작하는 오동작을 방지.
+- 팀 비활성(`team.enabled=false`) 상태에서 병렬 제안이 과도하게 제안되는 문제를 보정.
+
 ## [1.0.4] - 2026-02-20
 
 ### Added
