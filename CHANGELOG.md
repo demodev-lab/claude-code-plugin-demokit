@@ -8,6 +8,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- (none)
+
+## [1.0.4] - 2026-02-20
+
+### Added
 - Hook 런타임 토글 헬퍼 추가: `lib/core/hook-runtime.js`
 - Hook 런타임 토글 확장: `demodev.config.json > hooks.runtime.events/scripts`
 - Hook 관련 신규 테스트 추가:
