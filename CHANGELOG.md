@@ -12,9 +12,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [1.0.6] - 2026-02-20
 
+### Added
+- (none)
+
 ### Changed
-- `/superwork` 플로우 가이드를 Plan/Design/Do/Analyze→(조건부 Iterate)→Report까지 정석 체인으로 정합.
-- `/superwork` 요청 시 출력되는 PDCA 제안에서 Gap 개선 조건(Analyze 후 90% 미만) 기반 iterate 판단을 명시.
+- `/superwork` 플로우 가이드를 Plan/Design/Do/Analyze → (조건부 Iterate) → Report까지 정석 체인으로 정립.
+- `/superwork` 요청 시 `/pdca` 연계 가이드에 Analyze 결과 기준으로 Iterate 수행 조건(낮은 Match Rate 시 반복)을 명시.
 
 ### Fixed
 - `.pdca/` 하위 임시 산출물로 오인되는 문서(`docs/.bkit-memory.json`, `docs/.pdca-status.json`)가 생성되어 저장소에 남는 문제를 방지.
