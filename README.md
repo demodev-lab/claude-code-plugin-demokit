@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/demokit-logo.png" alt="demokit logo" width="220" />
+  <img src="./assets/demokit-logo.jpg" alt="demokit logo" width="220" />
 </p>
 
 # demokit
