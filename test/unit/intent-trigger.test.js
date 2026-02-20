@@ -9,4 +9,12 @@ describe('trigger - intent conflict between /pdca and /plan-plus', () => {
   it('keeps /pdca plan to pdca intent', () => {
     expect(matchIntent('/pdca plan')).toMatchObject({ id: 'pdca', command: '/pdca' });
   });
+
+  it('routes /superwork to superwork intent', () => {
+    expect(matchIntent('/superwork 회원가입 API 구현')).toMatchObject({ id: 'superwork', command: '/superwork' });
+  });
+
+  it('does not route natural language phrase to superwork intent', () => {
+    expect(matchIntent('구현 요청은 자동 오케스트레이션으로 처리하고 싶어요')).toBeNull();
+  });
 });

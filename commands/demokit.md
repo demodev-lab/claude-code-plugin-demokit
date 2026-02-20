@@ -31,6 +31,7 @@ allowed-tools:
   /pdca cleanup              완료/임시 문서 정리
   /pdca status               현재 상태 조회
   /pdca next                 다음 단계 제안
+  /superwork <구현내용>       전력투입(설계/구현/리뷰/QA) 오케스트레이션
 
 생성/개발
   /crud <Domain>             CRUD 일괄 생성

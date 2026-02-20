@@ -48,6 +48,18 @@ async function main() {
   const detected = matchIntent(userPrompt);
   if (detected) {
     messages.push(`의도 감지: ${detected.description}\n추천 명령: ${detected.command}`);
+
+    if (detected.id === 'superwork') {
+      try {
+        const { buildSuperworkBlueprint } = require('../lib/superwork');
+        const blueprint = buildSuperworkBlueprint(userPrompt);
+        if (blueprint && blueprint.message) {
+          messages.push(blueprint.message);
+        }
+      } catch (err) {
+        process.stderr.write(`[demokit] superwork blueprint 생성 오류: ${err.message}\n`);
+      }
+    }
   }
 
   // 2. 작업 규모 분류 → PDCA 제안

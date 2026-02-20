@@ -1,0 +1,13 @@
+name: superwork
+argument-hint: "구현내용 (예: 회원가입 API 구현)"
+agent: spring-architect
+next-skill: pdca
+pdca-phase: plan
+task-template: "Superwork 오케스트레이션: {feature}"
+agents:
+  plan: spring-architect
+  design: spring-architect
+  do: service-expert
+  analyze: gap-detector
+  iterate: pdca-iterator
+  report: report-generator

@@ -33,9 +33,23 @@
 /review domain:user
 ```
 
+## C) 초고속 전력 투입(모든 자원)
+
+```text
+/superwork 회원가입 API 구현
+/superwork 결제 취소 예외 처리 보강
+```
+
+권장 흐름:
+
+1. `/superwork`로 전체 범위를 분할
+2. `/pdca` 기반 단계별 산출물 정리
+3. `/superwork`가 붙여준 `/pdca do` 체크리스트로 Do 태스크 실행
+4. 결과를 `/review`와 `/qa`로 검증
+
 ---
 
-## C) 성능 이슈 핫픽스
+## D) 성능 이슈 핫픽스
 
 ```text
 /qa build
@@ -47,7 +61,7 @@
 
 ---
 
-## D) 파이프라인 기반 운영
+## E) 파이프라인 기반 운영
 
 ```text
 /pipeline user-management
@@ -66,7 +80,7 @@ flowchart LR
 
 ---
 
-## E) bkit에서 넘어온 팀용 호환 명령
+## F) bkit에서 넘어온 팀용 호환 명령
 
 ```text
 /bkit

@@ -15,7 +15,7 @@
 `demokit`은 단순 코드 생성기가 아니라, **설계 → 구현 → 리뷰 → 개선** 루프를 자동화하는 Spring Boot 특화 개발 워크플로우입니다.
 
 ### 핵심 포인트
-- ✅ **33개 슬래시 커맨드** (`/crud`, `/pdca`, `/pipeline`, `/review` 등)
+- ✅ **34개 슬래시 커맨드** (`/crud`, `/pdca`, `/pipeline`, `/review`, `/superwork` 등)
 - ✅ **PDCA 6단계** 기반 기능 개발
 - ✅ **멀티 에이전트 팀 실행** (level override + delegate mode 지원)
 - ✅ **Pipeline phase 스크립트 분리** (pre/post/stop/transition)
@@ -153,7 +153,7 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 | 프로젝트 | `/init`, `/help` |
 | CRUD/코드 생성 | `/crud`, `/entity`, `/repository`, `/service`, `/controller`, `/dto` |
 | 품질/분석 | `/review`, `/test`, `/qa`, `/optimize`, `/erd` |
-| 워크플로우 | `/pdca`, `/pipeline`, `/loop`, `/plan-plus`, `/cancel-loop` |
+| 워크플로우 | `/pdca`, `/pipeline`, `/superwork`, `/loop`, `/plan-plus`, `/cancel-loop` |
 | 인프라/설정 | `/config`, `/security`, `/docker`, `/gradle`, `/migration`, `/api-docs` |
 | Git | `/commit`, `/commit-push`, `/push`, `/pr`, `/changelog` |
 
@@ -257,7 +257,7 @@ npm test -- --runInBand
 demokit/
 ├── .claude-plugin/          # plugin/marketplace metadata
 ├── agents/                  # 전문 에이전트 프롬프트
-├── skills/                  # 33개 슬래시 커맨드
+├── skills/                  # 34개 슬래시 커맨드
 ├── hooks/                   # Claude Code hook registry
 ├── scripts/                 # hook/pipeline/runtime scripts
 ├── lib/                     # core, pdca, team, pipeline, task
