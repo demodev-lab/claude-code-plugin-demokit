@@ -44,8 +44,9 @@
 
 1. `/superwork`로 전체 범위를 분할
 2. `/pdca` 기반 단계별 산출물 정리
-3. `/superwork`가 붙여준 `/pdca do` 체크리스트로 Do 태스크 실행
-4. 결과를 `/review`와 `/qa`로 검증
+3. `/superwork`가 붙여준 `/pdca` 정석 체인과 체크리스트로 Plan/Design/Do/Analyze/Report를 순차 실행
+4. Analyze 결과가 낮으면 `/pdca iterate`로 Gap 보강, 아니면 `/pdca report`로 종료
+5. 결과를 `/review`와 `/qa`로 검증
 
 ---
 

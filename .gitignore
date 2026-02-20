@@ -9,3 +9,5 @@ Thumbs.db
 .env.local
 .clinerules-*
 .omx
+docs/.bkit-memory.json
+docs/.pdca-status.json

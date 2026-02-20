@@ -29,6 +29,7 @@ describe('superwork engine', () => {
     expect(result.message).toContain('### Do (do)');
     expect(result.message).toContain('병렬 그룹');
     expect(result.message).toContain('/pdca plan 회원관리-api-구현');
+    expect(result.message).toContain('/pdca iterate 회원관리-api-구현');
     expect(result.message).toContain('## 3) /pdca do 실행 체크리스트 템플릿');
     expect(result.message).toContain('/pdca do 회원관리-api-구현');
     expect(result.message).toContain('권장 실행 패턴');

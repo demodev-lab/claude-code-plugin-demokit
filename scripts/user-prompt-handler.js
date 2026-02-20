@@ -55,6 +55,7 @@ async function main() {
         const blueprint = buildSuperworkBlueprint(userPrompt);
         if (blueprint && blueprint.message) {
           messages.push(blueprint.message);
+          messages.push('⚠️ 지침: superwork 요청은 `/pdca plan` → `/pdca design` → `/pdca do` → `/pdca analyze` → (`/pdca iterate` 조건부) → `/pdca report` 정석 시퀀스로 이어갑니다.');
         }
       } catch (err) {
         process.stderr.write(`[demokit] superwork blueprint 생성 오류: ${err.message}\n`);

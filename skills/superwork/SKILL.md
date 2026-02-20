@@ -21,15 +21,18 @@ description: 이 스킬은 사용자가 "/superwork <구현내용>"을 요청할
 /superwork 회원가입 API 구현
 ```
 
-권장 2차 동작:
+권장 2차 동작(정석 플로우):
 
 ```text
 /pdca plan 회원가입-api-구현
 /pdca design 회원가입-api-구현
 /pdca do 회원가입-api-구현
+/pdca analyze 회원가입-api-구현
+/pdca iterate 회원가입-api-구현  # analyze 결과 <90%일 때만
+/pdca report 회원가입-api-구현
+/pdca status
+/pdca next
 ```
-
-작은 작업이면 `/pdca plan` → `/pdca do`로 축약해도 됩니다.
 
 ## `/pdca do` 체크리스트 연계
 

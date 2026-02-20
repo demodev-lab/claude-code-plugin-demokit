@@ -31,7 +31,7 @@ allowed-tools:
    - 아키텍처/설계, 핵심 구현, 보안·성능 점검, 테스트/QA를
      가능한 병렬 태스크로 분할해 team 오케스트레이션으로 동시 실행한다.
    - `/superwork`는 입력 내용을 기준으로 병렬 그룹(동시 수행 가능 태스크)을 제안한다.
-   - 상황에 따라 `/pdca plan` → `/pdca design` → `/pdca do` → `/pdca analyze` 순서를 보완적으로 수행한다.
+   - `/pdca` 정석 순서는 `/pdca plan` → `/pdca design` → `/pdca do` → `/pdca analyze` → `/pdca iterate`(조건부) → `/pdca report` → `/pdca status`/`/pdca next` 입니다.
 
 3. **통합 검증**
    - 구현 결과를 병합하고 충돌/중복/품질 리스크를 정리한다.
@@ -68,7 +68,13 @@ allowed-tools:
 ## 권장 체크리스트
 
 - `/pdca plan <구현내용>`
+- `/pdca design <구현내용>`
 - `/pdca do <구현내용>`
+- `/pdca analyze <구현내용>`
+- `/pdca iterate <구현내용>`
+- `/pdca report <구현내용>`
+- `/pdca status`
+- `/pdca next`
 - `/test all`
 - `/review`
 - `/qa test`
