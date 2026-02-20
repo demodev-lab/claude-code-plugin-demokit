@@ -35,7 +35,7 @@ demokit output styles를 실제로 설치한다.
 
 ```bash
 mkdir -p .claude/output-styles
-cp ${CLAUDE_PLUGIN_ROOT}/output-styles/*.md .claude/output-styles/
+cp "${CLAUDE_PLUGIN_ROOT}/output-styles/"*.md .claude/output-styles/
 ls -1 .claude/output-styles
 ```
 
@@ -43,7 +43,7 @@ ls -1 .claude/output-styles
 
 ```bash
 mkdir -p ~/.claude/output-styles
-cp ${CLAUDE_PLUGIN_ROOT}/output-styles/*.md ~/.claude/output-styles/
+cp "${CLAUDE_PLUGIN_ROOT}/output-styles/"*.md ~/.claude/output-styles/
 ls -1 ~/.claude/output-styles
 ```
 

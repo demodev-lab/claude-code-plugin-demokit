@@ -1,0 +1,4 @@
+.claude/settings.local.json
+coverage/
+.omx/
+.DS_Store

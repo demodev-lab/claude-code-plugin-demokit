@@ -9,7 +9,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.js",
+          "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.js\"",
             "timeout": 10000
           }
         ]
@@ -21,7 +21,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pre-write.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pre-write.js\"",
             "timeout": 5000
           }
         ]
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-bash-pre.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/unified-bash-pre.js\"",
             "timeout": 5000
           }
         ]
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-pre.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-pre.js\"",
             "timeout": 1500
           }
         ]
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-write-post.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/unified-write-post.js\"",
             "timeout": 5000
           }
         ]
@@ -63,7 +63,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/post-bash.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/post-bash.js\"",
             "timeout": 5000
           }
         ]
@@ -73,7 +73,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/skill-post.js\"",
             "timeout": 5000
           }
         ]
@@ -83,7 +83,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-post.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-post.js\"",
             "timeout": 1500
           }
         ]
@@ -95,7 +95,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/user-prompt-handler.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/user-prompt-handler.js\"",
             "timeout": 5000
           }
         ]
@@ -107,17 +107,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/unified-stop.js\"",
             "timeout": 5000
           },
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/stop-handler.js\"",
             "timeout": 5000
           },
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-stop.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-stop.js\"",
             "timeout": 3000
           }
         ]
@@ -129,12 +129,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/task-completed.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/task-completed.js\"",
             "timeout": 10000
           },
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-transition.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/pipeline-phase-transition.js\"",
             "timeout": 3000
           }
         ]
@@ -145,7 +145,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-start-handler.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/subagent-start-handler.js\"",
             "timeout": 5000
           }
         ]
@@ -156,7 +156,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/subagent-stop-handler.js\"",
             "timeout": 5000
           }
         ]
@@ -167,7 +167,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/team-idle-handler.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/team-idle-handler.js\"",
             "timeout": 5000
           }
         ]
@@ -179,7 +179,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/context-compaction.js",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/context-compaction.js\"",
             "timeout": 10000
           }
         ]
