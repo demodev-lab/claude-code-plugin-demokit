@@ -153,11 +153,22 @@ claude --plugin-dir /path/to/claude-code-plugin-demokit
 | 프로젝트 | `/init`, `/help` |
 | CRUD/코드 생성 | `/crud`, `/entity`, `/repository`, `/service`, `/controller`, `/dto` |
 | 품질/분석 | `/review`, `/test`, `/qa`, `/optimize`, `/erd` |
-| 워크플로우 | `/pdca`, `/pipeline`, `/superwork`, `/loop`, `/plan-plus`, `/cancel-loop` |
+| 워크플로우 | `/pdca`, `/pipeline`, `/loop`, `/plan-plus`, `/cancel-loop` |
+| 슈퍼워크 오케스트레이션 | `/superwork` |
 | 인프라/설정 | `/config`, `/security`, `/docker`, `/gradle`, `/migration`, `/api-docs` |
 | Git | `/commit`, `/commit-push`, `/push`, `/pr`, `/changelog` |
 
 > 개별 사용법은 `/{command} help`로 확인.
+
+### `superwork` 빠른 사용법
+
+- 입력 형식: `/superwork "<구현내용>"`
+- 예시: `/superwork 회원가입 API 구현`
+- 동작:
+  - 요청을 Plan/Design/Do/Analyze/Iterate/Report 단계로 분해
+  - 팀 설정을 반영해 병렬 작업 후보를 제안
+  - `/pdca` 흐름(`plan/design/do/analyze/...`)과 `do` 체크리스트를 한 번에 제시
+
 
 ### bkit 호환 alias 커맨드
 
