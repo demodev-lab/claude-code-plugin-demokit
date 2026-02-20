@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./assets/demokit-logo.jpg" alt="demokit logo" width="220" />
+</p>
+
 # demokit
 
 > Spring Boot 백엔드 개발을 위한 **Claude Code 플러그인**
