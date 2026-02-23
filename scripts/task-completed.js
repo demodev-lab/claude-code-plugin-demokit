@@ -305,6 +305,104 @@ async function main() {
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }
 
+  // 6.5. Wave 실행 전환
+  try {
+    const { stateWriter } = require(path.join(__dirname, '..', 'lib', 'team'));
+    const { completeWaveTask, finalizeWave, startWave } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-executor'));
+    const { extractLayer } = require(path.join(__dirname, '..', 'lib', 'team', 'coordinator'));
+
+    const taskDesc = hookData.task_description || hookData.tool_name || '';
+    const completedLayer = extractLayer(taskDesc);
+
+    if (completedLayer) {
+      // Phase 1: 원자적 task 완료 (file lock 내부)
+      let waveResult = null;
+      let completedWaveIndex = null;
+      let autoStartWave1 = false;
+      stateWriter.updateWaveExecution(projectRoot, (we) => {
+        // pending 상태 + wave 0 → 아직 wave 1이 시작되지 않은 초기 상태
+        if (we.status === 'pending' && we.currentWave === 0) {
+          autoStartWave1 = true;
+          return;
+        }
+        if (we.status !== 'in_progress' || we.currentWave <= 0) return;
+        completedWaveIndex = we.currentWave;
+        waveResult = completeWaveTask(we, we.currentWave, completedLayer);
+      });
+
+      // Wave 1 자동 시작 (pending → in_progress 전환)
+      if (autoStartWave1) {
+        try {
+          const initState = stateWriter.loadTeamState(projectRoot);
+          const initWaveExec = initState.waveExecution;
+          const w1Status = initWaveExec?.waves?.find(w => w.waveIndex === 1)?.status;
+          if (initWaveExec && w1Status !== 'blocked' && w1Status !== 'completed') {
+            const wave1Result = startWave(initWaveExec, 1, projectRoot);
+            stateWriter.updateWaveExecution(projectRoot, (we) => {
+              const w1 = initWaveExec.waves.find(w => w.waveIndex === 1);
+              if (w1) {
+                const target = we.waves.find(w => w.waveIndex === 1);
+                if (target) Object.assign(target, w1);
+              }
+              if (wave1Result) {
+                we.currentWave = 1;
+                we.status = 'in_progress';
+              }
+            });
+            if (wave1Result) {
+              hints.push(`[Wave] Wave 1 시작: ${wave1Result.tasks.map(t => t.layer).join(', ')}`);
+            } else {
+              hints.push('[Wave] Wave 1 시작 실패 (worktree 생성 오류)');
+            }
+          }
+        } catch (w1Err) {
+          process.stderr.write(`[demokit] wave 1 자동 시작 실패: ${w1Err.message}\n`);
+        }
+      }
+
+      // Phase 2: git 작업 (lock 밖)
+      if (waveResult && waveResult.waveCompleted && completedWaveIndex !== null) {
+        try {
+          const freshState = stateWriter.loadTeamState(projectRoot);
+          const freshWaveExec = freshState.waveExecution;
+          if (freshWaveExec) {
+            const mergeResult = finalizeWave(freshWaveExec, completedWaveIndex, projectRoot, 'HEAD');
+            if (mergeResult) {
+              hints.push(`[Wave] Wave ${completedWaveIndex} 완료: ${mergeResult.mergedCount}개 merge, ${mergeResult.conflictCount}개 conflict`);
+            }
+
+            if (waveResult.nextWaveIndex) {
+              const nextWaveResult = startWave(freshWaveExec, waveResult.nextWaveIndex, projectRoot);
+              // Phase 3: git 작업 결과 저장 (startWave 결과만 반영)
+              stateWriter.updateWaveExecution(projectRoot, (we) => {
+                const nextWave = freshWaveExec.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
+                if (nextWave) {
+                  const target = we.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
+                  if (target) Object.assign(target, nextWave);
+                }
+                if (nextWaveResult) {
+                  we.currentWave = waveResult.nextWaveIndex;
+                  we.status = 'in_progress';
+                }
+              });
+              if (nextWaveResult) {
+                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작: ${nextWaveResult.tasks.map(t => t.layer).join(', ')}`);
+              } else {
+                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작 실패 (worktree 생성 오류)`);
+              }
+            }
+          }
+        } catch (waveErr) {
+          process.stderr.write(`[demokit] wave git 작업 실패: ${waveErr.message}\n`);
+        }
+      }
+
+      if (waveResult && waveResult.allWavesCompleted) {
+        hints.push('[Wave] 모든 Wave 완료');
+      }
+    }
+  } catch { /* wave 모듈 로드 실패 시 무시 */ }
+
   core.debug.debug('task-completed', 'task-completed hook elapsed', {
     durationMs: Date.now() - hotPathStartMs,
     projectRoot,

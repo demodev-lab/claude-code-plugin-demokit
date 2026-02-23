@@ -44,6 +44,15 @@ describe('Team Coordinator', () => {
         const result = distributeWork(members, tasks, 'swarm');
         expect(result).toHaveLength(3);
         expect(result[0]).toHaveProperty('parallel');
+        expect(result[0]).toHaveProperty('isolation');
+        expect(result[0]).toHaveProperty('layer');
+        result.forEach(r => {
+          if (r.parallel) {
+            expect(r.isolation).toBe('worktree');
+          } else {
+            expect(r.isolation).toBeNull();
+          }
+        });
       });
     });
 

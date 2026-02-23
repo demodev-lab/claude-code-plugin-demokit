@@ -10,6 +10,27 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Added
 - (none)
 
+## [1.0.7] - 2026-02-23
+
+### Added
+- Wave 기반 Git Worktree 병렬 실행 시스템 (`lib/team/worktree-manager.js`, `lib/team/wave-executor.js`)
+- `worktree-manager`: git worktree CRUD (생성/삭제/merge/목록), wave 단위 일괄 생성/merge+cleanup, 부분 실패 시 rollback
+- `wave-executor`: parallelGroups → wavePlan 변환, wave 상태 관리, hook 기반 wave 전환 로직
+- `state-writer`: `initWaveExecution`/`updateWaveExecution` 함수, team-state version 1.2
+- `/superwork` 마크다운에 Wave 기반 병렬 실행 계획 자동 포함
+- `task-completed` hook에 Section 6.5 Wave 실행 전환 (3-phase 원자적 상태 관리)
+- Wave 1 자동 시작 (pending → in_progress 전환)
+- `coordinator.distributeSwarm`에 `isolation`/`layer` 필드 추가
+
+### Fixed
+- Shell command injection 방어: branch name sanitize, path validate, baseBranch/worktreeBranch sanitize
+- Race condition 방지: completeWaveTask를 file lock 내부에서 실행, stale snapshot overwrite 방지
+- Null guard: mergeAndCleanupWave, createWaveWorktrees, buildWavePlan, startWave 등 20+ 방어 코드
+- `removeWorktree` catch-all이 real error를 묻어버리는 문제 → 선택적 prune fallback
+- non-conflict merge 실패 시 worktree 삭제 → worktree 보존으로 변경
+- blocked wave 무한 재시도 방지, startWave 실패 시 상태 불일치 방지
+- buildWavePlan에서 layer 없는 task/non-array group filter, waveIndex 재인덱싱
+
 ## [1.0.6] - 2026-02-20
 
 ### Added

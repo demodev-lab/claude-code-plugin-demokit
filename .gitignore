@@ -1,6 +1,7 @@
 node_modules/
 .pdca/
 .pdca-snapshots/
+.demodev/worktrees/
 coverage/
 *.log
 .DS_Store
