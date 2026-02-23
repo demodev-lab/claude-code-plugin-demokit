@@ -97,6 +97,34 @@ describe('team/wave-executor', () => {
       const md = buildWaveExecutionMarkdown(plan, 'feat');
       expect(md).toContain('최종 merge');
     });
+
+    it('waveState 없이 호출해도 기존 출력 유지 (하위 호환)', () => {
+      const plan = buildWavePlan(sampleGroups, 'feat');
+      const md = buildWaveExecutionMarkdown(plan, 'feat', undefined);
+      expect(md).toContain('Wave 1');
+      expect(md).not.toContain('(started)');
+      expect(md).not.toContain('worktree:');
+    });
+
+    it('waveState 있으면 worktree 경로 + (started) 마커 포함', () => {
+      const plan = buildWavePlan(sampleGroups, 'feat');
+      const state = createWaveState(plan, 'feat');
+      // wave 1을 in_progress로 설정하고 worktree 경로 주입
+      state.waves[0].status = 'in_progress';
+      state.waves[0].tasks[0].worktreePath = '/tmp/wt/entity';
+      state.waves[0].tasks[0].branchName = 'wave-1/feat/entity';
+      state.waves[0].tasks[0].status = 'in_progress';
+
+      const md = buildWaveExecutionMarkdown(plan, 'feat', state);
+      expect(md).toContain('Wave 1: entity, dto, config (started)');
+      expect(md).toContain('worktree: `/tmp/wt/entity`');
+      expect(md).toContain('branch: `wave-1/feat/entity`');
+      // wave 2는 pending이므로 (started) 없음
+      expect(md).not.toContain('Wave 2: repository, service (started)');
+      // dispatch 지시가 포함되어야 함
+      expect(md).toContain('Wave Dispatch 지시');
+      expect(md).toContain('domain-expert');
+    });
   });
 
   describe('createWaveState', () => {

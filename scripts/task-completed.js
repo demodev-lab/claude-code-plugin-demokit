@@ -319,6 +319,7 @@ async function main() {
       let waveResult = null;
       let completedWaveIndex = null;
       let autoStartWave1 = false;
+      const waveAgentId = extractAgentId(hookData);
       stateWriter.updateWaveExecution(projectRoot, (we) => {
         // pending 상태 + wave 0 → 아직 wave 1이 시작되지 않은 초기 상태
         if (we.status === 'pending' && we.currentWave === 0) {
@@ -326,6 +327,12 @@ async function main() {
           return;
         }
         if (we.status !== 'in_progress' || we.currentWave <= 0) return;
+        // agentId 기록
+        if (waveAgentId) {
+          const wave = we.waves.find(w => w.waveIndex === we.currentWave);
+          const task = wave?.tasks?.find(t => t.layer === completedLayer);
+          if (task) task.agentId = waveAgentId;
+        }
         completedWaveIndex = we.currentWave;
         waveResult = completeWaveTask(we, we.currentWave, completedLayer);
       });
@@ -336,7 +343,7 @@ async function main() {
           const initState = stateWriter.loadTeamState(projectRoot);
           const initWaveExec = initState.waveExecution;
           const w1Status = initWaveExec?.waves?.find(w => w.waveIndex === 1)?.status;
-          if (initWaveExec && w1Status !== 'blocked' && w1Status !== 'completed') {
+          if (initWaveExec && w1Status === 'pending') {
             const wave1Result = startWave(initWaveExec, 1, projectRoot);
             stateWriter.updateWaveExecution(projectRoot, (we) => {
               const w1 = initWaveExec.waves.find(w => w.waveIndex === 1);
@@ -350,7 +357,14 @@ async function main() {
               }
             });
             if (wave1Result) {
-              hints.push(`[Wave] Wave 1 시작: ${wave1Result.tasks.map(t => t.layer).join(', ')}`);
+              const w1Info = wave1Result.worktrees.map(wt => `${wt.layer}=\`${wt.worktreePath}\``).join(', ');
+              hints.push(`[Wave] Wave 1 시작: ${w1Info}`);
+              try {
+                const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
+                const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
+                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1);
+                if (dispatch) hints.push(dispatch);
+              } catch { /* 무시 */ }
             } else {
               hints.push('[Wave] Wave 1 시작 실패 (worktree 생성 오류)');
             }
@@ -386,7 +400,14 @@ async function main() {
                 }
               });
               if (nextWaveResult) {
-                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작: ${nextWaveResult.tasks.map(t => t.layer).join(', ')}`);
+                const nwInfo = nextWaveResult.worktrees.map(wt => `${wt.layer}=\`${wt.worktreePath}\``).join(', ');
+                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작: ${nwInfo}`);
+                try {
+                  const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
+                  const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
+                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex);
+                  if (dispatch) hints.push(dispatch);
+                } catch { /* 무시 */ }
               } else {
                 hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작 실패 (worktree 생성 오류)`);
               }

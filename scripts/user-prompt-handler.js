@@ -65,7 +65,7 @@ async function main() {
     if (detected.id === 'pdca' && /\bdo\b/i.test(userPrompt)) {
       try {
         const { platform } = require('../lib/core');
-        const { buildWavePlan, createWaveState } = require('../lib/team/wave-executor');
+        const { buildWavePlan, createWaveState, startWave } = require('../lib/team/wave-executor');
         const { initWaveExecution, loadTeamState } = require('../lib/team/state-writer');
         const projectRoot = platform.findProjectRoot(process.cwd());
         if (projectRoot) {
@@ -82,7 +82,15 @@ async function main() {
                 const wavePlan = buildWavePlan(doPhaseData.parallelGroups, featureSlug);
                 if (wavePlan.length > 0) {
                   const waveState = createWaveState(wavePlan, featureSlug);
+                  startWave(waveState, 1, projectRoot);
                   initWaveExecution(projectRoot, waveState);
+                  if (waveState.status === 'in_progress') {
+                    try {
+                      const { buildWaveDispatchInstructions } = require('../lib/team/wave-dispatcher');
+                      const dispatch = buildWaveDispatchInstructions(waveState, 1);
+                      if (dispatch) messages.push(dispatch);
+                    } catch { /* 무시 */ }
+                  }
                 }
               }
             }
