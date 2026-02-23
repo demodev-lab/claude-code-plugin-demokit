@@ -245,11 +245,11 @@
       "test-expert": "sonnet",
       "code-reviewer": "opus",
       "spring-architect": "opus",
-      "gap-detector": "sonnet",
-      "pdca-iterator": "sonnet",
+      "gap-detector": "opus",
+      "pdca-iterator": "haiku",
       "report-generator": "haiku",
       "product-manager": "sonnet",
-      "dba-expert": "sonnet",
+      "dba-expert": "opus",
       "devops-engineer": "sonnet",
       "qa-monitor": "haiku"
     }
