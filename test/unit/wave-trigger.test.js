@@ -47,7 +47,7 @@ describe('wave-trigger', () => {
       expect(blueprint.hasRequest).toBe(true);
 
       const doPhase = blueprint.phases?.find(p => p.id === 'do');
-      if (doPhase?.team?.enabled && doPhase?.parallelGroups?.length > 1) {
+      if (blueprint.complexity?.mode === 'team' && doPhase?.team?.enabled && doPhase?.parallelGroups?.length > 1) {
         expect(initWaveExecution).toHaveBeenCalled();
         // startWave가 worktree 생성을 트리거했는지 확인
         expect(worktreeManager.createWaveWorktrees).toHaveBeenCalledWith(

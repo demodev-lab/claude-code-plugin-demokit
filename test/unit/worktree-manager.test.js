@@ -7,6 +7,7 @@ jest.mock('child_process', () => ({
 
 jest.mock('fs', () => ({
   mkdirSync: jest.fn(),
+  existsSync: jest.fn(),
 }));
 
 describe('team/worktree-manager', () => {
@@ -132,7 +133,6 @@ describe('team/worktree-manager', () => {
       let callCount = 0;
       execSync.mockImplementation(() => {
         callCount++;
-        // 첫 번째 worktree add 성공, 두 번째 실패
         if (callCount === 2) throw new Error('git worktree add failed');
         return '';
       });
@@ -170,6 +170,37 @@ describe('team/worktree-manager', () => {
       expect(result.mergedCount).toBe(1);
       expect(result.conflictCount).toBe(1);
       expect(result.results).toHaveLength(2);
+    });
+  });
+
+  describe('verifyWorktree', () => {
+    it('명령어 성공 → passed=true', () => {
+      execSync.mockReturnValue('BUILD SUCCESS');
+      const result = worktreeManager.verifyWorktree('/tmp/wt', 'npm test');
+      expect(result.passed).toBe(true);
+      expect(result.skipped).toBe(false);
+      expect(result.output).toBe('BUILD SUCCESS');
+    });
+
+    it('명령어 실패 → passed=false, output 포함', () => {
+      const err = new Error('test failed');
+      err.stderr = Buffer.from('3 tests failed');
+      execSync.mockImplementationOnce(() => { throw err; });
+      const result = worktreeManager.verifyWorktree('/tmp/wt', 'npm test');
+      expect(result.passed).toBe(false);
+      expect(result.skipped).toBe(false);
+      expect(result.output).toContain('3 tests failed');
+    });
+
+    it('명령어 없음 → skipped=true', () => {
+      const result = worktreeManager.verifyWorktree('/tmp/wt', null);
+      expect(result.passed).toBe(true);
+      expect(result.skipped).toBe(true);
+      expect(execSync).not.toHaveBeenCalled();
+    });
+
+    it('경로에 unsafe 문자 포함 시 throw', () => {
+      expect(() => worktreeManager.verifyWorktree('/tmp/\0evil', 'npm test')).toThrow('unsafe characters');
     });
   });
 });

@@ -1,10 +1,20 @@
+const fs = require('fs');
+const path = require('path');
 const {
   resolveAgentForLayer,
   buildWaveDispatchInstructions,
+  detectVerifyCommand,
   LAYER_AGENT_MAP,
+  LAYER_FILE_PATTERNS,
 } = require('../../lib/team/wave-dispatcher');
 
+jest.mock('fs');
+
 describe('team/wave-dispatcher', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('resolveAgentForLayer', () => {
     it('entity → domain-expert', () => {
       expect(resolveAgentForLayer('entity')).toBe('domain-expert');
@@ -33,6 +43,37 @@ describe('team/wave-dispatcher', () => {
     it('대소문자 무시', () => {
       expect(resolveAgentForLayer('Entity')).toBe('domain-expert');
       expect(resolveAgentForLayer('SERVICE')).toBe('service-expert');
+    });
+  });
+
+  describe('detectVerifyCommand', () => {
+    it('build.gradle 존재 → ./gradlew test', () => {
+      fs.existsSync.mockImplementation((p) => p.endsWith('build.gradle'));
+      expect(detectVerifyCommand('/project')).toBe('./gradlew test');
+    });
+
+    it('build.gradle.kts 존재 → ./gradlew test', () => {
+      fs.existsSync.mockImplementation((p) => p.endsWith('build.gradle.kts'));
+      expect(detectVerifyCommand('/project')).toBe('./gradlew test');
+    });
+
+    it('pom.xml 존재 → mvn test', () => {
+      fs.existsSync.mockImplementation((p) => p.endsWith('pom.xml'));
+      expect(detectVerifyCommand('/project')).toBe('mvn test');
+    });
+
+    it('package.json 존재 → npm test', () => {
+      fs.existsSync.mockImplementation((p) => p.endsWith('package.json'));
+      expect(detectVerifyCommand('/project')).toBe('npm test');
+    });
+
+    it('아무 빌드 파일 없음 → null', () => {
+      fs.existsSync.mockReturnValue(false);
+      expect(detectVerifyCommand('/project')).toBeNull();
+    });
+
+    it('projectRoot null → null', () => {
+      expect(detectVerifyCommand(null)).toBeNull();
     });
   });
 
@@ -65,6 +106,7 @@ describe('team/wave-dispatcher', () => {
     }
 
     it('in_progress tasks → 마크다운에 병렬, worktreePath, branchName, agent 포함', () => {
+      fs.existsSync.mockReturnValue(false);
       const state = makeWaveState();
       const md = buildWaveDispatchInstructions(state, 1);
       expect(md).toContain('병렬');
@@ -74,6 +116,50 @@ describe('team/wave-dispatcher', () => {
       expect(md).toContain('/tmp/wt/dto');
       expect(md).toContain('report-generator');
       expect(md).toContain('Wave Dispatch');
+    });
+
+    it('OWN FILES 포함 확인', () => {
+      fs.existsSync.mockReturnValue(false);
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1);
+      expect(md).toContain('OWN FILES');
+      expect(md).toContain('src/**/entity/**');
+      expect(md).toContain('src/**/dto/**');
+    });
+
+    it('DO NOT TOUCH 포함 확인 — 다른 task의 OWN FILES', () => {
+      fs.existsSync.mockReturnValue(false);
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1);
+      expect(md).toContain('DO NOT TOUCH');
+      // entity task의 DO NOT TOUCH에 dto 패턴이 있어야 함
+      const entitySection = md.split('### dto')[0];
+      expect(entitySection).toContain('src/**/dto/**');
+    });
+
+    it('VERIFY 지시 포함 확인 — projectRoot에 package.json 있을 때', () => {
+      fs.existsSync.mockImplementation((p) => p.endsWith('package.json'));
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1, { projectRoot: '/project' });
+      expect(md).toContain('npm test');
+      expect(md).toContain('최대 3회');
+      expect(md).toContain('STOP');
+    });
+
+    it('VERIFY 지시 생략 — 빌드 도구 없을 때', () => {
+      fs.existsSync.mockReturnValue(false);
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1, { projectRoot: '/project' });
+      expect(md).not.toContain('최대 3회');
+    });
+
+    it('리포트 양식 포함 확인', () => {
+      fs.existsSync.mockReturnValue(false);
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1);
+      expect(md).toContain('Files modified');
+      expect(md).toContain('How verified');
+      expect(md).toContain('Known issues');
     });
 
     it('null waveState → 빈 문자열', () => {
@@ -109,6 +195,7 @@ describe('team/wave-dispatcher', () => {
     });
 
     it('layer 없는 in_progress task는 무시', () => {
+      fs.existsSync.mockReturnValue(false);
       const state = {
         waves: [{
           waveIndex: 1,
@@ -126,6 +213,7 @@ describe('team/wave-dispatcher', () => {
     });
 
     it('unknown layer → agent fallback으로 layer 이름 사용', () => {
+      fs.existsSync.mockReturnValue(false);
       const state = {
         waves: [{
           waveIndex: 1,
@@ -135,6 +223,13 @@ describe('team/wave-dispatcher', () => {
       };
       const md = buildWaveDispatchInstructions(state, 1);
       expect(md).toContain('custom-layer');
+    });
+
+    it('options 없이 호출해도 동작 (하위 호환)', () => {
+      fs.existsSync.mockReturnValue(false);
+      const state = makeWaveState();
+      const md = buildWaveDispatchInstructions(state, 1);
+      expect(md).toContain('Wave Dispatch');
     });
   });
 });

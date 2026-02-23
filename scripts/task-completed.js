@@ -308,7 +308,7 @@ async function main() {
   // 6.5. Wave 실행 전환
   try {
     const { stateWriter } = require(path.join(__dirname, '..', 'lib', 'team'));
-    const { completeWaveTask, finalizeWave, startWave } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-executor'));
+    const { completeWaveTask, failWaveTask, finalizeWave, startWave } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-executor'));
     const { extractLayer } = require(path.join(__dirname, '..', 'lib', 'team', 'coordinator'));
 
     const taskDesc = hookData.task_description || hookData.tool_name || '';
@@ -334,10 +334,15 @@ async function main() {
       const we = teamSt.waveExecution;
       if (we && we.currentWave > 0) {
         const wave = we.waves?.find(w => w.waveIndex === we.currentWave);
-        const task = wave?.tasks?.find(t => t.agentId === waveAgentId && t.status !== 'completed');
+        const task = wave?.tasks?.find(t => t.agentId === waveAgentId && t.status !== 'completed' && t.status !== 'failed');
         if (task?.layer) completedLayer = task.layer;
       }
     }
+
+    // 실패 감지: hookData에서 에러 신호 확인
+    const isFailure = hookData.error
+      || hookData.result === 'error'
+      || hookData.result === 'failure';
 
     if (completedLayer) {
       // Phase 1: 원자적 task 완료 (file lock 내부)
@@ -358,7 +363,9 @@ async function main() {
           if (task) task.agentId = waveAgentId;
         }
         completedWaveIndex = we.currentWave;
-        waveResult = completeWaveTask(we, we.currentWave, completedLayer);
+        waveResult = isFailure
+          ? failWaveTask(we, we.currentWave, completedLayer)
+          : completeWaveTask(we, we.currentWave, completedLayer);
       });
 
       // Wave 1 자동 시작 (pending → in_progress 전환)
@@ -386,7 +393,7 @@ async function main() {
               try {
                 const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
                 const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
-                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1);
+                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1, { projectRoot });
                 if (dispatch) hints.push(dispatch);
               } catch { /* 무시 */ }
             } else {
@@ -406,10 +413,78 @@ async function main() {
           if (freshWaveExec) {
             const mergeResult = finalizeWave(freshWaveExec, completedWaveIndex, projectRoot, 'HEAD');
             if (mergeResult) {
-              hints.push(`[Wave] Wave ${completedWaveIndex} 완료: ${mergeResult.mergedCount}개 merge, ${mergeResult.conflictCount}개 conflict`);
+              let waveHint = `[Wave] Wave ${completedWaveIndex} 완료: ${mergeResult.mergedCount}개 merge, ${mergeResult.conflictCount}개 conflict`;
+              if (mergeResult.verifyFailedCount > 0) {
+                waveHint += `, ${mergeResult.verifyFailedCount}개 verify 실패 (${mergeResult.verifyFailed.join(', ')} — worktree 보존됨)`;
+              }
+              hints.push(waveHint);
             }
 
-            if (waveResult.nextWaveIndex) {
+            // verify-failed task status 디스크 반영
+            if (mergeResult && mergeResult.verifyFailedCount > 0) {
+              stateWriter.updateWaveExecution(projectRoot, (we) => {
+                const cw = we.waves.find(w => w.waveIndex === completedWaveIndex);
+                if (cw) {
+                  for (const layer of mergeResult.verifyFailed) {
+                    const task = cw.tasks.find(t => t.layer === layer);
+                    if (task) task.status = 'failed';
+                  }
+                }
+              });
+            }
+
+            // 실패 task 재스케줄 (mergeResult 존재 시에만 — finalize 자체 실패 시 건너뜀)
+            const hasFailures = mergeResult && (
+              mergeResult.verifyFailedCount > 0
+              || freshWaveExec.waves.find(w => w.waveIndex === completedWaveIndex)
+                  ?.tasks.some(t => t.status === 'failed')
+            );
+            if (hasFailures) {
+              const { rescheduleFailedTasks, buildHelperSpawnHint } = require(
+                path.join(__dirname, '..', 'lib', 'team', 'wave-executor')
+              );
+              const reschedule = rescheduleFailedTasks(freshWaveExec, completedWaveIndex);
+              if (reschedule.rescheduled.length > 0) {
+                hints.push(`[Wave] 실패 task 재스케줄: ${reschedule.rescheduled.join(', ')} → Wave ${reschedule.targetWaveIndex}`);
+                stateWriter.updateWaveExecution(projectRoot, (we) => {
+                  const retryWave = freshWaveExec.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
+                  if (retryWave) {
+                    const existing = we.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
+                    if (existing) Object.assign(existing, retryWave);
+                    else { we.waves.push(retryWave); we.totalWaves = we.waves.length; }
+                  }
+                });
+              }
+              const helperHint = buildHelperSpawnHint(freshWaveExec, completedWaveIndex);
+              if (helperHint) hints.push(helperHint);
+            }
+
+            // Phase 3: cross-validation (merge 성공 시에만)
+            if (mergeResult && mergeResult.mergedCount > 0) {
+              try {
+                const { attachCrossValidation, buildCrossValidationMarkdown } = require(
+                  path.join(__dirname, '..', 'lib', 'team', 'cross-validator')
+                );
+                const cvResult = attachCrossValidation(freshWaveExec, completedWaveIndex, freshWaveExec.complexityScore || 0);
+                if (cvResult.required && cvResult.pairs.length > 0) {
+                  hints.push(buildCrossValidationMarkdown(cvResult.pairs, completedWaveIndex, freshWaveExec.featureSlug));
+                  stateWriter.updateWaveExecution(projectRoot, (we) => {
+                    const wave = we.waves.find(w => w.waveIndex === completedWaveIndex);
+                    if (wave) wave.crossValidation = cvResult;
+                  });
+                }
+              } catch { /* cross-validation 실패해도 wave 흐름 유지 */ }
+            }
+
+            const verifyBlocked = mergeResult && mergeResult.verifyFailedCount > 0 && mergeResult.mergedCount === 0;
+            const finalizeBlocked = !mergeResult || verifyBlocked;
+            if (verifyBlocked) {
+              hints.push(`[Wave] verify 전체 실패로 다음 Wave 진행 차단. 실패 worktree를 수동 확인하세요.`);
+            } else if (!mergeResult) {
+              hints.push(`[Wave] Wave ${completedWaveIndex} finalize 실패 (merge 대상 없음). 다음 Wave 진행 차단.`);
+            }
+
+            if (waveResult.nextWaveIndex && !finalizeBlocked) {
               const nextWaveResult = startWave(freshWaveExec, waveResult.nextWaveIndex, projectRoot);
               // Phase 3: git 작업 결과 저장 (startWave 결과만 반영)
               stateWriter.updateWaveExecution(projectRoot, (we) => {
@@ -429,7 +504,7 @@ async function main() {
                 try {
                   const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
                   const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
-                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex);
+                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex, { projectRoot });
                   if (dispatch) hints.push(dispatch);
                 } catch { /* 무시 */ }
               } else {
@@ -442,8 +517,32 @@ async function main() {
         }
       }
 
-      if (waveResult && waveResult.allWavesCompleted) {
+      if (waveResult && waveResult.allWavesCompleted && waveResult.waveCompleted) {
         hints.push('[Wave] 모든 Wave 완료');
+        // Phase 3: metrics 수집
+        try {
+          const { buildRunMetrics, appendRunMetrics } = require(
+            path.join(__dirname, '..', 'lib', 'team', 'wave-metrics')
+          );
+          const finalWaveState = stateWriter.loadTeamState(projectRoot).waveExecution;
+          if (finalWaveState) {
+            const runMetrics = buildRunMetrics(finalWaveState, {
+              completedAt: new Date().toISOString(),
+            });
+            appendRunMetrics(projectRoot, runMetrics);
+          }
+        } catch { /* metrics 수집 실패해도 wave 흐름 유지 */ }
+        // Phase 3: policy rebuild
+        try {
+          const { rebuildPolicy, getPolicySuggestions } = require(
+            path.join(__dirname, '..', 'lib', 'team', 'policy-learner')
+          );
+          rebuildPolicy(projectRoot);
+          const suggestions = getPolicySuggestions(projectRoot);
+          for (const s of suggestions) {
+            hints.push(`[Policy] ${s.message}`);
+          }
+        } catch { /* policy 실패해도 wave 흐름 유지 */ }
       }
     }
   } catch { /* wave 모듈 로드 실패 시 무시 */ }
