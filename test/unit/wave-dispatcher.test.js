@@ -231,5 +231,92 @@ describe('team/wave-dispatcher', () => {
       const md = buildWaveDispatchInstructions(state, 1);
       expect(md).toContain('Wave Dispatch');
     });
+
+    describe('이전 wave 교차 검증 컨텍스트', () => {
+      it('waveIndex > 1 + prevWave.crossValidation 있으면 컨텍스트 포함', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        state.waves[0].waveIndex = 1;
+        state.waves[0].status = 'completed';
+        state.waves[0].crossValidation = {
+          required: true,
+          pairs: [{ sourceLayer: 'entity', validatorAgent: 'service-expert' }],
+        };
+        state.waves[1].waveIndex = 2;
+        state.waves[1].status = 'in_progress';
+        state.waves[1].tasks = [
+          { layer: 'service', status: 'in_progress', worktreePath: '/tmp/wt/service', branchName: 'wave-2/test-feat/service' },
+        ];
+        const md = buildWaveDispatchInstructions(state, 2);
+        expect(md).toContain('이전 Wave 교차 검증 결과');
+        expect(md).toContain('entity');
+        expect(md).toContain('service-expert');
+      });
+
+      it('prevWave.crossValidation 없으면 컨텍스트 미포함', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        state.waves[0].status = 'completed';
+        state.waves[1].waveIndex = 2;
+        state.waves[1].status = 'in_progress';
+        state.waves[1].tasks = [
+          { layer: 'service', status: 'in_progress', worktreePath: '/tmp/wt/service', branchName: 'wave-2/test-feat/service' },
+        ];
+        const md = buildWaveDispatchInstructions(state, 2);
+        expect(md).not.toContain('이전 Wave 교차 검증 결과');
+      });
+
+      it('waveIndex === 1이면 컨텍스트 미포함', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1);
+        expect(md).not.toContain('이전 Wave 교차 검증 결과');
+      });
+    });
+
+    describe('pod integration', () => {
+      it('options.level 전달 시 pod protocol 포함', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1, { level: 'MultiModule' });
+        expect(md).toContain('Work Pod Protocol');
+        expect(md).toContain('pod');
+        expect(md).toContain('Navigator');
+      });
+
+      it('options.level = Starter → pod 미포함', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1, { level: 'Starter' });
+        expect(md).not.toContain('Work Pod Protocol');
+        expect(md).not.toContain('pod');
+      });
+
+      it('options.level 없으면 pod 미포함 (하위 호환)', () => {
+        fs.existsSync.mockReturnValue(false);
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1, {});
+        expect(md).not.toContain('Work Pod Protocol');
+      });
+
+      it('pod 활성 시 중복 VERIFY 지시 생략', () => {
+        fs.existsSync.mockImplementation((p) => p.endsWith('package.json'));
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1, { projectRoot: '/project', level: 'MultiModule' });
+        // pod protocol에는 verify가 포함되지만, 별도 VERIFY 블록은 생략
+        expect(md).toContain('Work Pod Protocol');
+        // 기존 VERIFY 블록의 고유 텍스트 ("각 subagent는 구현 후 반드시")가 없어야 함
+        expect(md).not.toContain('각 subagent는 구현 후 반드시');
+      });
+
+      it('unknown level → pod 미적용 + VERIFY 지시 유지', () => {
+        fs.existsSync.mockImplementation((p) => p.endsWith('package.json'));
+        const state = makeWaveState();
+        const md = buildWaveDispatchInstructions(state, 1, { projectRoot: '/project', level: 'UnknownLevel' });
+        expect(md).not.toContain('Work Pod Protocol');
+        // unknown level이면 pod가 resolve 안 되므로 기존 VERIFY 블록 유지
+        expect(md).toContain('각 subagent는 구현 후 반드시');
+      });
+    });
   });
 });

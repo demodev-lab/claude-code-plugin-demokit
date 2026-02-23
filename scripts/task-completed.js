@@ -393,7 +393,8 @@ async function main() {
               try {
                 const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
                 const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
-                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1, { projectRoot });
+                const level = activePdcaFeature?.level || core.cache.get('level') || null;
+                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1, { projectRoot, level });
                 if (dispatch) hints.push(dispatch);
               } catch { /* 무시 */ }
             } else {
@@ -446,6 +447,49 @@ async function main() {
               const reschedule = rescheduleFailedTasks(freshWaveExec, completedWaveIndex);
               if (reschedule.rescheduled.length > 0) {
                 hints.push(`[Wave] 실패 task 재스케줄: ${reschedule.rescheduled.join(', ')} → Wave ${reschedule.targetWaveIndex}`);
+
+                // Dynamic Scheduler: policy 기반 재할당 + spawn payload (in-memory 수정)
+                try {
+                  const { reassignFailedTask, buildSpawnHelperPayload } = require(
+                    path.join(__dirname, '..', 'lib', 'team', 'dynamic-scheduler')
+                  );
+                  const { loadPolicy } = require(
+                    path.join(__dirname, '..', 'lib', 'team', 'policy-learner')
+                  );
+                  const policy = loadPolicy(projectRoot);
+                  const completedWave = freshWaveExec.waves.find(w => w.waveIndex === completedWaveIndex);
+                  const failedTasks = (completedWave?.tasks || []).filter(t => t.status === 'failed' && !t.retryOf);
+
+                  const reassignments = [];
+                  const spawnPayloads = [];
+                  for (const ft of failedTasks) {
+                    const ra = reassignFailedTask({ layer: ft.layer, agentId: ft.agentId, failureClass: ft.failureClass }, policy);
+                    if (ra) reassignments.push(ra);
+                    const sp = buildSpawnHelperPayload({
+                      layer: ft.layer, errorDetails: ft.errorDetails, worktreePath: ft.worktreePath,
+                      branchName: ft.branchName, waveIndex: completedWaveIndex, failureClass: ft.failureClass,
+                    }, freshWaveExec);
+                    if (sp) spawnPayloads.push(sp);
+                  }
+
+                  // freshWaveExec의 retry wave를 in-memory에서 직접 수정
+                  // → 아래 단일 updateWaveExecution에서 한 번에 디스크 반영
+                  const retryWaveInMem = freshWaveExec.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
+                  if (retryWaveInMem) {
+                    const actualReassigned = reassignments.filter(r => r.reassigned);
+                    for (const ra of actualReassigned) {
+                      const task = retryWaveInMem.tasks.find(t => t.layer === ra.layer);
+                      if (task) task.agentId = ra.reassignedAgent;
+                    }
+                    if (spawnPayloads.length > 0) {
+                      retryWaveInMem.spawnPayloads = spawnPayloads;
+                    }
+                    if (actualReassigned.length > 0) {
+                      hints.push(`[Wave] 동적 재할당: ${actualReassigned.map(r => `${r.layer}→${r.reassignedAgent}`).join(', ')}`);
+                    }
+                  }
+                } catch { /* dynamic-scheduler 실패해도 기존 흐름 유지 */ }
+
                 stateWriter.updateWaveExecution(projectRoot, (we) => {
                   const retryWave = freshWaveExec.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
                   if (retryWave) {
@@ -462,12 +506,12 @@ async function main() {
             // Phase 3: cross-validation (merge 성공 시에만)
             if (mergeResult && mergeResult.mergedCount > 0) {
               try {
-                const { attachCrossValidation, buildCrossValidationMarkdown } = require(
+                const { attachCrossValidation, buildCrossValidationDispatch } = require(
                   path.join(__dirname, '..', 'lib', 'team', 'cross-validator')
                 );
-                const cvResult = attachCrossValidation(freshWaveExec, completedWaveIndex, freshWaveExec.complexityScore || 0);
+                const cvResult = attachCrossValidation(freshWaveExec, completedWaveIndex, freshWaveExec.complexityScore ?? 0);
                 if (cvResult.required && cvResult.pairs.length > 0) {
-                  hints.push(buildCrossValidationMarkdown(cvResult.pairs, completedWaveIndex, freshWaveExec.featureSlug));
+                  hints.push(buildCrossValidationDispatch(cvResult.pairs, completedWaveIndex, freshWaveExec.featureSlug));
                   stateWriter.updateWaveExecution(projectRoot, (we) => {
                     const wave = we.waves.find(w => w.waveIndex === completedWaveIndex);
                     if (wave) wave.crossValidation = cvResult;
@@ -504,7 +548,8 @@ async function main() {
                 try {
                   const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
                   const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
-                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex, { projectRoot });
+                  const level = activePdcaFeature?.level || core.cache.get('level') || null;
+                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex, { projectRoot, level });
                   if (dispatch) hints.push(dispatch);
                 } catch { /* 무시 */ }
               } else {

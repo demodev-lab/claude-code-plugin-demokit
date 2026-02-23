@@ -81,13 +81,16 @@ async function main() {
               if (doPhaseData?.parallelGroups?.length > 1) {
                 const wavePlan = buildWavePlan(doPhaseData.parallelGroups, featureSlug);
                 if (wavePlan.length > 0) {
-                  const waveState = createWaveState(wavePlan, featureSlug);
+                  const complexityScore = blueprint.complexity?.score ?? null;
+                  const waveState = createWaveState(wavePlan, featureSlug, { complexityScore });
                   startWave(waveState, 1, projectRoot);
                   initWaveExecution(projectRoot, waveState);
                   if (waveState.status === 'in_progress') {
                     try {
                       const { buildWaveDispatchInstructions } = require('../lib/team/wave-dispatcher');
-                      const dispatch = buildWaveDispatchInstructions(waveState, 1);
+                      const { cache } = require('../lib/core');
+                      const level = cache.get('level') || null;
+                      const dispatch = buildWaveDispatchInstructions(waveState, 1, { level });
                       if (dispatch) messages.push(dispatch);
                     } catch { /* 무시 */ }
                   }
