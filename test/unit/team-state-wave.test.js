@@ -87,6 +87,24 @@ describe('team/state-writer waveExecution', () => {
     }
   });
 
+  it('withTeamLock으로 atomic read-modify-write', () => {
+    const root = createProjectRoot();
+    try {
+      stateWriter.initWaveExecution(root, { featureSlug: 'locked', status: 'pending', waves: [] });
+      const result = stateWriter.withTeamLock(root, () => {
+        const state = stateWriter.loadTeamState(root);
+        state.waveExecution.status = 'in_progress';
+        stateWriter.saveTeamState(root, state);
+        return state.waveExecution.status;
+      });
+      expect(result).toBe('in_progress');
+      const state = stateWriter.loadTeamState(root);
+      expect(state.waveExecution.status).toBe('in_progress');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   it('normalizeState가 non-object waveExecution을 null로 변환', () => {
     const root = createProjectRoot();
     try {

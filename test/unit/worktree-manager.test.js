@@ -1,4 +1,5 @@
 const { execSync } = require('child_process');
+const fs = require('fs');
 const worktreeManager = require('../../lib/team/worktree-manager');
 
 jest.mock('child_process', () => ({
@@ -7,7 +8,7 @@ jest.mock('child_process', () => ({
 
 jest.mock('fs', () => ({
   mkdirSync: jest.fn(),
-  existsSync: jest.fn(),
+  existsSync: jest.fn().mockReturnValue(false),
 }));
 
 describe('team/worktree-manager', () => {
@@ -48,6 +49,30 @@ describe('team/worktree-manager', () => {
 
     it('특수문자만 있는 branchName일 때 throw', () => {
       expect(() => worktreeManager.createWorktree('/project', '!!!')).toThrow('empty string after sanitization');
+    });
+
+    it('worktree가 이미 존재하면 재사용 (git 명령 실행 안 함)', () => {
+      fs.existsSync.mockReturnValue(true);
+      const result = worktreeManager.createWorktree('/project', 'wave-1/feat/dto');
+      expect(execSync).not.toHaveBeenCalled();
+      expect(result).toHaveProperty('worktreePath');
+      expect(result.branchName).toBe('wave-1/feat/dto');
+      fs.existsSync.mockReturnValue(false);
+    });
+
+    it('branch가 이미 존재하면 -b 없이 재시도', () => {
+      const err = new Error('branch already exists');
+      err.stderr = Buffer.from("fatal: a branch named 'wave-1/feat/dto' already exists");
+      execSync
+        .mockImplementationOnce(() => { throw err; })  // git worktree add -b fails
+        .mockReturnValueOnce('');                       // git worktree add (without -b) succeeds
+      const result = worktreeManager.createWorktree('/project', 'wave-1/feat/dto');
+      expect(execSync).toHaveBeenCalledTimes(2);
+      expect(execSync).toHaveBeenLastCalledWith(
+        expect.stringContaining('git worktree add'),
+        expect.any(Object),
+      );
+      expect(result.branchName).toBe('wave-1/feat/dto');
     });
   });
 

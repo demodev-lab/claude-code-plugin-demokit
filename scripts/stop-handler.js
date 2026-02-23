@@ -101,23 +101,29 @@ async function main() {
         .map(m => m.id)
         .filter(Boolean);
 
-      // 활성 멤버 → paused로 변경
-      let pausedAny = false;
-      for (const member of teamState.members) {
-        if (member.status === 'active') {
-          member.status = 'paused';
-          member.currentTask = null;
-          pausedAny = true;
-        }
-      }
-      if (pausedAny) {
-        teamState.history = teamState.history || [];
-        teamState.history.push({
-          event: 'session_stopped',
-          timestamp: new Date().toISOString(),
-          pausedMembers: teamState.members.filter(m => m.status === 'paused').map(m => m.id),
+      // 활성 멤버 → paused로 변경 (atomic read-modify-write)
+      if (activeMembersAtStop.length > 0) {
+        teamState = stateWriter.withTeamLock(projectRoot, () => {
+          const fresh = stateWriter.loadTeamState(projectRoot);
+          let pausedAny = false;
+          for (const member of fresh.members) {
+            if (member.status === 'active') {
+              member.status = 'paused';
+              member.currentTask = null;
+              pausedAny = true;
+            }
+          }
+          if (pausedAny) {
+            fresh.history = fresh.history || [];
+            fresh.history.push({
+              event: 'session_stopped',
+              timestamp: new Date().toISOString(),
+              pausedMembers: fresh.members.filter(m => m.status === 'paused').map(m => m.id),
+            });
+            stateWriter.saveTeamState(projectRoot, fresh);
+          }
+          return fresh;
         });
-        stateWriter.saveTeamState(projectRoot, teamState);
       }
 
       // 오랫동안 활동하지 않은 멤버 정리
@@ -138,24 +144,26 @@ async function main() {
 
       // stop 이벤트 단위 정리: 미작업 멤버 제거 옵션
       if (isCompleteStop && cleanupPolicy?.pruneMembersOnStop) {
-        const stoppedState = stateWriter.loadTeamState(projectRoot);
-        const prunedMembers = stoppedState.members
-          .filter(m => m.status !== 'active')
-          .map(m => m.id)
-          .filter(Boolean);
-        if (prunedMembers.length > 0) {
-          stoppedState.members = stoppedState.members.filter(m => m.status === 'active');
-          stoppedState.history = stoppedState.history || [];
-          stoppedState.history.push({
-            event: 'members_pruned_on_stop',
-            at: new Date().toISOString(),
-            removedMembers: prunedMembers,
-          });
-          if (stoppedState.history.length > 100) {
-            stoppedState.history = stoppedState.history.slice(-100);
+        stateWriter.withTeamLock(projectRoot, () => {
+          const stoppedState = stateWriter.loadTeamState(projectRoot);
+          const prunedMembers = stoppedState.members
+            .filter(m => m.status !== 'active')
+            .map(m => m.id)
+            .filter(Boolean);
+          if (prunedMembers.length > 0) {
+            stoppedState.members = stoppedState.members.filter(m => m.status === 'active');
+            stoppedState.history = stoppedState.history || [];
+            stoppedState.history.push({
+              event: 'members_pruned_on_stop',
+              at: new Date().toISOString(),
+              removedMembers: prunedMembers,
+            });
+            if (stoppedState.history.length > 100) {
+              stoppedState.history = stoppedState.history.slice(-100);
+            }
+            stateWriter.saveTeamState(projectRoot, stoppedState);
           }
-          stateWriter.saveTeamState(projectRoot, stoppedState);
-        }
+        });
       }
 
       // 완전 종료 처리 정책: clearOnStop 플래그가 명시될 때만 세션 종료 시 정리
