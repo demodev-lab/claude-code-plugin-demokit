@@ -7,6 +7,28 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-23
+
+### Added
+- Layer Constants 단일 소스 모듈 (`layer-constants.js`) — LAYER_DEPENDENCIES + LAYER_FILE_PATTERNS 정본
+- Work Pod 시스템 (`work-pod.js`) — Navigator/Dev/Executor/QA 4인 Pod 프로토콜
+- Dynamic Scheduler (`dynamic-scheduler.js`) — 실패 task 정책 기반 재할당 + spawn helper
+- Artifact Writer (`artifact-writer.js`) — PRD/DESIGN/TASKS 산출물 파일 자동 저장
+- Cross-Team Validation 완전 구현
+  - `test` layer를 CROSS_VALIDATION_MAP에 추가 (`service-expert`)
+  - LAYER_REVIEW_CHECKLIST: 레이어별 검토 체크리스트
+  - `buildCrossValidationMarkdown`: 파일 패턴, 검토 항목, 완료 보고 양식 포함
+  - `buildCrossValidationDispatch`: 병렬 Task subagent 실행 지시 래퍼
+  - 이전 wave 교차 검증 결과를 다음 wave dispatch 마크다운에 주입
+- Superwork 산출물 강화: PRD 수락 기준, Design 의존관계 다이어그램, Tasks YAML
+- Coordinator `resolveTaskDependencies`에 ownFiles 자동 주입
+- 오케스트레이션 갭 분석 문서 (`docs/orchestration-gap-analysis.md`)
+
+### Fixed
+- `/pdca do` 경로에서 `complexityScore`가 `createWaveState`에 전달되지 않던 문제
+- `task-completed.js`에서 `complexityScore || 0` → `?? 0` 시맨틱 수정
+- `buildCrossValidationMarkdown`에서 `featureSlug` undefined 시 `'unknown'` fallback 추가
+
 ## [1.0.8] - 2026-02-23
 
 ### Fixed
