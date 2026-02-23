@@ -3,7 +3,7 @@
  * 서브에이전트가 idle 상태로 들어갈 때 다음 작업 제안
  */
 const path = require('path');
-const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
+const { resolveAgentIdFromHook, resolveWorktreePathFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
 
 async function main() {
   let input = '';
@@ -40,6 +40,7 @@ async function main() {
   }
 
   const teammate = resolveAgentIdFromHook(hookData);
+  const worktreePath = resolveWorktreePathFromHook(hookData, process.cwd());
   if (!teammate) {
     process.stderr.write('[demokit] team-idle-handler: teammate identifier is missing; skip team assignment suggestion.\n');
     console.log(JSON.stringify({}));
@@ -58,7 +59,7 @@ async function main() {
     state = stateWriter.loadTeamState(projectRoot);
   }
 
-  stateWriter.updateMemberStatus(projectRoot, teammate, 'idle', null);
+  stateWriter.updateMemberStatus(projectRoot, teammate, 'idle', null, { worktreePath });
   orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
   const latest = stateWriter.loadTeamState(projectRoot);
   const next = coordinator.getNextAssignment(latest, null, teammate);
@@ -68,7 +69,7 @@ async function main() {
     const assignmentRef = next.nextTaskId || next.nextTask;
     const assigned = stateWriter.assignTaskToMember(projectRoot, assignmentRef, teammate, 'team-idle');
     if (assigned?.assigned || assigned?.alreadyAssigned) {
-      stateWriter.updateMemberStatus(projectRoot, teammate, 'active', assignmentRef);
+      stateWriter.updateMemberStatus(projectRoot, teammate, 'active', assignmentRef, { worktreePath });
       messages.push(`할당: ${next.nextTask}`);
       if (next.nextTaskId) messages.push(`작업 ID: ${next.nextTaskId}`);
     } else {

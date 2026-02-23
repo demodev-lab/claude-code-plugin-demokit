@@ -3,7 +3,7 @@
  * 서브에이전트 종료 시 상태를 team-state.json에 반영
  */
 const path = require('path');
-const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
+const { resolveAgentIdFromHook, resolveWorktreePathFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
 
 async function main() {
   let input = '';
@@ -54,12 +54,13 @@ async function main() {
     || hookData.tool_input?.task_id
     || hookData.tool_input?.command
     || null;
+  const worktreePath = resolveWorktreePathFromHook(hookData, process.cwd());
 
   if (taskId) {
-    stateWriter.recordTaskCompletion(projectRoot, teammate, taskId, finalStatus === 'idle' ? 'completed' : 'failed');
+    stateWriter.recordTaskCompletion(projectRoot, teammate, taskId, finalStatus === 'idle' ? 'completed' : 'failed', { worktreePath });
   } else {
     stateWriter.releaseTaskAssignmentsForMember(projectRoot, teammate);
-    stateWriter.updateMemberStatus(projectRoot, teammate, finalStatus, null);
+    stateWriter.updateMemberStatus(projectRoot, teammate, finalStatus, null, { worktreePath });
   }
 
   const result = {

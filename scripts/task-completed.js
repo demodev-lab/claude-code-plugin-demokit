@@ -7,7 +7,7 @@
  */
 const path = require('path');
 const core = require(path.join(__dirname, '..', 'lib', 'core'));
-const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
+const { resolveAgentIdFromHook, resolveWorktreePathFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
 
 function extractAgentId(hookData) {
   const resolved = resolveAgentIdFromHook(hookData);
@@ -249,6 +249,7 @@ async function main() {
     if (teamState.enabled) {
       const taskDesc = hookData.task_description || hookData.tool_name || '';
       const explicitAgentId = extractAgentId(hookData);
+      const worktreePath = resolveWorktreePathFromHook(hookData, process.cwd());
 
       // 완료 기록
       let finalState = teamState;
@@ -280,6 +281,7 @@ async function main() {
         result: 'completed',
         staleMemberMs: cleanupPolicy?.staleMemberMs,
         syncContext: syncContext || undefined,
+        worktreePath,
       });
       finalState = completionResult.state || finalState;
 

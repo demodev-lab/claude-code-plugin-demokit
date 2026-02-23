@@ -8,8 +8,8 @@
  * - 존재 여부 검증
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const HOOK_TIMEOUT_MIN_MS = 100;
 const HOOK_TIMEOUT_MAX_MS = 120000;
@@ -28,6 +28,22 @@ function parseHookScriptPath(command) {
   }
 
   return null;
+}
+
+function isSafeScriptPath(scriptPath) {
+  if (!scriptPath || typeof scriptPath !== 'string') return false;
+  if (path.isAbsolute(scriptPath)) return false;
+
+  const normalized = path.posix.normalize(scriptPath);
+  if (!(normalized.startsWith('hooks/') || normalized.startsWith('scripts/'))) {
+    return false;
+  }
+
+  if (normalized.includes('../') || normalized === '..') {
+    return false;
+  }
+
+  return true;
 }
 
 function readHooksJson(hooksJsonPath) {
@@ -58,7 +74,7 @@ function createResult(rootPath, hooksJsonPath) {
 function validateHookTimeout(result, hook, location) {
   result.stats.timeoutChecked += 1;
 
-  if (!Object.prototype.hasOwnProperty.call(hook, 'timeout')) {
+  if (!Object.hasOwn(hook, 'timeout')) {
     result.warnings.push(`timeout missing: ${location} (expected ms, e.g. 5000)`);
     return;
   }
@@ -132,6 +148,12 @@ function validateHooksRoot(rootPath = path.resolve(__dirname, '..')) {
           return;
         }
 
+        if (!isSafeScriptPath(scriptPath)) {
+          result.stats.invalid += 1;
+          result.errors.push(`unsafe script path for ${eventName}: ${scriptPath}`);
+          return;
+        }
+
         result.stats.checked += 1;
         const fullPath = path.join(absoluteRoot, scriptPath);
         if (fs.existsSync(fullPath)) {
@@ -171,12 +193,16 @@ function formatSummary(result) {
 
   if (result.warnings.length) {
     lines.push('', '[Warnings]');
-    result.warnings.forEach((warning) => lines.push(`- ${warning}`));
+    result.warnings.forEach((warning) => {
+      lines.push(`- ${warning}`);
+    });
   }
 
   if (result.errors.length) {
     lines.push('', '[Errors]');
-    result.errors.forEach((error) => lines.push(`- ${error}`));
+    result.errors.forEach((error) => {
+      lines.push(`- ${error}`);
+    });
   }
 
   lines.push('', result.valid ? '✅ Hooks validation passed' : '❌ Hooks validation failed');
@@ -226,6 +252,7 @@ function main() {
 
 module.exports = {
   parseHookScriptPath,
+  isSafeScriptPath,
   validateHooksRoot,
   formatSummary,
   parseArgs,

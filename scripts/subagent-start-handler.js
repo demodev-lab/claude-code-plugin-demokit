@@ -3,7 +3,7 @@
  * 새 서브에이전트가 시작될 때 상태를 team-state.json에 기록
  */
 const path = require('path');
-const { resolveAgentIdFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
+const { resolveAgentIdFromHook, resolveWorktreePathFromHook } = require(path.join(__dirname, '..', 'lib', 'team', 'agent-id'));
 
 async function main() {
   let input = '';
@@ -50,6 +50,7 @@ async function main() {
     || hookData.tool_input?.task_description
     || hookData.prompt
     || null;
+  const worktreePath = resolveWorktreePathFromHook(hookData, process.cwd());
   const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
 
   const currentState = stateWriter.loadTeamState(projectRoot);
@@ -60,7 +61,7 @@ async function main() {
     stateWriter.cleanupStaleMembers(projectRoot, cleanupPolicy.staleMemberMs);
   }
 
-  stateWriter.updateMemberStatus(projectRoot, teammate, 'active', currentTask);
+  stateWriter.updateMemberStatus(projectRoot, teammate, 'active', currentTask, { worktreePath });
 
   orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
 
