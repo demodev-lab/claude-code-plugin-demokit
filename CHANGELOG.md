@@ -7,6 +7,16 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-02-23
+
+### Fixed
+- Wave 초기화 중복 실행 방지: `buildSuperworkBlueprint`에 기존 waveExecution 가드 추가
+- Worktree 생성 idempotent 처리: 기존 branch/worktree 존재 시 재사용
+- `stop-handler.js` state 쓰기에 `withFileLock` 적용 (race condition 방지)
+
+### Added
+- `state-writer.withTeamLock()` 헬퍼 함수 export
+
 ## [1.1.0] - 2026-02-23
 
 ### Added
