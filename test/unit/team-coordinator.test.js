@@ -15,6 +15,30 @@ describe('Team Coordinator', () => {
     });
   });
 
+  describe('resolveTaskDependencies — ownFiles', () => {
+    it('entity task에 ownFiles 존재', () => {
+      const tasks = [{ description: 'entity 구현', layer: 'entity' }];
+      const result = resolveTaskDependencies(tasks);
+      expect(result[0].ownFiles).toBeDefined();
+      expect(result[0].ownFiles).toContain('src/**/entity/**');
+    });
+
+    it('레이어 없는 task에 ownFiles 미추가', () => {
+      const tasks = [{ description: 'unknown task' }];
+      const result = resolveTaskDependencies(tasks);
+      expect(result[0].ownFiles).toBeUndefined();
+    });
+
+    it('ownFiles 변경해도 원본 상수 오염 안 됨', () => {
+      const { LAYER_FILE_PATTERNS } = require('../../lib/team/layer-constants');
+      const original = [...LAYER_FILE_PATTERNS.entity];
+      const tasks = [{ description: 'entity 구현', layer: 'entity' }];
+      const result = resolveTaskDependencies(tasks);
+      result[0].ownFiles.push('mutated');
+      expect(LAYER_FILE_PATTERNS.entity).toEqual(original);
+    });
+  });
+
   describe('isMatchedTask', () => {
     it('id 매칭', () => {
       expect(isMatchedTask({ id: 'task-1' }, 'task-1')).toBe(true);
