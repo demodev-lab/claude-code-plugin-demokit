@@ -8,7 +8,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
-- (none)
+- `/superwork` blueprint 생성 시 wave state 자동 초기화 (team enabled + parallelGroups > 1 조건)
+- `/pdca do` 실행 시 wave state 초기화 트리거 (중복 초기화 방지 포함)
+- wave-trigger 단위 테스트 6건 추가
 
 ## [1.0.7] - 2026-02-23
 

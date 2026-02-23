@@ -61,6 +61,37 @@ async function main() {
         process.stderr.write(`[demokit] superwork blueprint 생성 오류: ${err.message}\n`);
       }
     }
+
+    if (detected.id === 'pdca' && /\bdo\b/i.test(userPrompt)) {
+      try {
+        const { platform } = require('../lib/core');
+        const { buildWavePlan, createWaveState } = require('../lib/team/wave-executor');
+        const { initWaveExecution, loadTeamState } = require('../lib/team/state-writer');
+        const projectRoot = platform.findProjectRoot(process.cwd());
+        if (projectRoot) {
+          const teamState = loadTeamState(projectRoot);
+          // 이미 활성 wave가 있으면 중복 초기화 방지
+          if (!teamState.waveExecution || teamState.waveExecution.status === 'completed') {
+            const doMatch = userPrompt.match(/\bdo\s+(\S+)/i);
+            const featureSlug = doMatch ? doMatch[1] : 'default';
+            const { buildSuperworkBlueprint } = require('../lib/superwork');
+            const blueprint = buildSuperworkBlueprint(`/superwork ${featureSlug}`);
+            if (blueprint.hasRequest && blueprint.phases) {
+              const doPhaseData = blueprint.phases.find(p => p.id === 'do');
+              if (doPhaseData?.parallelGroups?.length > 1) {
+                const wavePlan = buildWavePlan(doPhaseData.parallelGroups, featureSlug);
+                if (wavePlan.length > 0) {
+                  const waveState = createWaveState(wavePlan, featureSlug);
+                  initWaveExecution(projectRoot, waveState);
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        process.stderr.write(`[demokit] pdca do wave init: ${err.message}\n`);
+      }
+    }
   }
 
   // 2. 작업 규모 분류 → PDCA 제안
