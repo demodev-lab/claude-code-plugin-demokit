@@ -1,6 +1,6 @@
 const { buildSuperworkBlueprint } = require('../../lib/superwork');
 const { initWaveExecution, loadTeamState } = require('../../lib/team/state-writer');
-const { buildWavePlan, createWaveState } = require('../../lib/team/wave-executor');
+const { buildWavePlan, createWaveState, startWave } = require('../../lib/team/wave-executor');
 const { platform } = require('../../lib/core');
 const { matchIntent } = require('../../lib/intent/trigger');
 
@@ -12,6 +12,17 @@ jest.mock('../../lib/team/state-writer', () => {
     loadTeamState: jest.fn(() => ({})),
   };
 });
+
+jest.mock('../../lib/team/worktree-manager', () => ({
+  createWaveWorktrees: jest.fn((projectRoot, featureSlug, waveIndex, layerNames) =>
+    layerNames.map(layer => ({
+      layer,
+      worktreePath: `/tmp/wt/${featureSlug}/wave-${waveIndex}/${layer}`,
+      branchName: `wave-${waveIndex}/${featureSlug}/${layer}`,
+    })),
+  ),
+  mergeAndCleanupWave: jest.fn(),
+}));
 
 jest.mock('../../lib/core', () => {
   const actual = jest.requireActual('../../lib/core');
@@ -30,13 +41,21 @@ describe('wave-trigger', () => {
   });
 
   describe('superwork 트리거', () => {
-    it('team enabled + parallelGroups > 1 → initWaveExecution 호출', () => {
+    it('team enabled + parallelGroups > 1 → initWaveExecution 호출 + startWave로 wave 1 시작', () => {
+      const worktreeManager = require('../../lib/team/worktree-manager');
       const blueprint = buildSuperworkBlueprint('/superwork 회원가입 API 구현');
       expect(blueprint.hasRequest).toBe(true);
 
       const doPhase = blueprint.phases?.find(p => p.id === 'do');
       if (doPhase?.team?.enabled && doPhase?.parallelGroups?.length > 1) {
         expect(initWaveExecution).toHaveBeenCalled();
+        // startWave가 worktree 생성을 트리거했는지 확인
+        expect(worktreeManager.createWaveWorktrees).toHaveBeenCalledWith(
+          '/mock/project',
+          expect.any(String),
+          1,
+          expect.any(Array),
+        );
       }
     });
 
@@ -77,6 +96,7 @@ describe('wave-trigger', () => {
                 const wavePlan = buildWavePlan(doPhaseData.parallelGroups, featureSlug);
                 if (wavePlan.length > 0) {
                   const waveState = createWaveState(wavePlan, featureSlug);
+                  startWave(waveState, 1, projectRoot);
                   initWaveExecution(projectRoot, waveState);
                 }
               }

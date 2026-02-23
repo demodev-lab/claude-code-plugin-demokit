@@ -114,47 +114,6 @@ describe('team/worktree-manager', () => {
     });
   });
 
-  describe('listWorktrees', () => {
-    it('porcelain 출력 파싱', () => {
-      execSync.mockReturnValue(
-        'worktree /project\nbranch refs/heads/main\n\nworktree /tmp/wt\nbranch refs/heads/feature\n',
-      );
-      const result = worktreeManager.listWorktrees('/project');
-      expect(result).toHaveLength(2);
-      expect(result[1].branch).toBe('feature');
-    });
-
-    it('detached HEAD worktree 파싱', () => {
-      execSync.mockReturnValue(
-        'worktree /project\nbranch refs/heads/main\n\nworktree /tmp/detached\nHEAD abc123\ndetached\n',
-      );
-      const result = worktreeManager.listWorktrees('/project');
-      expect(result).toHaveLength(2);
-      expect(result[0].branch).toBe('main');
-      expect(result[1].detached).toBe(true);
-      expect(result[1].branch).toBeUndefined();
-    });
-
-    it('bare worktree 파싱', () => {
-      execSync.mockReturnValue('worktree /project\nbare\n');
-      const result = worktreeManager.listWorktrees('/project');
-      expect(result).toHaveLength(1);
-      expect(result[0].bare).toBe(true);
-    });
-
-    it('non-heads ref 파싱', () => {
-      execSync.mockReturnValue('worktree /tmp/wt\nbranch refs/remotes/origin/main\n');
-      const result = worktreeManager.listWorktrees('/project');
-      expect(result).toHaveLength(1);
-      expect(result[0].branch).toBe('refs/remotes/origin/main');
-    });
-
-    it('실패 시 빈 배열', () => {
-      execSync.mockImplementation(() => { throw new Error('fail'); });
-      expect(worktreeManager.listWorktrees('/project')).toEqual([]);
-    });
-  });
-
   describe('createWaveWorktrees', () => {
     it('레이어별 worktree 일괄 생성', () => {
       execSync.mockReturnValue('');

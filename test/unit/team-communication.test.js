@@ -1,6 +1,6 @@
 const {
   MESSAGE_TYPES, createMessage, createBroadcast,
-  createPhaseTransitionNotice, createPlanDecision, createDirective,
+  createPhaseTransitionNotice,
 } = require('../../lib/team/communication');
 
 describe('Team Communication', () => {
@@ -86,31 +86,4 @@ describe('Team Communication', () => {
     });
   });
 
-  describe('createPlanDecision', () => {
-    it('승인 메시지', () => {
-      const msg = createPlanDecision('developer', true);
-      expect(msg.type).toBe('approval');
-      expect(msg.payload.subject).toBe('Plan Approved');
-    });
-
-    it('거절 메시지 + 피드백', () => {
-      const msg = createPlanDecision('developer', false, 'API 설계 수정 필요');
-      expect(msg.type).toBe('rejection');
-      expect(msg.payload.body).toBe('API 설계 수정 필요');
-    });
-  });
-
-  describe('createDirective', () => {
-    it('CTO 지시 메시지', () => {
-      const msg = createDirective('developer', 'Entity 먼저 구현하세요', {
-        feature: 'auth',
-        phase: 'do',
-      });
-      expect(msg.type).toBe('directive');
-      expect(msg.from).toBe('cto');
-      expect(msg.to).toBe('developer');
-      expect(msg.payload.body).toBe('Entity 먼저 구현하세요');
-      expect(msg.payload.feature).toBe('auth');
-    });
-  });
 });

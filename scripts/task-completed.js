@@ -312,14 +312,38 @@ async function main() {
     const { extractLayer } = require(path.join(__dirname, '..', 'lib', 'team', 'coordinator'));
 
     const taskDesc = hookData.task_description || hookData.tool_name || '';
-    const completedLayer = extractLayer(taskDesc);
+    let completedLayer = extractLayer(taskDesc);
+    const waveAgentId = extractAgentId(hookData);
+
+    // fallback 1: worktree branch name에서 layer 추출
+    if (!completedLayer) {
+      try {
+        const cwd = process.cwd();
+        if (cwd.includes('.demodev/worktrees') || cwd.includes('.claude/worktrees')) {
+          const branch = require('child_process')
+            .execSync('git branch --show-current', { cwd, encoding: 'utf-8' }).trim();
+          const m = branch.match(/^wave-\d+\/[^/]+\/([a-z]+)$/);
+          if (m) completedLayer = m[1];
+        }
+      } catch { /* 무시 */ }
+    }
+
+    // fallback 2: agentId로 현재 wave의 미완료 task 매칭
+    if (!completedLayer && waveAgentId) {
+      const teamSt = stateWriter.loadTeamState(projectRoot);
+      const we = teamSt.waveExecution;
+      if (we && we.currentWave > 0) {
+        const wave = we.waves?.find(w => w.waveIndex === we.currentWave);
+        const task = wave?.tasks?.find(t => t.agentId === waveAgentId && t.status !== 'completed');
+        if (task?.layer) completedLayer = task.layer;
+      }
+    }
 
     if (completedLayer) {
       // Phase 1: 원자적 task 완료 (file lock 내부)
       let waveResult = null;
       let completedWaveIndex = null;
       let autoStartWave1 = false;
-      const waveAgentId = extractAgentId(hookData);
       stateWriter.updateWaveExecution(projectRoot, (we) => {
         // pending 상태 + wave 0 → 아직 wave 1이 시작되지 않은 초기 상태
         if (we.status === 'pending' && we.currentWave === 0) {

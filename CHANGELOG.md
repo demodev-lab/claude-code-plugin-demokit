@@ -7,6 +7,24 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-02-23
+
+### Fixed
+- `finalizeWave` 트리거 갭: `extractLayer` null 시 wave 처리 블록이 영원히 스킵되는 결함 수정
+  - fallback 1: worktree branch name에서 layer 추출
+  - fallback 2: agentId로 현재 wave 미완료 task 매칭
+
+### Removed
+- `coordinator.js`: `distributeWork`, `distributeLeader`, `distributeCouncil`, `distributeWatchdog`, `distributePipeline`, `distributeSwarm`, `canParallelizeAtPosition` 제거
+- `cto-logic.js`: `decidePdcaPhase`, `evaluateDocument`, `recommendTeamComposition`, `REQUIRED_SECTIONS` 제거
+- `task-queue.js`: `_taskAssignments` Map, `assignTaskToRole`, `getTeamProgress`, `findNextAvailableTask`, `isPhaseComplete` 제거
+- `orchestrator.js`: `shouldUseTeam`, `delegateTask`, `selectPattern` 제거
+- `communication.js`: `createPlanDecision`, `createDirective` 제거
+- `hooks.js`: `handleTeammateIdle` 제거
+- `state-writer.js`: `getActiveMembers` 제거
+- `worktree-manager.js`: `listWorktrees` 제거
+- `agent-id.js`: `normalizeAgentId` export 제거 (내부 헬퍼로 유지)
+
 ### Added
 - `/superwork` blueprint 생성 시 wave state 자동 초기화 (team enabled + parallelGroups > 1 조건)
 - `/pdca do` 실행 시 wave state 초기화 트리거 (중복 초기화 방지 포함)

@@ -1,5 +1,5 @@
 const {
-  NEXT_PHASE_MAP, assignNextTeammateWork, handleTeammateIdle, shouldRecomposeTeam,
+  NEXT_PHASE_MAP, assignNextTeammateWork, shouldRecomposeTeam,
 } = require('../../lib/team/hooks');
 
 describe('Team Hooks', () => {
@@ -55,22 +55,6 @@ describe('Team Hooks', () => {
       const result = assignNextTeammateWork('plan', 'auth', 'Monolith');
       expect(result.notice).not.toBeNull();
       expect(result.notice.type).toBe('phase_transition');
-    });
-  });
-
-  describe('handleTeammateIdle', () => {
-    it('pdcaStatus 없으면 null 반환', () => {
-      expect(handleTeammateIdle('dev-1', null)).toBeNull();
-      expect(handleTeammateIdle('dev-1', {})).toBeNull();
-    });
-
-    it('feature 있으면 작업 탐색 시도', () => {
-      // task-queue에 할당된 작업이 없으므로 null
-      const result = handleTeammateIdle('dev-1', {
-        feature: 'auth',
-        currentPhase: 'do',
-      });
-      expect(result).toBeNull();
     });
   });
 

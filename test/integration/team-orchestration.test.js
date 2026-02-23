@@ -1,75 +1,10 @@
 /**
  * Team 오케스트레이션 통합 테스트
- * 팀 구성 → 작업 분배 → 완료 흐름
+ * 작업 큐 관리 및 매칭 흐름
  */
-const { distributeWork, getNextAssignment, buildTaskQueueFromPhase, isMatchedTask } = require('../../lib/team/coordinator');
+const { getNextAssignment, isMatchedTask } = require('../../lib/team/coordinator');
 
 describe('Team Orchestration Integration', () => {
-  const teamMembers = ['spring-architect', 'domain-expert', 'api-expert'];
-
-  describe('팀 구성 → 작업 분배 → 완료 흐름', () => {
-    it('leader 패턴으로 순차 작업 분배', () => {
-      const tasks = [
-        { description: 'entity 모델 설계', subject: 'Entity 설계' },
-        { description: 'repository 구현', subject: 'Repository 구현' },
-        { description: 'service 로직 구현', subject: 'Service 구현' },
-      ];
-
-      // 작업 분배
-      const assignments = distributeWork(teamMembers, tasks, 'leader');
-      expect(assignments).toHaveLength(3);
-      expect(assignments[0].agent).toBe('spring-architect');
-      expect(assignments[1].agent).toBe('domain-expert');
-      expect(assignments[2].agent).toBe('api-expert');
-
-      // 모두 순차
-      assignments.forEach(a => expect(a.parallel).toBe(false));
-    });
-
-    it('pipeline 패턴으로 스테이지 기반 분배', () => {
-      const tasks = [
-        { description: 'entity 작업' },
-        { description: 'service 작업' },
-        { description: 'controller 작업' },
-      ];
-
-      const assignments = distributeWork(teamMembers, tasks, 'pipeline');
-
-      // 의존성 순서: entity → service → controller
-      expect(assignments).toHaveLength(3);
-      expect(assignments[0].stage).toBe(1);
-      expect(assignments[0].dependsOn).toBeNull();
-      expect(assignments[1].stage).toBe(2);
-      expect(assignments[1].dependsOn).toBeDefined();
-      expect(assignments[2].stage).toBe(3);
-    });
-
-    it('swarm 패턴으로 병렬 가능한 작업 식별', () => {
-      const tasks = [
-        { description: 'entity 모델 작업' },
-        { description: 'dto 정의 작업' },
-        { description: 'service 구현 작업' },
-      ];
-
-      const assignments = distributeWork(teamMembers, tasks, 'swarm');
-      expect(assignments).toHaveLength(3);
-
-      // entity와 dto는 독립적이므로 병렬 가능
-      // 의존성 정렬 후 첫 작업은 항상 parallel:true
-      expect(assignments[0].parallel).toBe(true);
-    });
-
-    it('council 패턴으로 전체 분석', () => {
-      const tasks = [{ description: '전체 코드 리뷰' }];
-      const assignments = distributeWork(teamMembers, tasks, 'council');
-      expect(assignments).toHaveLength(3);
-      assignments.forEach(a => {
-        expect(a.parallel).toBe(true);
-        expect(a.task).toEqual(tasks);
-      });
-    });
-  });
-
   describe('작업 큐 관리', () => {
     it('다음 작업 할당 + 완료 처리', () => {
       const teamState = {
