@@ -421,20 +421,16 @@ async function main() {
               hints.push(waveHint);
             }
 
-            // verify-failed task status 디스크 반영
+            // verify-failed + 재스케줄 + cross-validation을 in-memory에서 처리 후 단일 디스크 쓰기
+            let _pendingVerifyFailed = [];
+            let _pendingRetryWave = null;
+            let _pendingCvResult = null;
+
             if (mergeResult && mergeResult.verifyFailedCount > 0) {
-              stateWriter.updateWaveExecution(projectRoot, (we) => {
-                const cw = we.waves.find(w => w.waveIndex === completedWaveIndex);
-                if (cw) {
-                  for (const layer of mergeResult.verifyFailed) {
-                    const task = cw.tasks.find(t => t.layer === layer);
-                    if (task) task.status = 'failed';
-                  }
-                }
-              });
+              _pendingVerifyFailed = mergeResult.verifyFailed;
             }
 
-            // 실패 task 재스케줄 (mergeResult 존재 시에만 — finalize 자체 실패 시 건너뜀)
+            // 실패 task 재스케줄 (mergeResult 존재 시에만)
             const hasFailures = mergeResult && (
               mergeResult.verifyFailedCount > 0
               || freshWaveExec.waves.find(w => w.waveIndex === completedWaveIndex)
@@ -448,7 +444,6 @@ async function main() {
               if (reschedule.rescheduled.length > 0) {
                 hints.push(`[Wave] 실패 task 재스케줄: ${reschedule.rescheduled.join(', ')} → Wave ${reschedule.targetWaveIndex}`);
 
-                // Dynamic Scheduler: policy 기반 재할당 + spawn payload (in-memory 수정)
                 try {
                   const { reassignFailedTask, buildSpawnHelperPayload } = require(
                     path.join(__dirname, '..', 'lib', 'team', 'dynamic-scheduler')
@@ -472,8 +467,6 @@ async function main() {
                     if (sp) spawnPayloads.push(sp);
                   }
 
-                  // freshWaveExec의 retry wave를 in-memory에서 직접 수정
-                  // → 아래 단일 updateWaveExecution에서 한 번에 디스크 반영
                   const retryWaveInMem = freshWaveExec.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
                   if (retryWaveInMem) {
                     const actualReassigned = reassignments.filter(r => r.reassigned);
@@ -488,22 +481,14 @@ async function main() {
                       hints.push(`[Wave] 동적 재할당: ${actualReassigned.map(r => `${r.layer}→${r.reassignedAgent}`).join(', ')}`);
                     }
                   }
+                  _pendingRetryWave = retryWaveInMem ? { index: reschedule.targetWaveIndex, data: retryWaveInMem } : null;
                 } catch { /* dynamic-scheduler 실패해도 기존 흐름 유지 */ }
-
-                stateWriter.updateWaveExecution(projectRoot, (we) => {
-                  const retryWave = freshWaveExec.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
-                  if (retryWave) {
-                    const existing = we.waves.find(w => w.waveIndex === reschedule.targetWaveIndex);
-                    if (existing) Object.assign(existing, retryWave);
-                    else { we.waves.push(retryWave); we.totalWaves = we.waves.length; }
-                  }
-                });
               }
               const helperHint = buildHelperSpawnHint(freshWaveExec, completedWaveIndex);
               if (helperHint) hints.push(helperHint);
             }
 
-            // Phase 3: cross-validation (merge 성공 시에만)
+            // cross-validation (merge 성공 시에만, in-memory 처리)
             if (mergeResult && mergeResult.mergedCount > 0) {
               try {
                 const { attachCrossValidation, buildCrossValidationDispatch } = require(
@@ -512,12 +497,36 @@ async function main() {
                 const cvResult = attachCrossValidation(freshWaveExec, completedWaveIndex, freshWaveExec.complexityScore ?? 0);
                 if (cvResult.required && cvResult.pairs.length > 0) {
                   hints.push(buildCrossValidationDispatch(cvResult.pairs, completedWaveIndex, freshWaveExec.featureSlug));
-                  stateWriter.updateWaveExecution(projectRoot, (we) => {
-                    const wave = we.waves.find(w => w.waveIndex === completedWaveIndex);
-                    if (wave) wave.crossValidation = cvResult;
-                  });
+                  _pendingCvResult = cvResult;
                 }
               } catch { /* cross-validation 실패해도 wave 흐름 유지 */ }
+            }
+
+            // 단일 updateWaveExecution으로 모든 pending 변경사항 일괄 반영
+            if (_pendingVerifyFailed.length > 0 || _pendingRetryWave || _pendingCvResult) {
+              stateWriter.updateWaveExecution(projectRoot, (we) => {
+                // verify-failed 반영
+                if (_pendingVerifyFailed.length > 0) {
+                  const cw = we.waves.find(w => w.waveIndex === completedWaveIndex);
+                  if (cw) {
+                    for (const layer of _pendingVerifyFailed) {
+                      const task = cw.tasks.find(t => t.layer === layer);
+                      if (task) task.status = 'failed';
+                    }
+                  }
+                }
+                // retry wave 반영
+                if (_pendingRetryWave) {
+                  const existing = we.waves.find(w => w.waveIndex === _pendingRetryWave.index);
+                  if (existing) Object.assign(existing, _pendingRetryWave.data);
+                  else { we.waves.push(_pendingRetryWave.data); we.totalWaves = we.waves.length; }
+                }
+                // cross-validation 반영
+                if (_pendingCvResult) {
+                  const wave = we.waves.find(w => w.waveIndex === completedWaveIndex);
+                  if (wave) wave.crossValidation = _pendingCvResult;
+                }
+              });
             }
 
             const verifyBlocked = mergeResult && mergeResult.verifyFailedCount > 0 && mergeResult.mergedCount === 0;
@@ -596,6 +605,20 @@ async function main() {
     durationMs: Date.now() - hotPathStartMs,
     projectRoot,
   });
+
+  // 6.9. Token tracking
+  try {
+    const tokenTrackingEnabled = core.hookRuntime.shouldRun({ scriptKey: 'tokenTracking', scriptFallback: false });
+    if (tokenTrackingEnabled) {
+      const tracker = require(path.join(__dirname, '..', 'dist', 'lib', 'analytics', 'token-tracker'));
+      let metrics = tracker.loadMetrics(projectRoot);
+      if (!metrics) metrics = tracker.createSession(Date.now().toString());
+      const inputText = hookData.content || hookData.tool_input?.prompt || '';
+      const outputText = hookData.result || hookData.tool_result || '';
+      metrics = tracker.recordTurn(metrics, inputText, outputText);
+      tracker.saveMetrics(projectRoot, metrics);
+    }
+  } catch { /* 토큰 추적 실패 시 무시 */ }
 
   // 7. Loop 상태 확인
   try {
