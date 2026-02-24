@@ -38,6 +38,18 @@ async function main() {
               process.stderr.write(`[demokit] force-stop 마커 삭제 실패: ${e.message}\n`);
             }
           } else {
+            // 쿨다운: 최근 60초 이내 block한 적이 있으면 재차단 안 함 (무한 루프 방지)
+            const blockMarker = path.join(projectRoot, '.pdca', '.continuation-blocked');
+            try {
+              if (fs.existsSync(blockMarker)) {
+                const stat = fs.statSync(blockMarker);
+                if (Date.now() - stat.mtimeMs < 60000) {
+                  console.log(JSON.stringify({}));
+                  return;
+                }
+              }
+            } catch { /* ignore */ }
+
             const { status } = require(path.join(__dirname, '..', 'lib', 'pdca'));
             const { PHASE_ORDER } = status;
             const features = status.listFeatures(projectRoot);
@@ -55,6 +67,8 @@ async function main() {
               const completedPhases = PHASE_ORDER.filter(phase => s.phases[phase]?.status === 'completed');
               const remainingPhases = PHASE_ORDER.filter(phase => s.phases[phase]?.status !== 'completed');
               const systemMessage = `[demokit] PDCA 진행 중 — 종료가 차단되었습니다.\n\n활성 feature: ${f.feature} (${f.currentPhase} 진행 중)\n완료: ${completedPhases.join(', ') || '없음'} | 남은: ${remainingPhases.join(', ')}\n\n계속 작업하거나, 강제 종료: /pdca force-stop`;
+              // block 마커 기록 (쿨다운 시작)
+              try { fs.writeFileSync(blockMarker, new Date().toISOString()); } catch { /* ignore */ }
               console.log(JSON.stringify({ decision: 'block', systemMessage }));
               return;
             }
