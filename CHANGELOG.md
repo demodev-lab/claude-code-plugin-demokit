@@ -7,6 +7,29 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-02-24
+
+### Added
+- File Ownership (`lib/team/file-ownership.ts`) — Wave task별 파일 소유권 분류
+- Model Router (`lib/routing/model-router.ts`) — 레이어별 모델 자동 라우팅
+- Token Tracker (`lib/analytics/token-tracker.ts`) — 세션 토큰 사용량 추적
+- Project Scanner (`lib/memory/project-scanner.ts`) — 프로젝트 구조 자동 스캔
+
+### Fixed
+- `continuationEnforcement` 무한 루프: Stop hook에서 매 turn 종료 시 block → UserPromptSubmit 비차단 리마인더로 전환
+- Wave plan 동일 layer 중복 제거
+
+### Performance
+- `platform.js:findProjectRoot` 프로세스 내 캐시 (모든 hook에서 반복 디렉토리 탐색 제거)
+- `pipeline-phase-runtime.js` `.pipeline` 디렉토리 없으면 early return (매 툴호출 fs read 방지)
+- `pre-write.js` 비 Java 파일에서 config/convention 로드 skip
+- `loop/state.js:getState` 200ms TTL 캐시
+- `subagent-start-handler.js` 4x withFileLock → 1x withTeamLock 통합 (24→6 fs ops)
+- `stop-handler.js` 4-5x withFileLock → 1x withTeamLock 통합 (30-50→6 fs ops)
+- `wave-dispatcher.js:listProjectFiles` TTL 캐시 30초
+- `automation.js:_loadConfig` TTL 캐시 10초
+- `task-completed.js:updateWaveExecution` 3회 개별 호출 → 단일 호출 통합
+
 ## [1.1.2] - 2026-02-24
 
 ### Added
