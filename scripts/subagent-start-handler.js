@@ -63,6 +63,23 @@ async function main() {
 
   stateWriter.updateMemberStatus(projectRoot, teammate, 'active', currentTask, { worktreePath });
 
+  // Agent Trace
+  try {
+    if (hookRuntime.shouldRun({ scriptKey: 'agentTraceEnabled', scriptFallback: false })) {
+      const trace = require(path.join(__dirname, '..', 'dist', 'lib', 'analytics', 'agent-trace'));
+      const sessionId = trace.resolveSessionId(hookData);
+      trace.appendTrace(projectRoot, sessionId, {
+        timestamp: new Date().toISOString(),
+        event: 'start',
+        agentId: teammate,
+        taskDescription: currentTask,
+        worktreePath,
+        exitCode: null,
+        durationMs: null,
+      });
+    }
+  } catch { /* trace 실패 시 무시 */ }
+
   orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
 
   const result = {
