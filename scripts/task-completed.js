@@ -349,7 +349,7 @@ async function main() {
       let waveResult = null;
       let completedWaveIndex = null;
       let autoStartWave1 = false;
-      stateWriter.updateWaveExecution(projectRoot, (we) => {
+      const taskCompleteState = stateWriter.updateWaveExecution(projectRoot, (we) => {
         // pending 상태 + wave 0 → 아직 wave 1이 시작되지 않은 초기 상태
         if (we.status === 'pending' && we.currentWave === 0) {
           autoStartWave1 = true;
@@ -371,12 +371,11 @@ async function main() {
       // Wave 1 자동 시작 (pending → in_progress 전환)
       if (autoStartWave1) {
         try {
-          const initState = stateWriter.loadTeamState(projectRoot);
-          const initWaveExec = initState.waveExecution;
+          const initWaveExec = taskCompleteState?.waveExecution;
           const w1Status = initWaveExec?.waves?.find(w => w.waveIndex === 1)?.status;
           if (initWaveExec && w1Status === 'pending') {
             const wave1Result = startWave(initWaveExec, 1, projectRoot);
-            stateWriter.updateWaveExecution(projectRoot, (we) => {
+            const wave1State = stateWriter.updateWaveExecution(projectRoot, (we) => {
               const w1 = initWaveExec.waves.find(w => w.waveIndex === 1);
               if (w1) {
                 const target = we.waves.find(w => w.waveIndex === 1);
@@ -392,7 +391,7 @@ async function main() {
               hints.push(`[Wave] Wave 1 시작: ${w1Info}`);
               try {
                 const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
-                const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
+                const latestWE = wave1State?.waveExecution;
                 const level = activePdcaFeature?.level || core.cache.get('level') || null;
                 const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, 1, { projectRoot, level });
                 if (dispatch) hints.push(dispatch);
@@ -409,8 +408,7 @@ async function main() {
       // Phase 2: git 작업 (lock 밖)
       if (waveResult && waveResult.waveCompleted && completedWaveIndex !== null) {
         try {
-          const freshState = stateWriter.loadTeamState(projectRoot);
-          const freshWaveExec = freshState.waveExecution;
+          const freshWaveExec = taskCompleteState?.waveExecution;
           if (freshWaveExec) {
             const mergeResult = finalizeWave(freshWaveExec, completedWaveIndex, projectRoot, 'HEAD');
             if (mergeResult) {
@@ -502,9 +500,26 @@ async function main() {
               } catch { /* cross-validation 실패해도 wave 흐름 유지 */ }
             }
 
-            // 단일 updateWaveExecution으로 모든 pending 변경사항 일괄 반영
-            if (_pendingVerifyFailed.length > 0 || _pendingRetryWave || _pendingCvResult) {
-              stateWriter.updateWaveExecution(projectRoot, (we) => {
+            const verifyBlocked = mergeResult && mergeResult.verifyFailedCount > 0 && mergeResult.mergedCount === 0;
+            const finalizeBlocked = !mergeResult || verifyBlocked;
+            if (verifyBlocked) {
+              hints.push(`[Wave] verify 전체 실패로 다음 Wave 진행 차단. 실패 worktree를 수동 확인하세요.`);
+            } else if (!mergeResult) {
+              hints.push(`[Wave] Wave ${completedWaveIndex} finalize 실패 (merge 대상 없음). 다음 Wave 진행 차단.`);
+            }
+
+            // git ops: startWave (lock 밖에서 실행)
+            let nextWaveResult = null;
+            if (waveResult.nextWaveIndex && !finalizeBlocked) {
+              nextWaveResult = startWave(freshWaveExec, waveResult.nextWaveIndex, projectRoot);
+            }
+
+            // 단일 updateWaveExecution으로 pending + nextWave 변경사항 일괄 반영
+            const hasPending = _pendingVerifyFailed.length > 0 || _pendingRetryWave || _pendingCvResult;
+            const hasNextWave = waveResult.nextWaveIndex && !finalizeBlocked;
+            let batchState = null;
+            if (hasPending || hasNextWave) {
+              batchState = stateWriter.updateWaveExecution(projectRoot, (we) => {
                 // verify-failed 반영
                 if (_pendingVerifyFailed.length > 0) {
                   const cw = we.waves.find(w => w.waveIndex === completedWaveIndex);
@@ -526,44 +541,33 @@ async function main() {
                   const wave = we.waves.find(w => w.waveIndex === completedWaveIndex);
                   if (wave) wave.crossValidation = _pendingCvResult;
                 }
+                // next wave start 반영
+                if (hasNextWave) {
+                  const nextWave = freshWaveExec.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
+                  if (nextWave) {
+                    const target = we.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
+                    if (target) Object.assign(target, nextWave);
+                  }
+                  if (nextWaveResult) {
+                    we.currentWave = waveResult.nextWaveIndex;
+                    we.status = 'in_progress';
+                  }
+                }
               });
             }
 
-            const verifyBlocked = mergeResult && mergeResult.verifyFailedCount > 0 && mergeResult.mergedCount === 0;
-            const finalizeBlocked = !mergeResult || verifyBlocked;
-            if (verifyBlocked) {
-              hints.push(`[Wave] verify 전체 실패로 다음 Wave 진행 차단. 실패 worktree를 수동 확인하세요.`);
-            } else if (!mergeResult) {
-              hints.push(`[Wave] Wave ${completedWaveIndex} finalize 실패 (merge 대상 없음). 다음 Wave 진행 차단.`);
-            }
-
-            if (waveResult.nextWaveIndex && !finalizeBlocked) {
-              const nextWaveResult = startWave(freshWaveExec, waveResult.nextWaveIndex, projectRoot);
-              // Phase 3: git 작업 결과 저장 (startWave 결과만 반영)
-              stateWriter.updateWaveExecution(projectRoot, (we) => {
-                const nextWave = freshWaveExec.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
-                if (nextWave) {
-                  const target = we.waves.find(w => w.waveIndex === waveResult.nextWaveIndex);
-                  if (target) Object.assign(target, nextWave);
-                }
-                if (nextWaveResult) {
-                  we.currentWave = waveResult.nextWaveIndex;
-                  we.status = 'in_progress';
-                }
-              });
-              if (nextWaveResult) {
-                const nwInfo = nextWaveResult.worktrees.map(wt => `${wt.layer}=\`${wt.worktreePath}\``).join(', ');
-                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작: ${nwInfo}`);
-                try {
-                  const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
-                  const latestWE = stateWriter.loadTeamState(projectRoot).waveExecution;
-                  const level = activePdcaFeature?.level || core.cache.get('level') || null;
-                  const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex, { projectRoot, level });
-                  if (dispatch) hints.push(dispatch);
-                } catch { /* 무시 */ }
-              } else {
-                hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작 실패 (worktree 생성 오류)`);
-              }
+            if (nextWaveResult) {
+              const nwInfo = nextWaveResult.worktrees.map(wt => `${wt.layer}=\`${wt.worktreePath}\``).join(', ');
+              hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작: ${nwInfo}`);
+              try {
+                const { buildWaveDispatchInstructions } = require(path.join(__dirname, '..', 'lib', 'team', 'wave-dispatcher'));
+                const latestWE = batchState?.waveExecution;
+                const level = activePdcaFeature?.level || core.cache.get('level') || null;
+                const dispatch = latestWE && buildWaveDispatchInstructions(latestWE, waveResult.nextWaveIndex, { projectRoot, level });
+                if (dispatch) hints.push(dispatch);
+              } catch { /* 무시 */ }
+            } else if (waveResult.nextWaveIndex && !finalizeBlocked) {
+              hints.push(`[Wave] Wave ${waveResult.nextWaveIndex} 시작 실패 (worktree 생성 오류)`);
             }
           }
         } catch (waveErr) {
@@ -578,7 +582,7 @@ async function main() {
           const { buildRunMetrics, appendRunMetrics } = require(
             path.join(__dirname, '..', 'lib', 'team', 'wave-metrics')
           );
-          const finalWaveState = stateWriter.loadTeamState(projectRoot).waveExecution;
+          const finalWaveState = taskCompleteState?.waveExecution;
           if (finalWaveState) {
             const runMetrics = buildRunMetrics(finalWaveState, {
               completedAt: new Date().toISOString(),
