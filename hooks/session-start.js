@@ -56,6 +56,35 @@ async function main() {
   cache.set('project', project);
   cache.set('level', levelResult.level);
 
+  // 5.5. Project auto-scan
+  try {
+    const scanEnabled = require('../lib/core').hookRuntime.shouldRun({ scriptKey: 'projectAutoScan', scriptFallback: false });
+    if (scanEnabled) {
+      const scanner = require(path.join(__dirname, '..', 'dist', 'lib', 'memory', 'project-scanner'));
+      const { storage: memStorage } = require('../lib/memory');
+      const memory = memStorage.loadMemory(projectRoot);
+      const existing = memory.project?.metadata || null;
+      if (scanner.shouldRescan(existing)) {
+        const metadata = scanner.scanProject(projectRoot, gradle, project, levelResult.level);
+        const updated = scanner.mergeIntoMemory(memory, metadata);
+        memStorage.saveMemory(projectRoot, updated);
+      }
+    }
+  } catch { /* 스캔 실패 시 무시 */ }
+
+  // 5.6. Bean scan
+  try {
+    const scanEnabled = require('../lib/core').hookRuntime.shouldRun({ scriptKey: 'beanScanHandler', scriptFallback: false });
+    if (scanEnabled) {
+      const scanner = require(path.join(__dirname, '..', 'dist', 'lib', 'lsp', 'bean-scanner'));
+      const existing = scanner.loadBeanGraph(projectRoot);
+      if (scanner.shouldRescan(existing)) {
+        const graph = scanner.scanBeans(projectRoot);
+        scanner.saveBeanGraph(projectRoot, graph);
+      }
+    }
+  } catch { /* bean scan 실패 시 무시 */ }
+
   // 6. systemMessage 구성
   const lines = [
     `[demokit] Spring Boot 프로젝트 감지`,
@@ -145,6 +174,20 @@ async function main() {
       lines.push(`🧠 프로젝트 메모리: ${summary}`);
     }
   } catch { /* memory 모듈 로드 실패 시 무시 */ }
+
+  // Context Injection
+  try {
+    const ctxConfig = require('../lib/core').config.getConfigValue('contextInjection.enabled', true);
+    const { injector } = require('../lib/context-store');
+    if (injector && ctxConfig !== false) {
+      const merged = injector.injectContext(projectRoot);
+      if (merged.systemMessageLines.length > 0) {
+        lines.push('');
+        lines.push('[Context] 통합 컨텍스트 주입');
+        lines.push(...merged.systemMessageLines);
+      }
+    }
+  } catch { /* ignore */ }
 
   // Feature Usage Report
   try {

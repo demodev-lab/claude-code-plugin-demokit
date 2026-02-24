@@ -32,6 +32,18 @@
       "majorFeature": "Major Feature (PDCA 필수)"
     }
   },
+  "lsp": {
+    "beanScanEnabled": true,
+    "cacheTtlMs": 300000,
+    "maxFiles": 500
+  },
+  "contextInjection": {
+    "enabled": true,
+    "maxSystemMessageLines": 20
+  },
+  "agentTrace": {
+    "enabled": false
+  },
   "project": {
     "type": "spring-boot",
     "language": "java",
@@ -182,6 +194,7 @@
     "documentPath": ".pdca",
     "automationLevel": "semi-auto",
     "matchRateThreshold": 90,
+    "verificationEnabled": true,
     "maxIterations": 5,
     "doStickyCacheTtlMs": 15000,
     "matchRateWeights": {
@@ -327,6 +340,7 @@
         "do": { "SingleModule": 3 }
       }
     },
+    "fileOwnership": true,
     "cleanup": {
       "staleMemberMs": 1800000,
       "clearTeamStateOnStop": false,
@@ -356,7 +370,13 @@
         "contextCompaction": true,
         "subagentStartHandler": true,
         "subagentStopHandler": true,
+        "continuationEnforcement": true,
+        "rateLimitDetection": true,
         "teamIdleHandler": true,
+        "tokenTracking": true,
+        "projectAutoScan": true,
+        "beanScanHandler": true,
+        "agentTraceEnabled": false,
         "pipelinePhasePre": false,
         "pipelinePhasePost": false,
         "pipelinePhaseStop": true,
@@ -390,6 +410,15 @@
       { "id": 8, "name": "Review", "agent": "code-reviewer" },
       { "id": 9, "name": "Deployment", "agent": "devops-engineer" }
     ]
+  },
+  "routing": {
+    "enabled": true
+  },
+  "analytics": {
+    "tokenTracking": true
+  },
+  "memory": {
+    "autoScan": true
   },
   "contextEngineering": {
     "enabled": true,

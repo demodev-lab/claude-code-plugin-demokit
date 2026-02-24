@@ -63,6 +63,25 @@ async function main() {
     stateWriter.updateMemberStatus(projectRoot, teammate, finalStatus, null, { worktreePath });
   }
 
+  // Agent Trace
+  try {
+    if (hookRuntime.shouldRun({ scriptKey: 'agentTraceEnabled', scriptFallback: false })) {
+      const trace = require(path.join(__dirname, '..', 'dist', 'lib', 'analytics', 'agent-trace'));
+      const sessionId = trace.resolveSessionId(hookData);
+      const lastStart = trace.findLastStart(projectRoot, sessionId, teammate);
+      const durationMs = lastStart ? Date.now() - new Date(lastStart.timestamp).getTime() : null;
+      trace.appendTrace(projectRoot, sessionId, {
+        timestamp: new Date().toISOString(),
+        event: 'stop',
+        agentId: teammate,
+        taskDescription: taskId,
+        worktreePath,
+        exitCode: hookData.exit_code ?? null,
+        durationMs,
+      });
+    }
+  } catch { /* trace 실패 시 무시 */ }
+
   const result = {
     systemMessage: `[demokit] 서브에이전트 종료: ${teammate} (${finalStatus})`,
   };
