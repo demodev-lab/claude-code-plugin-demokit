@@ -7,6 +7,23 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-02-24
+
+### Added
+- Spring Bean Scanner (`lib/lsp/bean-scanner.ts`) — Java 소스 정적 파싱으로 Spring Bean 탐색 및 의존성 그래프 생성
+- Context Injector (`lib/context-store/context-injector.ts`) — 6개 소스 우선순위 기반 프롬프트 컨텍스트 병합
+- Agent Trace (`lib/analytics/agent-trace.ts`) — 서브에이전트 실행 흐름 JSONL 기록 및 통계 요약
+- `demodev.config.json`에 `lsp`, `contextInjection`, `agentTrace` 설정 섹션 추가
+
+### Fixed
+- Bean Scanner: 생성자 regex에 access modifier 필수 적용 (`new ClassName()` 오매칭 방지)
+- Bean Scanner: `findJavaFiles` early exit로 대규모 프로젝트 탐색 성능 개선
+- Context Injector: 병합 우선순위 역전 버그 수정 (priority 1이 최종 승자)
+- Context Injector: PDCA 내부 루프 개별 try/catch로 실패 격리
+- Context Injector: `contextInjection.enabled` config 플래그 반영
+- Agent Trace: `resolveSessionId` 고정 fallback으로 프로세스 간 sessionId 일관성 보장
+- Agent Trace: `findLastStart` tail-read 방식으로 I/O 최적화
+
 ## [1.1.1] - 2026-02-23
 
 ### Fixed
