@@ -94,82 +94,84 @@ async function main() {
     const clearMode = cleanupPolicy?.clearTeamStateOnStopMode || TEAM_CLEAR_MODE_NEVER;
 
     const staleMs = Number(cleanupPolicy?.staleMemberMs);
-    let teamState = stateWriter.loadTeamState(projectRoot);
-    if (teamState.enabled) {
-      const activeMembersAtStop = teamState.members
+    const initialState = stateWriter.loadTeamState(projectRoot);
+    if (initialState.enabled) {
+      const activeMembersAtStop = initialState.members
         .filter(m => m.status === 'active')
         .map(m => m.id)
         .filter(Boolean);
 
-      // 활성 멤버 → paused로 변경 (atomic read-modify-write)
-      if (activeMembersAtStop.length > 0) {
-        teamState = stateWriter.withTeamLock(projectRoot, () => {
-          const fresh = stateWriter.loadTeamState(projectRoot);
-          let pausedAny = false;
-          for (const member of fresh.members) {
-            if (member.status === 'active') {
-              member.status = 'paused';
-              member.currentTask = null;
-              pausedAny = true;
+      // 단일 withTeamLock으로 pause + cleanup + prune을 일괄 처리
+      const teamState = stateWriter.withTeamLock(projectRoot, () => {
+        const fresh = stateWriter.loadTeamState(projectRoot);
+
+        // 1. 활성 멤버 → paused
+        let pausedAny = false;
+        for (const member of fresh.members) {
+          if (member.status === 'active') {
+            member.status = 'paused';
+            member.currentTask = null;
+            pausedAny = true;
+          }
+        }
+        if (pausedAny) {
+          fresh.history = fresh.history || [];
+          fresh.history.push({
+            event: 'session_stopped',
+            timestamp: new Date().toISOString(),
+            pausedMembers: fresh.members.filter(m => m.status === 'paused').map(m => m.id),
+          });
+        }
+
+        // 2. stale member cleanup
+        if (Number.isFinite(staleMs) && staleMs > 0 && Array.isArray(fresh.members)) {
+          const now = Date.now();
+          fresh.members = fresh.members.filter(m => {
+            if (!m.lastActiveAt) return true;
+            return now - new Date(m.lastActiveAt).getTime() < staleMs;
+          });
+        }
+
+        // 3. 완료되지 않은 active 멤버의 점유 작업 해제 (세션 종료 시)
+        if (isCompleteStop && Array.isArray(fresh.taskQueue)) {
+          for (const memberId of activeMembersAtStop) {
+            for (const task of fresh.taskQueue) {
+              if (task.assignee === memberId && task.status === 'in_progress') {
+                task.assignee = null;
+                task.status = 'pending';
+              }
             }
           }
-          if (pausedAny) {
-            fresh.history = fresh.history || [];
-            fresh.history.push({
-              event: 'session_stopped',
-              timestamp: new Date().toISOString(),
-              pausedMembers: fresh.members.filter(m => m.status === 'paused').map(m => m.id),
-            });
-            stateWriter.saveTeamState(projectRoot, fresh);
-          }
-          return fresh;
-        });
-      }
-
-      // 오랫동안 활동하지 않은 멤버 정리
-      let staleCleanup = { state: teamState, removedMemberIds: [] };
-      if (Number.isFinite(staleMs) && staleMs > 0) {
-        staleCleanup = stateWriter.cleanupStaleMembers(projectRoot, staleMs);
-        if (staleCleanup.removedMemberIds?.length > 0) {
-          teamState = staleCleanup.state;
         }
-      }
 
-      // 완료되지 않은 active 멤버의 점유 작업 해제(세션 종료 시)
-      if (isCompleteStop) {
-        for (const memberId of activeMembersAtStop) {
-          stateWriter.releaseTaskAssignmentsForMember(projectRoot, memberId);
-        }
-      }
-
-      // stop 이벤트 단위 정리: 미작업 멤버 제거 옵션
-      if (isCompleteStop && cleanupPolicy?.pruneMembersOnStop) {
-        stateWriter.withTeamLock(projectRoot, () => {
-          const stoppedState = stateWriter.loadTeamState(projectRoot);
-          const prunedMembers = stoppedState.members
+        // 4. prune (세션 종료 + 정책 활성 시)
+        if (isCompleteStop && cleanupPolicy?.pruneMembersOnStop) {
+          const prunedMembers = fresh.members
             .filter(m => m.status !== 'active')
             .map(m => m.id)
             .filter(Boolean);
           if (prunedMembers.length > 0) {
-            stoppedState.members = stoppedState.members.filter(m => m.status === 'active');
-            stoppedState.history = stoppedState.history || [];
-            stoppedState.history.push({
+            fresh.members = fresh.members.filter(m => m.status === 'active');
+            fresh.history = fresh.history || [];
+            fresh.history.push({
               event: 'members_pruned_on_stop',
               at: new Date().toISOString(),
               removedMembers: prunedMembers,
             });
-            if (stoppedState.history.length > 100) {
-              stoppedState.history = stoppedState.history.slice(-100);
-            }
-            stateWriter.saveTeamState(projectRoot, stoppedState);
           }
-        });
-      }
+        }
 
-      // 완전 종료 처리 정책: clearOnStop 플래그가 명시될 때만 세션 종료 시 정리
+        if (fresh.history && fresh.history.length > 100) {
+          fresh.history = fresh.history.slice(-100);
+        }
+
+        stateWriter.saveTeamState(projectRoot, fresh);
+        return fresh;
+      });
+
+      // 완전 종료 처리 정책
       if (isCompleteStop) {
-        const latestTeamState = stateWriter.loadTeamState(projectRoot);
-        const hasLiveMembers = hasLiveMembersForClear(latestTeamState);
+        const hasLiveMembers = hasLiveMembersForClear(teamState);
         const clearStateAtStop = shouldClearTeamStateAtStop(clearMode, isCompleteStop, hasLiveMembers)
           || cleanupPolicy?.forceClearOnStop === true
           || cleanupPolicy?.clearOnStop === true;

@@ -53,15 +53,34 @@ async function main() {
   const worktreePath = resolveWorktreePathFromHook(hookData, process.cwd());
   const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
 
-  const currentState = stateWriter.loadTeamState(projectRoot);
-  if (!currentState.enabled) {
-    stateWriter.saveTeamState(projectRoot, { ...currentState, enabled: true });
-  }
-  if (cleanupPolicy.staleMemberMs) {
-    stateWriter.cleanupStaleMembers(projectRoot, cleanupPolicy.staleMemberMs);
-  }
+  // 단일 withTeamLock으로 enable + cleanup + memberStatus를 일괄 처리
+  stateWriter.withTeamLock(projectRoot, () => {
+    const state = stateWriter.loadTeamState(projectRoot);
+    if (!state.enabled) state.enabled = true;
 
-  stateWriter.updateMemberStatus(projectRoot, teammate, 'active', currentTask, { worktreePath });
+    // stale member cleanup (inline)
+    if (cleanupPolicy.staleMemberMs && Array.isArray(state.members)) {
+      const now = Date.now();
+      state.members = state.members.filter(m => {
+        if (!m.lastActiveAt) return true;
+        return now - new Date(m.lastActiveAt).getTime() < cleanupPolicy.staleMemberMs;
+      });
+    }
+
+    // member status update (inline)
+    let member = state.members.find(m => m.id === teammate);
+    if (!member) {
+      member = { id: teammate, status: 'active', currentTask, worktreePath, lastActiveAt: new Date().toISOString() };
+      state.members.push(member);
+    } else {
+      member.status = 'active';
+      member.currentTask = currentTask;
+      if (worktreePath) member.worktreePath = worktreePath;
+      member.lastActiveAt = new Date().toISOString();
+    }
+
+    stateWriter.saveTeamState(projectRoot, state);
+  });
 
   // Agent Trace
   try {
