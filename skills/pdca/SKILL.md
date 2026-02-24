@@ -24,6 +24,7 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
   next      다음 단계 안내
   archive   완료된 feature 아카이브
   cleanup   완료된 모든 feature 일괄 아카이브
+  force-stop  PDCA 미완료 차단 해제 (강제 종료)
 
 예시:
   /pdca plan user-management
@@ -31,6 +32,7 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
   /pdca do user-management
   /pdca status
   /pdca next
+  /pdca force-stop
   /pdca archive user-management
   /pdca cleanup
 
@@ -86,9 +88,23 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 3. 각 단계 완료 시 상태 업데이트
 4. 상태 업데이트: do → completed
 
+### /pdca force-stop
+**PDCA 미완료 차단 해제**
+
+PDCA가 진행 중일 때 종료(Stop)가 차단됩니다. 강제로 종료하려면 이 명령을 사용합니다.
+
+1. `.pdca/.force-stop` 마커 파일 생성
+2. 다음 Stop 시 차단이 해제되어 정상 종료됨
+3. 마커 파일은 사용 후 자동 삭제
+
 ### /pdca analyze {feature}
 **설계 vs 구현 Gap 분석**
 
+0. **빌드/테스트 검증** (pdca.verificationEnabled가 true일 때만):
+   - `lib/pdca/verify.ts`(컴파일: `dist/lib/pdca/verify.js`)로 빌드 도구 자동 감지
+   - Bash로 빌드/테스트 명령 실행 (gradle: `./gradlew test`, maven: `./mvnw test`, npm: `npm test`)
+   - 결과를 `.pdca/{feature}/verification.json`에 저장
+   - 빌드 실패 시 경고 표시 후 gap 분석은 계속 진행
 1. Design 문서와 실제 구현 코드 비교
 2. **병렬 Gap 분석** — 다음 Task들을 한 메시지에서 동시에 호출:
    - Task 1: API 엔드포인트 + DTO 필드 일치율 분석

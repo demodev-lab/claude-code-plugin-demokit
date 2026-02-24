@@ -182,6 +182,7 @@
     "documentPath": ".pdca",
     "automationLevel": "semi-auto",
     "matchRateThreshold": 90,
+    "verificationEnabled": true,
     "maxIterations": 5,
     "doStickyCacheTtlMs": 15000,
     "matchRateWeights": {
@@ -356,6 +357,8 @@
         "contextCompaction": true,
         "subagentStartHandler": true,
         "subagentStopHandler": true,
+        "continuationEnforcement": true,
+        "rateLimitDetection": true,
         "teamIdleHandler": true,
         "pipelinePhasePre": false,
         "pipelinePhasePost": false,

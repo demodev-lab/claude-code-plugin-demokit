@@ -212,6 +212,24 @@ async function main() {
     return;
   }
 
+  // rate limit 감지 (loop 활성 시에만)
+  const shouldRunRateLimit = hookRuntime.shouldRun({
+    scriptKey: 'rateLimitDetection',
+    scriptFallback: false,
+  });
+  if (shouldRunRateLimit) {
+    const isRateLimited = detectRateLimit(hookData);
+    if (isRateLimited) {
+      const updated = loopStateMod.recordRateLimit(projectRoot);
+      const waitSec = calcBackoff(updated.rateLimitCount);
+      console.log(JSON.stringify({
+        decision: 'block',
+        systemMessage: buildRateLimitMessage(loopState, waitSec, updated.rateLimitCount),
+      }));
+      return;
+    }
+  }
+
   // completion promise 감지
   const transcript = hookData.transcript || hookData.stop_reason || hookData.content || '';
   if (loopState.completionPromise && transcript.includes(loopState.completionPromise)) {
@@ -310,3 +328,28 @@ main().catch(err => {
   console.error(`[demokit] stop-handler 오류: ${err.message}`);
   console.log(JSON.stringify({}));
 });
+
+const RATE_LIMIT_PATTERNS = [
+  /rate.?limit/i, /too many requests/i, /\b429\b/,
+  /quota exceeded/i, /overloaded/i, /retry.{0,20}after/i,
+];
+
+function detectRateLimit(hookData) {
+  const text = [hookData.stop_reason, hookData.error]
+    .filter(Boolean).join('\n');
+  return RATE_LIMIT_PATTERNS.some(p => p.test(text));
+}
+
+function calcBackoff(count) {
+  return Math.min(60 * count, 300);
+}
+
+function buildRateLimitMessage(loopState, waitSec, count) {
+  return [
+    `[demokit] Rate limit 감지 — ${waitSec}초 후 자동 재시도`,
+    '',
+    `Loop ${loopState.currentIteration}/${loopState.maxIterations} 진행 중`,
+    `Rate limit 횟수: ${count}회`,
+    `다음 액션: Bash("sleep ${waitSec}") 실행 후 작업 재개`,
+  ].join('\n');
+}
