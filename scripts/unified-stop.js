@@ -23,60 +23,17 @@ async function main() {
 
   const hints = [];
 
-  // Continuation enforcement: PDCA 미완료 시 종료 차단
+  // force-stop 마커 정리 (잔여 마커 제거)
   try {
-    const { hookRuntime, platform } = require(path.join(__dirname, '..', 'lib', 'core'));
-    if (hookRuntime.shouldRun({ scriptKey: 'continuationEnforcement', scriptFallback: false })) {
-      const projectRoot = platform.findProjectRoot(process.cwd());
-      if (projectRoot) {
-        const loopState = require(path.join(__dirname, '..', 'lib', 'loop', 'state'));
-        const currentLoopState = loopState.getState(projectRoot);
-        if (!currentLoopState.active) {
-          const forceStopMarker = path.join(projectRoot, '.pdca', '.force-stop');
-          if (fs.existsSync(forceStopMarker)) {
-            try { fs.unlinkSync(forceStopMarker); } catch (e) {
-              process.stderr.write(`[demokit] force-stop 마커 삭제 실패: ${e.message}\n`);
-            }
-          } else {
-            // 쿨다운: 최근 60초 이내 block한 적이 있으면 재차단 안 함 (무한 루프 방지)
-            const blockMarker = path.join(projectRoot, '.pdca', '.continuation-blocked');
-            try {
-              if (fs.existsSync(blockMarker)) {
-                const stat = fs.statSync(blockMarker);
-                if (Date.now() - stat.mtimeMs < 60000) {
-                  console.log(JSON.stringify({}));
-                  return;
-                }
-              }
-            } catch { /* ignore */ }
-
-            const { status } = require(path.join(__dirname, '..', 'lib', 'pdca'));
-            const { PHASE_ORDER } = status;
-            const features = status.listFeatures(projectRoot);
-            const incompleteFeatures = [];
-            for (const f of features) {
-              const s = status.loadStatus(projectRoot, f.feature);
-              if (!s || !s.phases) continue;
-              if (PHASE_ORDER.some(phase => s.phases[phase]?.status !== 'completed')) {
-                incompleteFeatures.push({ ...f, _status: s });
-              }
-            }
-            if (incompleteFeatures.length > 0) {
-              const f = incompleteFeatures[0];
-              const s = f._status;
-              const completedPhases = PHASE_ORDER.filter(phase => s.phases[phase]?.status === 'completed');
-              const remainingPhases = PHASE_ORDER.filter(phase => s.phases[phase]?.status !== 'completed');
-              const systemMessage = `[demokit] PDCA 진행 중 — 종료가 차단되었습니다.\n\n활성 feature: ${f.feature} (${f.currentPhase} 진행 중)\n완료: ${completedPhases.join(', ') || '없음'} | 남은: ${remainingPhases.join(', ')}\n\n계속 작업하거나, 강제 종료: /pdca force-stop`;
-              // block 마커 기록 (쿨다운 시작)
-              try { fs.writeFileSync(blockMarker, new Date().toISOString()); } catch { /* ignore */ }
-              console.log(JSON.stringify({ decision: 'block', systemMessage }));
-              return;
-            }
-          }
-        }
+    const { platform } = require(path.join(__dirname, '..', 'lib', 'core'));
+    const projectRoot = platform.findProjectRoot(process.cwd());
+    if (projectRoot) {
+      const forceStopMarker = path.join(projectRoot, '.pdca', '.force-stop');
+      if (fs.existsSync(forceStopMarker)) {
+        try { fs.unlinkSync(forceStopMarker); } catch { /* ignore */ }
       }
     }
-  } catch { /* continuation enforcement 실패 시 무시 */ }
+  } catch { /* ignore */ }
 
   // Agent dispatch는 stop-handler.js에서 처리하므로 여기서는 생략
   // Skill-specific stop dispatch만 수행
