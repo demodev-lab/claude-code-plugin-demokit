@@ -1,5 +1,5 @@
 name: qa
-argument-hint: "[build|test|log]"
+argument-hint: "[build|test|log|summary]"
 agent: qa-monitor
 pdca-phase: analyze
 task-template: "Run QA checks"

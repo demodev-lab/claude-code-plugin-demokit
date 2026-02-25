@@ -1,6 +1,7 @@
 # Plan Plus: {{feature}}
 
 > 생성일: {{date}}
+> 모드: {{mode}}
 > 상태: 승인 대기
 
 ---
@@ -35,6 +36,14 @@
 | Could   |      |      |
 | Won't   |      |      |
 
+### NFR (Non-Functional Requirements)
+
+| 카테고리 | 요구사항 | 기준 |
+|---------|---------|------|
+| 성능     |         |      |
+| 보안     |         |      |
+| 확장성   |         |      |
+
 ---
 
 ## 3. 대안 분석
@@ -42,61 +51,46 @@
 ### 방안 A: {{alternativeA}}
 - 장점:
 - 단점:
+- API 힌트: {{alternativeA_apiHint}}
+- 데이터 모델 힌트: {{alternativeA_dataHint}}
 
 ### 방안 B: {{alternativeB}}
 - 장점:
 - 단점:
+- API 힌트: {{alternativeB_apiHint}}
+- 데이터 모델 힌트: {{alternativeB_dataHint}}
 
 ### 권장안: {{recommended}}
 - 선택 근거:
 
 ---
 
-## 4. YAGNI 검토
+## 4. YAGNI Review (Non-Goals)
 
 ### 포함 (구현 범위)
 {{includeScope}}
 
-### 제외 (현재 스코프 밖)
+### Non-Goals (현재 스코프 밖)
 | 항목 | 제외 사유 |
 |------|----------|
 |      |          |
 
 ---
 
-## 5. API 설계 초안
+## 5. 구현 방향
 
-| Method | Endpoint | 설명 | 요청 DTO | 응답 DTO |
-|--------|----------|------|---------|---------|
-|        |          |      |         |         |
-
----
-
-## 6. 데이터 모델 초안
-
-### Entity
-```
-{{entityDesign}}
-```
-
-### 연관관계
-{{relationships}}
-
----
-
-## 7. 구현 순서
-
+### 구현 순서
 - [ ] Step 1:
 - [ ] Step 2:
 - [ ] Step 3:
 
-### 검증 포인트
-| 단계 | 검증 방법 | 기대 결과 |
-|------|----------|----------|
-|      |          |          |
+### 주요 기술 결정
+{{technicalDecisions}}
 
 ---
 
 ## 승인
 
 - [ ] 사용자 승인 완료
+
+> 다음: /pdca design {{feature}}

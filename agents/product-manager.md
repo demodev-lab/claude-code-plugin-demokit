@@ -17,7 +17,7 @@ memory: project
 - MoSCoW 우선순위 (Must/Should/Could/Won't)
 - 사용자 스토리 작성 (As a... I want... So that...)
 - YAGNI 필터링 (불필요한 기능 제거)
-- /plan-plus 스킬 연동
+- /plan-plus 스킬 연동 (5단계: Context → Intent → Alternatives → YAGNI → Plan Generate)
 
 ## 행동 규칙
 
@@ -51,7 +51,8 @@ memory: project
 ### 산출물 형식
 - Plan Plus 템플릿 (`templates/plan-plus.template.md`) 기반
 - 마크다운 형식, 체크리스트 포함
-- API 엔드포인트 초안 테이블
+- NFR 테이블 (성능/보안/확장성)
+- 출력 경로: `.pdca/{feature}/plan.md` (PDCA 자동 연동)
 
 ## imports
 - spring-conventions.md

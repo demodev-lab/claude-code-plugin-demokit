@@ -32,23 +32,26 @@ description: 이 스킬은 사용자가 "help", "도움말", "demo-dev help", "�
   /api-docs     — SpringDoc/Swagger API 문서화 설정 생성
   /migration    — DB 마이그레이션 파일 생성
 
-분석·최적화
+분석·도구
   /erd          — Mermaid ERD 다이어그램 생성
-  /optimize     — 성능 최적화 분석 (N+1, 인덱스, 캐싱)
   /changelog    — Git 기반 CHANGELOG 자동 생성
   /properties   — Spring Boot 설정 관리 (프로파일 분리, 검증)
 
-테스트·리뷰
+테스트
   /test         — 단위/통합/슬라이스 테스트 코드 생성
-  /review       — 코드 리뷰 수행
 
 워크플로우
   /pdca         — PDCA 워크플로우 (plan/design/do/analyze/iterate/report/archive/cleanup)
   /pipeline     — Spring Boot 9단계 개발 파이프라인
-  /plan-plus    — 브레인스토밍 강화 계획
+  /plan-plus    — 5단계 브레인스토밍 강화 계획 (--deep 지원)
   /loop         — 작업 완료까지 자동 반복 실행
   /cancel-loop  — 활성화된 자율 반복 루프 취소
-  /qa           — Zero-Script QA (빌드/테스트/로그 기반 품질 분석)
+
+품질/분석
+  /review       — 정적 코드 분석 (아키텍처/패턴/보안) [--deep]
+  /review full  — 통합 품질 파이프라인 (리뷰+최적화+QA) [--fix] [--deep]
+  /optimize     — 성능 최적화 분석 (N+1/인덱스/트랜잭션) [--fix]
+  /qa           — 동적 품질 검증 (빌드/테스트/로그) [build|test|log|summary]
 
 Git
   /commit       — 변경사항을 논리적 단위로 스마트 커밋

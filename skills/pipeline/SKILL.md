@@ -133,6 +133,8 @@ node scripts/pipeline-ctl.js next
 3. 쿼리 성능 개선
 4. 캐시 적용 여부 검토
 
+> `/optimize` 스킬 실행 (domain-expert + dba-expert 병렬)
+
 ### Phase 8: Review (코드 리뷰)
 **담당 에이전트**: code-reviewer
 
@@ -140,6 +142,8 @@ node scripts/pipeline-ctl.js next
 2. Spring Best Practices 적용 확인
 3. 보안 취약점 점검 (SQL Injection, XSS 등)
 4. 코드 일관성 검증
+
+> `/review` 스킬 실행 (code-reviewer, 필요 시 --deep)
 
 ### Phase 9: Deployment (배포 준비)
 **담당 에이전트**: devops-engineer

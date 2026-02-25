@@ -105,6 +105,23 @@ async function main() {
     }
   }
 
+  // 1.5. PDCA 진행 중 리마인더 (비차단)
+  try {
+    const { platform } = require('../lib/core');
+    const projectRoot = platform.findProjectRoot(process.cwd());
+    if (projectRoot && hookRuntime.shouldRun({ scriptKey: 'continuationEnforcement', scriptFallback: false })) {
+      const { status } = require('../lib/pdca');
+      const features = status.listFeatures(projectRoot);
+      const incomplete = features.find(f => {
+        const s = status.loadStatus(projectRoot, f.feature);
+        return s && s.phases && status.PHASE_ORDER.some(p => s.phases[p]?.status !== 'completed');
+      });
+      if (incomplete && !detected) {
+        messages.push(`PDCA 진행 중: ${incomplete.feature} (${incomplete.currentPhase}). 계속하려면 /pdca ${incomplete.currentPhase} ${incomplete.feature}`);
+      }
+    }
+  } catch { /* ignore */ }
+
   // 2. 작업 규모 분류 → PDCA 제안
   const sizeResult = classifyBySize(userPrompt);
   if (sizeResult.suggestPdca) {

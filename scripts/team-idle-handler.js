@@ -47,46 +47,81 @@ async function main() {
     return;
   }
 
-  let state = stateWriter.loadTeamState(projectRoot);
-  if (!state.enabled) {
+  // 단일 withTeamLock으로 cleanup + idle 마킹 + sync + assign을 일괄 처리
+  const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
+  const messages = [`[demokit] Subagent idle: ${teammate}`];
+
+  const result = stateWriter.withTeamLock(projectRoot, () => {
+    const state = stateWriter.loadTeamState(projectRoot);
+    if (!state.enabled) return { enabled: false };
+
+    // 1. stale member cleanup (inline)
+    if (cleanupPolicy?.staleMemberMs && Array.isArray(state.members)) {
+      const now = Date.now();
+      state.members = state.members.filter(m => {
+        if (!m.lastActiveAt) return true;
+        return now - new Date(m.lastActiveAt).getTime() < cleanupPolicy.staleMemberMs;
+      });
+    }
+
+    // 2. 멤버 idle 상태로 마킹
+    let member = state.members.find(m => m.id === teammate);
+    if (!member) {
+      member = { id: teammate, status: 'idle', currentTask: null, worktreePath, lastActiveAt: new Date().toISOString() };
+      state.members.push(member);
+    } else {
+      member.status = 'idle';
+      member.currentTask = null;
+      if (worktreePath) member.worktreePath = worktreePath;
+      member.lastActiveAt = new Date().toISOString();
+    }
+
+    // 3. PDCA → taskQueue 동기화 (inline, 락 없는 orchestrator 호출)
+    try {
+      orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
+    } catch { /* ignore */ }
+
+    // 4. 다음 작업 할당 판단
+    const freshState = stateWriter.loadTeamState(projectRoot);
+    const next = coordinator.getNextAssignment(freshState, null, teammate);
+
+    if (next && next.nextAgent === teammate) {
+      const assignmentRef = next.nextTaskId || next.nextTask;
+      // inline assign
+      const task = Array.isArray(freshState.taskQueue)
+        ? freshState.taskQueue.find(t => (t.id || t.description || t.subject) === assignmentRef)
+        : null;
+      if (task && (!task.assignee || task.assignee === teammate)) {
+        task.assignee = teammate;
+        task.status = 'in_progress';
+        task.assignedBy = 'team-idle';
+        // 멤버 active로 전환
+        const m = freshState.members.find(x => x.id === teammate);
+        if (m) { m.status = 'active'; m.currentTask = assignmentRef; m.lastActiveAt = new Date().toISOString(); }
+        stateWriter.saveTeamState(projectRoot, freshState);
+        return { enabled: true, assigned: true, next, freshState };
+      }
+      stateWriter.saveTeamState(projectRoot, freshState);
+      return { enabled: true, assigned: false, freshState };
+    }
+
+    stateWriter.saveTeamState(projectRoot, freshState);
+    return { enabled: true, assigned: false, next, freshState };
+  });
+
+  if (!result || !result.enabled) {
     console.log(JSON.stringify({}));
     return;
   }
 
-  const cleanupPolicy = teamConfig.getCleanupPolicy ? teamConfig.getCleanupPolicy() : {};
-  if (cleanupPolicy?.staleMemberMs) {
-    stateWriter.cleanupStaleMembers(projectRoot, cleanupPolicy.staleMemberMs);
-    state = stateWriter.loadTeamState(projectRoot);
-  }
-
-  stateWriter.updateMemberStatus(projectRoot, teammate, 'idle', null, { worktreePath });
-  orchestrator.syncTeamQueueFromPdca(projectRoot, stateWriter);
-  const latest = stateWriter.loadTeamState(projectRoot);
-  const next = coordinator.getNextAssignment(latest, null, teammate);
-
-  const messages = [`[demokit] Subagent idle: ${teammate}`];
-  if (next && next.nextAgent === teammate) {
-    const assignmentRef = next.nextTaskId || next.nextTask;
-    const assigned = stateWriter.assignTaskToMember(projectRoot, assignmentRef, teammate, 'team-idle');
-    if (assigned?.assigned || assigned?.alreadyAssigned) {
-      stateWriter.updateMemberStatus(projectRoot, teammate, 'active', assignmentRef, { worktreePath });
-      messages.push(`할당: ${next.nextTask}`);
-      if (next.nextTaskId) messages.push(`작업 ID: ${next.nextTaskId}`);
-    } else {
-      messages.push('현재 작업은 다른 멤버에 의해 선점되었거나 사라졌습니다.');
-      const queueState = stateWriter.loadTeamState(projectRoot);
-      if (queueState.taskQueue.length > 0) {
-        messages.push(`대기 작업: ${queueState.taskQueue[0]?.description || queueState.taskQueue[0]?.subject || '(미할당)'}`);
-      } else {
-        messages.push('현재 대기 작업이 없습니다.');
-      }
-    }
-  } else if (latest.taskQueue.length > 0) {
-    const nextDesc = typeof latest.taskQueue[0] === 'string'
-      ? latest.taskQueue[0]
-      : (latest.taskQueue[0]?.description || latest.taskQueue[0]?.subject || latest.taskQueue[0]?.task || latest.taskQueue[0]?.id);
+  if (result.assigned && result.next) {
+    messages.push(`할당: ${result.next.nextTask}`);
+    if (result.next.nextTaskId) messages.push(`작업 ID: ${result.next.nextTaskId}`);
+  } else if (result.freshState?.taskQueue?.length > 0) {
+    const t = result.freshState.taskQueue[0];
+    const nextDesc = typeof t === 'string' ? t : (t?.description || t?.subject || t?.task || t?.id);
     messages.push(`현재 대기 작업: ${nextDesc || '미할당'}`);
-    if (next) messages.push(`다음 할당 대상: ${next.nextAgent}`);
+    if (result.next) messages.push(`다음 할당 대상: ${result.next.nextAgent}`);
   } else {
     messages.push('현재 대기 작업이 없습니다.');
   }

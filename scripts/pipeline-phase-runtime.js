@@ -255,30 +255,30 @@ function printJson(payload) {
 }
 
 async function resolvePipelineContext(stage, hookData) {
-  const { platform, config: coreConfig, hookRuntime } = require(path.join(__dirname, '..', 'lib', 'core'));
-  const phaseScriptConfig = getPhaseScriptConfig(coreConfig);
+  const { config: coreConfig, hookRuntime } = require(path.join(__dirname, '..', 'lib', 'core'));
 
   const stageControl = getStageHookControl(stage);
-  const stageEnabledDefault = stageDefaultEnabled(stage, phaseScriptConfig);
+  if (!stageControl) return { enabled: false };
 
-  if (!stageControl || !stageEnabledDefault) {
-    return { enabled: false };
-  }
+  const phaseScriptConfig = getPhaseScriptConfig(coreConfig);
+  if (!stageDefaultEnabled(stage, phaseScriptConfig)) return { enabled: false };
 
   const shouldRun = hookRuntime.shouldRun({
     eventName: stageControl.eventName,
     scriptKey: stageControl.scriptKey,
     eventFallback: true,
-    scriptFallback: stageEnabledDefault,
+    scriptFallback: true,
   });
+  if (!shouldRun) return { enabled: false };
 
-  if (!shouldRun) {
-    return { enabled: false };
-  }
-
+  // 파이프라인 마커 파일 존재 여부를 먼저 확인 (fs read 최소화)
+  const { platform } = require(path.join(__dirname, '..', 'lib', 'core'));
   const projectRoot = platform.findProjectRoot(process.cwd());
-  if (!projectRoot) {
-    return { enabled: true, projectRoot: null };
+  if (!projectRoot) return { enabled: true, projectRoot: null };
+
+  const markerDir = path.join(projectRoot, '.pipeline');
+  if (!fs.existsSync(markerDir)) {
+    return { enabled: true, projectRoot, pipelineState: null };
   }
 
   const { state: pipelineStateModule } = require(path.join(__dirname, '..', 'lib', 'pipeline'));

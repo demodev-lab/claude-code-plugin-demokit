@@ -1,8 +1,15 @@
 name: review
-argument-hint: "리뷰 대상 (파일 경로, 도메인명, 또는 전체)"
+argument-hint: "리뷰 대상 [--deep] (파일 경로, 도메인명, full, 또는 전체)"
 agent: code-reviewer
 pdca-phase: analyze
-task-template: "Review {domain} Code"
+task-template: "Review {feature} Code"
+
+deepMode:
+  enabled: true
+  flag: "--deep"
+  agents: [security-expert]
+  securityHintTriggers: [auth, jwt, security, permission, role, admin, token, oauth]
+
 imports:
   - shared/spring-conventions.md
   - shared/jpa-patterns.md

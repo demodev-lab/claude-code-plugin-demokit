@@ -59,8 +59,28 @@ async function main() {
   if (taskId) {
     stateWriter.recordTaskCompletion(projectRoot, teammate, taskId, finalStatus === 'idle' ? 'completed' : 'failed', { worktreePath });
   } else {
-    stateWriter.releaseTaskAssignmentsForMember(projectRoot, teammate);
-    stateWriter.updateMemberStatus(projectRoot, teammate, finalStatus, null, { worktreePath });
+    // 단일 withTeamLock으로 release + updateStatus 통합
+    stateWriter.withTeamLock(projectRoot, () => {
+      const state = stateWriter.loadTeamState(projectRoot);
+      // release task assignments
+      if (Array.isArray(state.taskQueue)) {
+        for (const task of state.taskQueue) {
+          if (task.assignee === teammate && task.status === 'in_progress') {
+            task.assignee = null;
+            task.status = 'pending';
+          }
+        }
+      }
+      // update member status
+      const member = state.members?.find(m => m.id === teammate);
+      if (member) {
+        member.status = finalStatus;
+        member.currentTask = null;
+        if (worktreePath) member.worktreePath = worktreePath;
+        member.lastActiveAt = new Date().toISOString();
+      }
+      stateWriter.saveTeamState(projectRoot, state);
+    });
   }
 
   // Agent Trace

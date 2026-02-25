@@ -40,7 +40,7 @@ async function main() {
   }
 
   if (!filePath.endsWith('.java')) {
-    // Java 파일이 아니면 permission 경고만 전달
+    // Java 파일이 아니면 permission 경고만 전달 (config 로드 불필요)
     if (permWarnings.length > 0) {
       console.log(JSON.stringify({
         systemMessage: `[demokit 권한 검증]\n${permWarnings.join('\n')}`,
@@ -51,6 +51,7 @@ async function main() {
     return;
   }
 
+  // Java 파일에서만 config + convention checker 로드
   const { config, file: fileUtil } = require('../lib/core');
   const checker = require('../lib/spring/convention-checker');
   const cfg = config.loadConfig();
