@@ -7,6 +7,34 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-02-25
+
+### Added
+- `/review --deep` 모드: security-expert 에이전트를 활용한 심층 보안 분석
+- `/review full` 통합 품질 파이프라인: 리뷰 + 최적화 + QA를 단일 명령으로 실행
+- `/optimize` dual-agent 병렬 분석: domain-expert(코드) + dba-expert(DB) 동시 실행
+- `/optimize --fix` dry-run 확인 단계: 수정 전 변경 예정 목록 표시
+- `/qa` 병렬 실행: build + log 동시 분석 후 test 순차 실행
+- `/qa` 전제조건 체크 및 에러 핸들링 (빌드 도구/XML/로그 부재 시 graceful skip)
+- 인라인 체크포인트: /review, /qa, /optimize 3개 스킬 모두 Task/단계별 진행 표시
+- `demodev.config.json`에 `quality-chain` 에이전트 매핑 추가
+
+### Fixed
+- `skills/review/skill.yaml` task-template: `{domain}` → `{feature}` 버그 수정
+- `lib/core/skill-loader.js` optimize fallback argument-hint가 실제 SKILL.md 사양과 불일치
+- `skills/optimize/skill.yaml` pdca-phase, task-template, imports 누락 수정
+
+### Changed
+- 심각도 체계 3개 스킬 통일: `🔴 Critical / 🟡 Warning / 🟢 Info`
+- `agents/code-reviewer.md` 심각도 형식 동기화 (`높음/중간/제안` → emoji 기반)
+- `skills/pipeline/SKILL.md` Phase 7→`/optimize`, Phase 8→`/review` 위임 안내
+- `skills/pdca/SKILL.md` analyze 단계에 품질 보조 지표 섹션 추가
+- `skills/help/SKILL.md` 품질/분석 카테고리 분리 및 `/review full` 추가
+- `commands/demokit.md`, `commands/bkit.md` 품질/분석 섹션 최신화
+- `commands/code-review.md` --deep, full 모드 사용 가이드 추가
+- `commands/zero-script-qa.md` summary subcommand 추가
+- `demokit-system/_GRAPH-INDEX.md` /review, /optimize, /qa 설명 업데이트
+
 ## [1.1.3] - 2026-02-24
 
 ### Added

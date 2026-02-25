@@ -18,10 +18,12 @@ allowed-tools:
 - 빌드 점검: `/qa build`
 - 테스트 점검: `/qa test`
 - 로그 점검: `/qa log`
+- 종합 리포트: `/qa summary`
 
 ## 권장 흐름
 
 1. `/qa build`
 2. `/qa test`
 3. `/qa log`
-4. `/review` 또는 `/pdca analyze <feature>`
+4. `/qa summary`
+5. `/review` 또는 `/pdca analyze <feature>`

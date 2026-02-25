@@ -1,3 +1,8 @@
 name: optimize
-argument-hint: "최적화 대상 (예: n-plus-one, index)"
+argument-hint: "도메인명, 파일경로, all [--fix] (예: User, all --fix)"
 agent: domain-expert
+pdca-phase: analyze
+task-template: "Optimize {feature}"
+imports:
+  - shared/spring-conventions.md
+  - shared/jpa-patterns.md

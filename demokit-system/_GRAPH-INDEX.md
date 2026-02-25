@@ -55,7 +55,7 @@ demokit 시스템의 전체 노드 인덱스.
 | /docker | Docker 설정 |
 | /gradle | Gradle 설정 |
 | /pdca | PDCA 워크플로우 |
-| /review | 코드 리뷰 |
+| /review | 정적 코드 리뷰 (--deep: 보안 심층, full: 통합 품질 파이프라인) |
 | /loop | 자동 반복 실행 |
 | /init | 프로젝트 초기화 |
 | /commit | 커밋 |
@@ -68,14 +68,14 @@ demokit 시스템의 전체 노드 인덱스.
 | /migration | 마이그레이션 |
 | /cache | 캐시 설정 |
 | /erd | ERD 생성 |
-| /optimize | 쿼리 최적화 |
+| /optimize | 성능 최적화 (N+1/인덱스/트랜잭션, domain-expert+dba-expert 병렬, --fix) |
 | /changelog | 변경 로그 |
 | /api-docs | API 문서 |
 | /cancel-loop | Loop 취소 |
-| /plan-plus | 브레인스토밍 강화 계획 |
+| /plan-plus | 5단계 브레인스토밍 강화 계획 (--deep 지원) |
 | /pipeline | 9단계 개발 파이프라인 |
 | /worker | 팀 워커 프로토콜 |
-| /qa | Zero-Script QA |
+| /qa | 동적 품질 검증 (빌드/테스트/로그/summary, 병렬 실행) |
 
 ## Hooks (훅)
 

@@ -41,15 +41,18 @@ allowed-tools:
   /controller <Domain>
   /dto <Domain>
 
-품질/안정화
+테스트
   /test <Domain|all>
-  /review <path|domain>
-  /qa [build|test|log]
-  /optimize <domain>
+
+품질/분석
+  /review [target] [--deep]     정적 코드 리뷰 (--deep: 보안 심층)
+  /review full [target] [--fix] [--deep]  통합 품질 파이프라인
+  /optimize [target] [--fix]    성능 최적화 (N+1/인덱스/트랜잭션)
+  /qa [build|test|log|summary]  동적 품질 검증 (빌드/테스트/로그)
 
 운영
   /pipeline <feature>        9단계 파이프라인 가이드
-  /plan-plus <feature>       브레인스토밍 강화 계획
+  /plan-plus <feature> [--deep]  5단계 브레인스토밍 강화 계획
   /loop <task>               반복 실행
   /cancel-loop               loop 중단
 

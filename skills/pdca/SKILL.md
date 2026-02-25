@@ -116,8 +116,13 @@ PDCA가 진행 중일 때 종료(Stop)가 차단됩니다. 강제로 종료하�
    - DTO 필드 (15%): 설계된 Request/Response 필드가 DTO에 있는지
    - 에러 처리 (15%): 설계된 에러 케이스가 처리되는지
    - 비즈니스 규칙 (15%): 설계된 로직이 Service에 구현되었는지
-4. 분석 보고서 생성 (`.pdca/{feature}/analysis.md`)
-5. 상태 업데이트: analyze → completed, matchRate 기록
+4. **품질 보조 지표** (선택적 표시):
+   - /review: 🔴 Critical N건, 🟡 Warning N건 (마지막 실행 결과)
+   - /qa: BUILD SUCCESS/FAILED, 테스트 통과율 N%
+5. 분석 보고서 생성 (`.pdca/{feature}/analysis.md`)
+6. 상태 업데이트: analyze → completed, matchRate 기록
+
+→ 빌드/테스트 검증이 필요하면: /qa
 
 ### /pdca iterate {feature}
 **Match Rate < 90% 시 자동 수정 반복**

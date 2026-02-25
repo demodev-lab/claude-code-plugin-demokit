@@ -1,15 +1,51 @@
 name: plan-plus
-argument-hint: "기능명 (예: user-management, order-payment)"
+argument-hint: "기능명 [--deep] (예: user-management, order-payment --deep)"
 pdca-phase: plan
 task-template: "Plan Plus {feature}"
+
 agents:
-  context-explore: spring-architect
-  intent-discover: product-manager
-  alternatives: spring-architect
-  yagni-review: product-manager
-  incremental-verify: spring-architect
-  plan-generate: product-manager
+  context-explore:
+    coordinator: spring-architect
+    parallel: [domain-expert, api-expert]
+    conditional:
+      security-triggers: security-expert
+  intent-discover:
+    lead: product-manager
+    conditional:
+      security-triggers: security-expert
+  alternatives:
+    default: spring-architect
+    deep:
+      coordinator: spring-architect
+      parallel: [api-expert, dba-expert]
+  yagni-review:
+    lead: product-manager
+    required: test-expert
+  plan-generate:
+    preflight: spring-architect
+    lead: product-manager
   default: spring-architect
+
+output:
+  path: ".pdca/{feature}/plan.md"
+  pdca-init: true
+
+security-triggers:
+  - auth
+  - authentication
+  - login
+  - payment
+  - order
+  - user-management
+  - user
+  - member
+  - permission
+  - role
+  - admin
+  - token
+  - oauth
+  - jwt
+
 imports:
   - shared/spring-conventions.md
   - shared/jpa-patterns.md

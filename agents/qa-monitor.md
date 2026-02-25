@@ -45,5 +45,5 @@ memory: project
 
 ### 산출물
 - 마크다운 형식 QA 리포트
-- 심각도별 분류 (Critical/Warning/Info)
+- 심각도별 분류 (🔴 Critical / 🟡 Warning / 🟢 Info)
 - 권장 조치사항 목록

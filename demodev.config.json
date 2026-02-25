@@ -247,7 +247,8 @@
       "ci-cd": "devops-engineer",
       "kubernetes": "devops-engineer",
       "qa": "qa-monitor",
-      "qa-log": "qa-monitor"
+      "qa-log": "qa-monitor",
+      "quality-chain": "code-reviewer"
     },
     "modelAssignment": {
       "domain-expert": "sonnet",
@@ -387,9 +388,30 @@
   "planPlus": {
     "enabled": true,
     "hardGate": true,
-    "stages": ["context-explore", "intent-discover", "alternatives", "yagni-review", "incremental-verify", "plan-generate"],
-    "relatedAgents": ["product-manager", "spring-architect", "domain-expert"],
-    "templatePath": "templates/plan-plus.template.md"
+    "stages": [
+      "context-explore",
+      "intent-discover",
+      "alternatives",
+      "yagni-review",
+      "plan-generate"
+    ],
+    "relatedAgents": [
+      "product-manager", "spring-architect", "domain-expert",
+      "api-expert", "security-expert", "test-expert"
+    ],
+    "templatePath": "templates/plan-plus.template.md",
+    "securityTriggers": [
+      "auth", "authentication", "login",
+      "payment", "order",
+      "user-management", "user", "member",
+      "permission", "role", "admin",
+      "token", "oauth", "jwt"
+    ],
+    "deepMode": {
+      "enabled": true,
+      "flag": "--deep",
+      "stage3CouncilAgents": ["spring-architect", "api-expert", "dba-expert"]
+    }
   },
   "developmentPipeline": {
     "enabled": true,
