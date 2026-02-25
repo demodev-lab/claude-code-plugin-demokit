@@ -60,6 +60,11 @@ feature 이름에 아래 키워드가 포함되면 `securityMode = true`로 설�
 → 다음 Stage로 진행할까요?
 ```
 
+## 확인 질문 형식
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
+사용자에게 확인 질문을 할 때는 **반드시 `AskUserQuestion` 도구를 사용**한다. 줄글 질문 금지.
+
 ## 실행 절차
 
 ### Stage 1: Context Explore (컨텍스트 탐색)
@@ -84,7 +89,7 @@ feature 이름에 아래 키워드가 포함되면 `securityMode = true`로 설�
 2. 암묵적 요구사항 발견 (사용자가 명시하지 않았지만 필요한 것)
 3. 비즈니스 규칙 정리
 4. **NFR 도출**: 성능, 보안, 확장성 요구사항을 테이블로 정리
-5. 사용자에게 확인 질문 (필요시)
+5. **`AskUserQuestion` 도구로 확인 질문** — 구현 방향 확정에 필요한 결정 사항을 선택형으로 질문한다 (줄글 질문 금지)
 
 **산출물**: 요구사항 목록 (MoSCoW 분류) + NFR 테이블
 

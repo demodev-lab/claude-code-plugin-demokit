@@ -119,14 +119,22 @@ description: 이 스킬은 사용자가 "최적화", "성능", "optimize", "N+1"
 체크포인트: [6/6 완료: 보고서 생성]
 
 ### --fix 옵션 시
-분석 완료 후 수정 전 dry-run 확인 단계:
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
+분석 완료 후 수정 예정 항목을 출력하고 **`AskUserQuestion` 도구**로 확인받는다:
 
 ```
 [수정 예정 항목]
 - UserService.getUser() @Transactional(readOnly=true) 추가
 - Order.user FetchType.LAZY 추가
-계속할까요? (y/n)
 ```
+
+- question: "위 항목을 자동 수정할까요?"
+- header: "자동 수정"
+- options:
+  - `전체 수정 (Recommended)` — 모든 항목 자동 수정
+  - `선택 수정` — 수정할 항목을 직접 지정
+  - `취소` — 수정하지 않고 보고서만 유지
 
 사용자 확인 후 코드 자동 수정:
 - Entity에 `FetchType.LAZY` 추가

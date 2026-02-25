@@ -27,6 +27,16 @@ description: 이 스킬은 사용자가 "캐시", "cache", "Caffeine", "Redis �
   /gradle — Gradle 의존성 관리
 ```
 
+## 사용자 선택 (인자 미지정 시)
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
+인자 없이 `/cache`만 실행하면 **`AskUserQuestion` 도구**로 캐시 전략을 질문한다:
+- question: "어떤 캐시 전략을 사용할까요?"
+- header: "캐시 전략"
+- options:
+  - `Caffeine 로컬 캐시 (Recommended)` — 단일 인스턴스, 빠른 응답. 별도 인프라 불필요
+  - `Redis 분산 캐시` — 다중 인스턴스 환경, 데이터 공유 필요 시
+
 ## 실행 절차
 
 ### Caffeine (로컬 캐시, 기본)

@@ -27,6 +27,16 @@ description: 이 스킬은 사용자가 "Security", "security", "JWT", "OAuth2",
   /api-docs — API 문서화 설정 생성
 ```
 
+## 사용자 선택 (인자 미지정 시)
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
+인자 없이 `/security`만 실행하면 **`AskUserQuestion` 도구**로 인증 방식을 질문한다:
+- question: "어떤 인증 방식을 설정할까요?"
+- header: "인증 방식"
+- options:
+  - `JWT 인증 (Recommended)` — Stateless 토큰 기반. 대부분의 REST API에 적합
+  - `OAuth2 Resource Server` — 외부 인증 서버 연동. 소셜 로그인/SSO 필요 시
+
 ## 실행 절차
 
 ### JWT 인증 (기본)

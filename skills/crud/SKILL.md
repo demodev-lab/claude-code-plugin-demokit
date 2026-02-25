@@ -38,8 +38,16 @@ description: 이 스킬은 사용자가 "CRUD 만들어줘", "crud 생성", "도
 - 이미 존재하는 도메인인지 확인
 
 ### 2. 필드 분석
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
 - fields가 제공된 경우 파싱
-- fields가 없으면 사용자에게 필드 입력 요청
+- fields가 없으면 **`AskUserQuestion` 도구**로 추가 옵션을 질문한다:
+  - Q1 (header: "QueryDSL"): QueryDSL 동적 쿼리 포함 여부
+    - `기본 CRUD만 (Recommended)` — JpaRepository 기본 메서드만 생성
+    - `QueryDSL 포함` — 동적 검색/필터링 Custom Repository 함께 생성
+  - Q2 (header: "Soft Delete"): 삭제 전략
+    - `Hard Delete (Recommended)` — 실제 삭제
+    - `Soft Delete` — deleted 플래그 사용, @SQLRestriction 적용
 - 필드별 타입 → JPA 컬럼 타입 매핑
 
 ### 3. 파일 생성 (병렬 전략)

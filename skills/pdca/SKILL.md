@@ -46,13 +46,15 @@ description: 이 스킬은 사용자가 "PDCA", "pdca plan", "pdca design", "pdc
 
 ### /pdca plan {feature}
 **요구사항 정의 + API 초안 + 데이터 모델 초안**
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
 
 1. feature명으로 PDCA 상태 파일 생성 (`.pdca/{feature}.status.json`)
 2. spring-architect 에이전트 호출
-3. 사용자와 대화형으로 요구사항 수집:
-   - 핵심 기능 목록
-   - 사용자 역할 (Role)
-   - 외부 시스템 연동 여부
+3. **`AskUserQuestion` 도구**로 요구사항 수집 (줄글 질문 금지):
+   - Q1 (header: "핵심 기능"): 주요 기능 선택 (multiSelect: true, 도메인에 맞는 선택지 동적 생성)
+   - Q2 (header: "사용자 역할"): 역할 선택 (multiSelect: true, 예: 일반 사용자/관리자/게스트)
+   - Q3 (header: "외부 연동"): 외부 시스템 연동 여부 (예: 없음/소셜 로그인/결제 PG/알림 서비스)
+   - Q4 (header: "인증 방식"): 인증 방식 선택 (예: JWT/Session/OAuth2, 해당 시에만)
 4. Plan 문서 생성 (`.pdca/{feature}/plan.md`):
    - 요구사항 목록
    - API 엔드포인트 초안 (Method + Path + 설명)

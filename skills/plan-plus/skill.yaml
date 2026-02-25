@@ -50,3 +50,4 @@ imports:
   - shared/spring-conventions.md
   - shared/jpa-patterns.md
   - shared/api-patterns.md
+  - shared/ask-user-convention.md

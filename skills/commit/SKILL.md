@@ -63,8 +63,9 @@ git diff --cached
 - 하나의 파일이 여러 그룹에 해당하면 가장 구체적인 그룹에 배치
 
 ### 4. 사용자 확인
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
 
-그룹별 커밋 계획을 표로 제시:
+그룹별 커밋 계획을 표로 먼저 출력한 뒤, **`AskUserQuestion` 도구**로 확인받는다:
 
 ```
 | # | 커밋 메시지 | 파일 |
@@ -73,7 +74,11 @@ git diff --cached
 | 2 | chore: Redis 의존성 추가 | build.gradle.kts |
 ```
 
-사용자 확인을 받은 후 진행.
+- question: "위 커밋 계획대로 진행할까요?"
+- header: "커밋 확인"
+- options:
+  - `진행 (Recommended)` — 위 계획대로 커밋 실행
+  - `수정 필요` — 그룹 분류나 메시지 변경 요청
 
 ### 5. 커밋 실행
 

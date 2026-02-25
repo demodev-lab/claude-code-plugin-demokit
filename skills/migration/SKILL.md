@@ -28,6 +28,16 @@ description: 이 스킬은 사용자가 "마이그레이션", "migration", "Flyw
   /crud   — CRUD 일괄 생성
 ```
 
+## 사용자 선택 (--type 미지정 시)
+> 컨벤션: `templates/shared/ask-user-convention.md` 참조
+
+`--type` 없이 실행하면 **`AskUserQuestion` 도구**로 마이그레이션 도구를 질문한다:
+- question: "어떤 마이그레이션 도구를 사용할까요?"
+- header: "마이그레이션"
+- options:
+  - `Flyway (Recommended)` — SQL 기반, 간단하고 직관적. Spring Boot 기본 지원
+  - `Liquibase` — XML/YAML 기반, 롤백 지원이 강력. 복잡한 스키마 관리에 적합
+
 ## 실행 절차
 
 ### Flyway (기본)
