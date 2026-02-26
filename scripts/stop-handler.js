@@ -97,8 +97,8 @@ async function main() {
           summarizer.saveSummary(projectRoot, currentSession, summaryResult);
         }
       } catch { /* 요약 실패 시 무시 */ }
-      // 요약 성공/실패 무관하게 항상 세션 정리
-      try { sessionState.clearCurrentSession(projectRoot); } catch { /* ignore */ }
+      // 세션 정리는 하지 않음 — Stop hook은 매 응답 후 실행되므로
+      // 새 세션 시작 시 initSession에서 자동으로 교체됨
     } catch { /* 모듈 로드 실패 시 무시 */ }
   }
 

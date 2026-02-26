@@ -511,6 +511,13 @@ function showSessionDetail(idx) {
   if (sm.learned?.length) html += section('\ud559\uc2b5', sm.learned);
   if (sm.next_steps?.length) html += section('\ub2e4\uc74c \ub2e8\uacc4', sm.next_steps);
   if (sm.notes) html += '<div class="detail-section"><h3>\ucc38\uace0</h3><p style="font-size:13px;">' + escHtml(sm.notes) + '</p></div>';
+  if (s.prompts?.length) {
+    html += '<div class="detail-section"><h3>\ud504\ub86c\ud504\ud2b8 \ubaa9\ub85d</h3><ul>' +
+      s.prompts.map(p => {
+        const time = p.ts ? p.ts.substring(11, 19) : '';
+        return '<li><span class="prompt-num">#' + p.number + '</span> <span class="prompt-time">' + time + '</span><br>' + escHtml(p.text) + '</li>';
+      }).join('') + '</ul></div>';
+  }
   if (s.stats?.filesModified?.length) {
     html += '<div class="detail-section"><h3>\uc218\uc815\ub41c \ud30c\uc77c</h3><ul>' +
       s.stats.filesModified.map(f => '<li>' + escHtml(f) + '</li>').join('') + '</ul></div>';

@@ -7,6 +7,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-02-26
+
+### Added
+- 대시보드 프롬프트 카드 클릭 시 프롬프트 목록 모달 표시
+- 세션 상세에서 해당 세션의 프롬프트 목록 표시
+- 세션 요약 저장 시 프롬프트 목록 포함
+- Claude Code 종료 시 CLAUDE_PID 감시로 web-ui 자동 종료
+
+### Fixed
+- Stop hook `clearCurrentSession` 제거: 매 응답 후 세션/관찰 데이터 삭제되던 버그 수정
+- Stop hook web-ui kill 제거: 매 응답 후 대시보드 서버 종료되던 버그 수정
+
 ## [1.2.1] - 2026-02-26
 
 ### Added
