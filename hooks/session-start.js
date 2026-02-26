@@ -26,24 +26,30 @@ async function main() {
     return;
   }
 
-  // Web UI 자동 시작 (포트 2415 미사용 시)
+  const fs = require('fs');
+  const crypto = require('crypto');
+
+  // Web UI 자동 시작 (port 파일 기반 중복 체크)
+  let webUiPort = null;
   try {
-    const net = require('net');
     const { spawn: spawnChild } = require('child_process');
-    const conn = net.createConnection({ port: 2415 }, () => {
-      conn.end(); // 이미 실행 중
-    });
-    conn.setTimeout(500, () => conn.destroy());
-    conn.on('error', () => {
+    const portFile = path.join(projectRoot, '.demodev', 'web-ui.port');
+    const hash = crypto.createHash('md5').update(projectRoot).digest();
+    webUiPort = 2415 + (hash[0] % 100);
+    let alreadyRunning = false;
+    try {
+      const info = JSON.parse(fs.readFileSync(portFile, 'utf-8'));
+      if (info.pid) { process.kill(info.pid, 0); alreadyRunning = true; webUiPort = info.port; }
+    } catch { /* 파일 없거나 프로세스 죽음 */ }
+    if (!alreadyRunning) {
       const child = spawnChild(process.execPath, [
-        path.join(__dirname, '..', 'scripts', 'web-ui.js'), projectRoot
-      ], { detached: true, stdio: 'ignore' });
+        path.join(__dirname, '..', 'scripts', 'web-ui.js'),
+      ], { detached: true, stdio: 'ignore', cwd: projectRoot });
       child.unref();
-    });
+    }
   } catch { /* ignore */ }
 
   // 1. build.gradle / build.gradle.kts 파싱
-  const fs = require('fs');
   const buildGradlePath = path.join(projectRoot, 'build.gradle');
   const buildGradleKtsPath = path.join(projectRoot, 'build.gradle.kts');
   const gradlePath = fs.existsSync(buildGradleKtsPath) ? buildGradleKtsPath : buildGradlePath;
@@ -225,6 +231,10 @@ async function main() {
       lines.push(featureReport);
     }
   } catch { /* ignore */ }
+
+  if (webUiPort) {
+    lines.push(`- Web UI: http://localhost:${webUiPort}`);
+  }
 
   lines.push('');
   lines.push('사용 가능한 명령: /crud, /entity, /service, /controller, /pdca, /review, /test, /loop, /plan-plus, /pipeline, /qa');

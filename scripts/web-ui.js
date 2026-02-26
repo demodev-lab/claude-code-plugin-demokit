@@ -3,20 +3,18 @@
  * 세션/관찰 데이터를 실시간으로 조회하는 웹 대시보드
  *
  * - SSE (Server-Sent Events)로 observations.jsonl 변경 즉시 push
- * - fs.watch 기반 파일 감시, 외부 의존성 없음
- * - Port: 2415
+ * - fs.watchFile 기반 파일 감시, 외부 의존성 없음
+ * - 프로젝트별 동적 포트 (projectRoot 해시 기반, 2415~2514)
  *
- * 사용: node scripts/web-ui.js
+ * 사용: node scripts/web-ui.js [projectRoot]
  */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
-
-const PORT = 2415;
+const crypto = require('crypto');
 
 // ── 프로젝트 루트 탐색 ──────────────────────────────────────
-// 인자: node web-ui.js [projectRoot]
 let projectRoot = process.argv[2] || null;
 if (!projectRoot) {
   try {
@@ -25,6 +23,15 @@ if (!projectRoot) {
   } catch { /* ignore */ }
 }
 if (!projectRoot) projectRoot = process.cwd();
+
+// ── 동적 포트 (projectRoot 해시 기반) ────────────────────────
+function getProjectPort(root) {
+  const hash = crypto.createHash('md5').update(root).digest();
+  return 2415 + (hash[0] % 100);
+}
+const PORT = getProjectPort(projectRoot);
+const DEMODEV_DIR = path.join(projectRoot, '.demodev');
+const PORT_FILE = path.join(DEMODEV_DIR, 'web-ui.port');
 
 const search = require(path.join(__dirname, '..', 'lib', 'memory', 'search'));
 const sessionLog = require(path.join(__dirname, '..', 'lib', 'memory', 'session-log'));
@@ -129,6 +136,9 @@ function handleAPI(pathname, query, res) {
     case '/api/current':
       return jsonResponse(res, state.loadCurrentSession(projectRoot) || {});
 
+    case '/api/info':
+      return jsonResponse(res, { projectRoot, pid: process.pid, port: PORT });
+
     default:
       return jsonResponse(res, { error: 'Not found' }, 404);
   }
@@ -169,11 +179,24 @@ const server = http.createServer((req, res) => {
   res.end('Not Found');
 });
 
+// ── Port 파일 관리 ──────────────────────────────────────────
+function writePortFile() {
+  try {
+    fs.mkdirSync(DEMODEV_DIR, { recursive: true });
+    fs.writeFileSync(PORT_FILE, JSON.stringify({ port: PORT, pid: process.pid, projectRoot }));
+  } catch { /* ignore */ }
+}
+
+function removePortFile() {
+  try { fs.unlinkSync(PORT_FILE); } catch { /* ignore */ }
+}
+
 // ── Cleanup ──────────────────────────────────────────────────
 function stopWatchers() {
   for (const fp of watchedFiles) {
     try { fs.unwatchFile(fp); } catch { /* ignore */ }
   }
+  removePortFile();
 }
 process.on('SIGINT', () => { stopWatchers(); process.exit(0); });
 process.on('SIGTERM', () => { stopWatchers(); process.exit(0); });
@@ -181,19 +204,19 @@ server.on('close', stopWatchers);
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`[demokit] Port ${PORT} already in use. Web UI is likely already running.`);
     process.exit(0);
   }
   throw err;
 });
 
 server.listen(PORT, () => {
+  writePortFile();
   const name = path.basename(projectRoot);
-  console.log(`\n  demokit Web UI`);
-  console.log(`  Project: ${name}`);
-  console.log(`  URL:     http://localhost:${PORT}`);
-  console.log(`  SSE:     http://localhost:${PORT}/api/events`);
-  console.log(`\n  Ctrl+C to stop\n`);
+  console.log(`\n  demokit 웹 대시보드`);
+  console.log(`  프로젝트: ${name}`);
+  console.log(`  주소:     http://localhost:${PORT}`);
+  console.log(`  SSE:      http://localhost:${PORT}/api/events`);
+  console.log(`\n  Ctrl+C 로 종료\n`);
 });
 
 // ── HTML ─────────────────────────────────────────────────────
@@ -202,7 +225,7 @@ const HTML_PAGE = `<!DOCTYPE html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>demokit — Session Dashboard</title>
+<title>demokit — 세션 대시보드</title>
 <style>
 :root {
   --bg: #0d1117; --surface: #161b22; --border: #30363d;
@@ -318,59 +341,59 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
 
 <div class="header">
   <h1>demokit</h1>
-  <span class="project" id="projectName">—</span>
+  <span class="project" id="projectName">\u2014</span>
   <div class="status">
     <div class="dot" id="sseDot"></div>
-    <span class="status-text" id="sseStatus">connecting...</span>
+    <span class="status-text" id="sseStatus">\uc5f0\uacb0 \uc911...</span>
   </div>
 </div>
 
 <div class="layout">
   <!-- Left: Stats + Sessions -->
   <div class="left">
-    <div class="panel-title">Stats</div>
+    <div class="panel-title">\ud1b5\uacc4</div>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-value" id="statTotal">—</div>
-        <div class="stat-label">observations</div>
+        <div class="stat-value" id="statTotal">\u2014</div>
+        <div class="stat-label">\uad00\ucc30</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="statFiles">—</div>
-        <div class="stat-label">files modified</div>
+        <div class="stat-value" id="statFiles">\u2014</div>
+        <div class="stat-label">\uc218\uc815\ub41c \ud30c\uc77c</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="statPrompt">—</div>
-        <div class="stat-label">prompt #</div>
+        <div class="stat-value" id="statPrompt">\u2014</div>
+        <div class="stat-label">\ud504\ub86c\ud504\ud2b8</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" id="statSession">—</div>
-        <div class="stat-label">sessions</div>
+        <div class="stat-value" id="statSession">\u2014</div>
+        <div class="stat-label">\uc138\uc158</div>
       </div>
     </div>
 
-    <div class="panel-title">Sessions</div>
+    <div class="panel-title">\uc138\uc158 \ubaa9\ub85d</div>
     <div class="session-list" id="sessionList">
-      <div class="empty-state"><p>No sessions</p></div>
+      <div class="empty-state"><p>\uc138\uc158 \uc5c6\uc74c</p></div>
     </div>
   </div>
 
   <!-- Right: Observation Timeline -->
   <div class="right" style="position:relative;">
     <div class="toolbar">
-      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn active" data-filter="all">\uc804\uccb4</button>
       <div class="filter-sep"></div>
-      <button class="filter-btn" data-filter="write">Write</button>
-      <button class="filter-btn" data-filter="bash">Bash</button>
-      <button class="filter-btn" data-filter="skill">Skill</button>
+      <button class="filter-btn" data-filter="write">\uc4f0\uae30</button>
+      <button class="filter-btn" data-filter="bash">\uba85\ub839</button>
+      <button class="filter-btn" data-filter="skill">\uc2a4\ud0ac</button>
       <div class="filter-sep"></div>
-      <button class="filter-btn" data-filter="entity-change">Entity</button>
+      <button class="filter-btn" data-filter="entity-change">\uc5d4\ud2f0\ud2f0</button>
       <button class="filter-btn" data-filter="api-change">API</button>
-      <button class="filter-btn" data-filter="config-change">Config</button>
-      <button class="filter-btn" data-filter="test-result">Test</button>
-      <button class="filter-btn" data-filter="build-result">Build</button>
+      <button class="filter-btn" data-filter="config-change">\uc124\uc815</button>
+      <button class="filter-btn" data-filter="test-result">\ud14c\uc2a4\ud2b8</button>
+      <button class="filter-btn" data-filter="build-result">\ube4c\ub4dc</button>
     </div>
     <div class="timeline" id="timeline">
-      <div class="empty-state"><p>Waiting for observations...</p></div>
+      <div class="empty-state"><p>\uad00\ucc30 \ub300\uae30 \uc911...</p></div>
     </div>
 
     <div class="detail-overlay" id="detailOverlay">
@@ -420,16 +443,16 @@ function updateStats(stats) {
 // ── Sessions ──
 function renderSessions(sessions) {
   const el = document.getElementById('sessionList');
-  if (!sessions?.length) { el.innerHTML = '<div class="empty-state"><p>No sessions</p></div>'; return; }
+  if (!sessions?.length) { el.innerHTML = '<div class="empty-state"><p>\uc138\uc158 \uc5c6\uc74c</p></div>'; return; }
   document.getElementById('statSession').textContent = sessions.length;
   el.innerHTML = sessions.map((s, i) => {
-    const req = s.summary?.request || '(no summary)';
-    const date = s.completedAt ? new Date(s.completedAt).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    const req = s.summary?.request || '(\uc694\uc57d \uc5c6\uc74c)';
+    const date = s.completedAt ? new Date(s.completedAt).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '\u2014';
     const src = s.source === 'llm' ? 'LLM' : 'TPL';
     return '<div class="session-item" onclick="showSessionDetail('+i+')" data-idx="'+i+'">' +
       '<div class="session-request">' + escHtml(req) + '</div>' +
       '<div class="session-meta"><span>' + date + '</span><span>' + src + '</span>' +
-      (s.stats?.toolUses ? '<span>tools: ' + s.stats.toolUses + '</span>' : '') +
+      (s.stats?.toolUses ? '<span>\ub3c4\uad6c: ' + s.stats.toolUses + '\ud68c</span>' : '') +
       '</div></div>';
   }).join('');
   window._sessions = sessions;
@@ -440,15 +463,15 @@ function showSessionDetail(idx) {
   if (!s) return;
   const el = document.getElementById('detailContent');
   const sm = s.summary || {};
-  let html = '<h2 style="font-size:15px;margin-bottom:16px;">' + escHtml(sm.request || '—') + '</h2>';
-  html += '<div style="font-size:11px;color:var(--text2);margin-bottom:16px;">Session: ' + s.sessionId + ' | ' + (s.completedAt || '') + '</div>';
-  if (sm.completed?.length) html += section('Completed', sm.completed);
-  if (sm.investigated?.length) html += section('Investigated', sm.investigated);
-  if (sm.learned?.length) html += section('Learned', sm.learned);
-  if (sm.next_steps?.length) html += section('Next Steps', sm.next_steps);
-  if (sm.notes) html += '<div class="detail-section"><h3>Notes</h3><p style="font-size:13px;">' + escHtml(sm.notes) + '</p></div>';
+  let html = '<h2 style="font-size:15px;margin-bottom:16px;">' + escHtml(sm.request || '\u2014') + '</h2>';
+  html += '<div style="font-size:11px;color:var(--text2);margin-bottom:16px;">\uc138\uc158: ' + s.sessionId + ' | ' + (s.completedAt || '') + '</div>';
+  if (sm.completed?.length) html += section('\uc644\ub8cc', sm.completed);
+  if (sm.investigated?.length) html += section('\uc870\uc0ac/\ubd84\uc11d', sm.investigated);
+  if (sm.learned?.length) html += section('\ud559\uc2b5', sm.learned);
+  if (sm.next_steps?.length) html += section('\ub2e4\uc74c \ub2e8\uacc4', sm.next_steps);
+  if (sm.notes) html += '<div class="detail-section"><h3>\ucc38\uace0</h3><p style="font-size:13px;">' + escHtml(sm.notes) + '</p></div>';
   if (s.stats?.filesModified?.length) {
-    html += '<div class="detail-section"><h3>Files Modified</h3><ul>' +
+    html += '<div class="detail-section"><h3>\uc218\uc815\ub41c \ud30c\uc77c</h3><ul>' +
       s.stats.filesModified.map(f => '<li>' + escHtml(f) + '</li>').join('') + '</ul></div>';
   }
   el.innerHTML = html;
@@ -466,14 +489,14 @@ function section(title, items) {
 function renderTimeline() {
   const el = document.getElementById('timeline');
   const filtered = allObservations.filter(o => matchFilter(o));
-  if (!filtered.length) { el.innerHTML = '<div class="empty-state"><p>No observations</p></div>'; return; }
+  if (!filtered.length) { el.innerHTML = '<div class="empty-state"><p>\uad00\ucc30 \uc5c6\uc74c</p></div>'; return; }
   el.innerHTML = filtered.map(o => renderObs(o, false)).join('');
 }
 
 function safeCls(s) { return String(s).replace(/[^a-zA-Z0-9\\-]/g, ''); }
 
 function renderObs(o, isNew) {
-  const time = o.ts ? o.ts.substring(11, 19) : '—';
+  const time = o.ts ? o.ts.substring(11, 19) : '\u2014';
   const type = safeCls(o.type || '?');
   const ot = safeCls(o.observationType || o.type || '');
   const detail = o.file || o.command?.substring(0, 80) || (o.skill ? 'skill:' + o.skill : '') || '';
@@ -510,7 +533,7 @@ function connectSSE() {
 
   es.addEventListener('connected', () => {
     dot.style.background = 'var(--green)';
-    statusEl.textContent = 'live';
+    statusEl.textContent = '\uc5f0\uacb0\ub428';
   });
 
   es.addEventListener('observation', (e) => {
@@ -518,9 +541,7 @@ function connectSSE() {
       const entries = JSON.parse(e.data);
       if (!Array.isArray(entries)) return;
       allObservations = [...entries.reverse(), ...allObservations];
-      // Update total stat
       document.getElementById('statTotal').textContent = allObservations.length;
-      // Prepend new items to timeline
       const timeline = document.getElementById('timeline');
       const emptyState = timeline.querySelector('.empty-state');
       if (emptyState) emptyState.remove();
@@ -552,7 +573,7 @@ function connectSSE() {
 
   es.onerror = () => {
     dot.style.background = 'var(--red)';
-    statusEl.textContent = 'disconnected';
+    statusEl.textContent = '\uc5f0\uacb0 \ub04a\uae40';
   };
 }
 

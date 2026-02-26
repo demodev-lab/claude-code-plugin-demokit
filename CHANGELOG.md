@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-02-26
+
+### Added
+- Web UI 프로젝트별 동적 포트 (projectRoot 해시 기반, 2415~2514 범위)
+- `.demodev/web-ui.port` 파일로 포트/PID 관리
+- SessionStart 시 Web UI 포트 번호 systemMessage에 표시
+- Stop hook에서 Web UI 프로세스 자동 종료
+- Web UI 전체 한글화
+
+### Fixed
+- `session-start.js` fs 참조 버그 수정 (require 순서 문제)
+- Web UI EADDRINUSE 처리로 동일 프로젝트 중복 실행 방지
+
 ## [1.2.0] - 2026-02-26
 
 ### Added

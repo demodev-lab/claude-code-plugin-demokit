@@ -86,6 +86,14 @@ async function main() {
     process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
+  // Web UI 종료 (port 파일 기반)
+  try {
+    const fs = require('fs');
+    const portFile = path.join(projectRoot, '.demodev', 'web-ui.port');
+    const info = JSON.parse(fs.readFileSync(portFile, 'utf-8'));
+    if (info.pid) process.kill(info.pid, 'SIGTERM');
+  } catch { /* ignore */ }
+
   // 세션 요약 생성 및 저장 (루프 비활성 시에만 — graceful degradation)
   if (!loopState.active) {
     try {
