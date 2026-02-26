@@ -138,7 +138,21 @@ function handleAPI(pathname, query, res) {
 
     case '/api/prompts': {
       const session = state.loadCurrentSession(projectRoot);
-      return jsonResponse(res, session?.prompts || []);
+      const prompts = session?.prompts || [];
+      // observations에서 promptNumber별 파일/작업 횟수 첨부
+      const observations = sessionLog.readObservations(projectRoot);
+      const byPrompt = {};
+      for (const obs of observations) {
+        const pn = obs.promptNumber || 0;
+        if (!byPrompt[pn]) byPrompt[pn] = { files: new Set(), toolUses: 0 };
+        byPrompt[pn].toolUses++;
+        if (obs.type === 'write' && obs.file) byPrompt[pn].files.add(path.basename(obs.file));
+      }
+      const enriched = prompts.map(p => {
+        const s = byPrompt[p.number];
+        return s ? { ...p, files: [...s.files], toolUses: s.toolUses } : p;
+      });
+      return jsonResponse(res, enriched);
     }
 
     case '/api/info':
@@ -512,15 +526,19 @@ function showSessionDetail(idx) {
   if (sm.next_steps?.length) html += section('\ub2e4\uc74c \ub2e8\uacc4', sm.next_steps);
   if (sm.notes) html += '<div class="detail-section"><h3>\ucc38\uace0</h3><p style="font-size:13px;">' + escHtml(sm.notes) + '</p></div>';
   if (s.prompts?.length) {
-    html += '<div class="detail-section"><h3>\ud504\ub86c\ud504\ud2b8 \ubaa9\ub85d</h3><ul>' +
-      s.prompts.map(p => {
-        const time = toKST(p.ts);
-        return '<li><span class="prompt-num">#' + p.number + '</span> <span class="prompt-time">' + time + '</span><br>' + escHtml(p.text) + '</li>';
-      }).join('') + '</ul></div>';
-  }
-  if (s.stats?.filesModified?.length) {
-    html += '<div class="detail-section"><h3>\uc218\uc815\ub41c \ud30c\uc77c</h3><ul>' +
-      s.stats.filesModified.map(f => '<li>' + escHtml(f) + '</li>').join('') + '</ul></div>';
+    html += '<div class="detail-section"><h3>\ud504\ub86c\ud504\ud2b8 \ubaa9\ub85d</h3>';
+    html += s.prompts.map(p => {
+      const time = toKST(p.ts);
+      let item = '<div class="prompt-item">';
+      item += '<span class="prompt-num">#' + p.number + '</span> <span class="prompt-time">' + time + '</span>';
+      if (p.toolUses) item += ' <span style="color:var(--text2);font-size:11px;">\uc791\uc5c5 ' + p.toolUses + '\ud68c</span>';
+      item += '<div class="prompt-text">' + escHtml(p.text) + '</div>';
+      if (p.files?.length) {
+        item += '<div style="margin-top:4px;font-size:11px;color:var(--text2);">\ubcc0\uacbd: ' + p.files.map(f => escHtml(f)).join(', ') + '</div>';
+      }
+      item += '</div>';
+      return item;
+    }).join('') + '</div>';
   }
   el.innerHTML = html;
   document.getElementById('detailOverlay').classList.add('open');
@@ -634,11 +652,16 @@ async function showPrompts() {
   } else {
     el.innerHTML = prompts.map(p => {
       const time = toKST(p.ts);
-      return '<div class="prompt-item">' +
-        '<span class="prompt-num">#' + p.number + '</span>' +
-        '<span class="prompt-time">' + time + '</span>' +
-        '<div class="prompt-text">' + escHtml(p.text) + '</div>' +
-        '</div>';
+      let item = '<div class="prompt-item">';
+      item += '<span class="prompt-num">#' + p.number + '</span>';
+      item += '<span class="prompt-time">' + time + '</span>';
+      if (p.toolUses) item += ' <span style="color:var(--text2);font-size:11px;">\uc791\uc5c5 ' + p.toolUses + '\ud68c</span>';
+      item += '<div class="prompt-text">' + escHtml(p.text) + '</div>';
+      if (p.files?.length) {
+        item += '<div style="margin-top:4px;font-size:11px;color:var(--text2);">\ubcc0\uacbd: ' + p.files.map(f => escHtml(f)).join(', ') + '</div>';
+      }
+      item += '</div>';
+      return item;
     }).join('');
   }
   document.getElementById('promptModal').classList.add('open');
