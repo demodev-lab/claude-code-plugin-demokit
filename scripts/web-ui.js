@@ -136,6 +136,11 @@ function handleAPI(pathname, query, res) {
     case '/api/current':
       return jsonResponse(res, state.loadCurrentSession(projectRoot) || {});
 
+    case '/api/prompts': {
+      const session = state.loadCurrentSession(projectRoot);
+      return jsonResponse(res, session?.prompts || []);
+    }
+
     case '/api/info':
       return jsonResponse(res, { projectRoot, pid: process.pid, port: PORT });
 
@@ -217,6 +222,20 @@ server.listen(PORT, () => {
   console.log(`  주소:     http://localhost:${PORT}`);
   console.log(`  SSE:      http://localhost:${PORT}/api/events`);
   console.log(`\n  Ctrl+C 로 종료\n`);
+
+  // Claude Code 프로세스 감시 — 종료 시 web-ui도 종료
+  const claudePid = parseInt(process.env.CLAUDE_PID);
+  if (claudePid) {
+    const pidCheck = setInterval(() => {
+      try { process.kill(claudePid, 0); } catch {
+        clearInterval(pidCheck);
+        stopWatchers();
+        server.close();
+        process.exit(0);
+      }
+    }, 3000);
+    pidCheck.unref();
+  }
 });
 
 // ── HTML ─────────────────────────────────────────────────────
@@ -259,6 +278,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
   padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .stat-card { background: var(--surface); border: 1px solid var(--border);
   border-radius: 6px; padding: 10px 12px; }
+.stat-card.clickable { cursor: pointer; transition: border-color 0.15s; }
+.stat-card.clickable:hover { border-color: var(--accent); }
 .stat-value { font-size: 20px; font-weight: 700; color: var(--accent); }
 .stat-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
 
@@ -330,6 +351,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
 .empty-state { padding: 40px; text-align: center; color: var(--text2); }
 .empty-state p { font-size: 13px; }
 
+/* Prompt modal */
+.prompt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6); z-index: 100; justify-content: center; align-items: center; }
+.prompt-modal.open { display: flex; }
+.prompt-modal-content { background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; width: 600px; max-height: 70vh; overflow-y: auto; padding: 20px 24px; }
+.prompt-modal-content h2 { font-size: 14px; margin-bottom: 12px; color: var(--text2); }
+.prompt-item { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.prompt-item:last-child { border-bottom: none; }
+.prompt-num { font-size: 11px; color: var(--accent); font-weight: 600; }
+.prompt-time { font-size: 11px; color: var(--text2); margin-left: 8px; }
+.prompt-text { font-size: 13px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -361,7 +395,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
         <div class="stat-value" id="statFiles">\u2014</div>
         <div class="stat-label">\uc218\uc815\ub41c \ud30c\uc77c</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card clickable" onclick="showPrompts()">
         <div class="stat-value" id="statPrompt">\u2014</div>
         <div class="stat-label">\ud504\ub86c\ud504\ud2b8</div>
       </div>
@@ -400,6 +434,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
       <button class="detail-close" onclick="closeDetail()">&times;</button>
       <div id="detailContent"></div>
     </div>
+  </div>
+</div>
+
+<div class="prompt-modal" id="promptModal" onclick="if(event.target===this)closePrompts()">
+  <div class="prompt-modal-content">
+    <h2>\ud504\ub86c\ud504\ud2b8 \ubaa9\ub85d</h2>
+    <div id="promptList"></div>
   </div>
 </div>
 
@@ -576,6 +617,27 @@ function connectSSE() {
     statusEl.textContent = '\uc5f0\uacb0 \ub04a\uae40';
   };
 }
+
+// ── Prompts ──
+async function showPrompts() {
+  const prompts = await fetchJSON('/api/prompts');
+  const el = document.getElementById('promptList');
+  if (!prompts?.length) {
+    el.innerHTML = '<div class="empty-state"><p>\uae30\ub85d\ub41c \ud504\ub86c\ud504\ud2b8 \uc5c6\uc74c</p></div>';
+  } else {
+    el.innerHTML = prompts.map(p => {
+      const time = p.ts ? p.ts.substring(11, 19) : '';
+      return '<div class="prompt-item">' +
+        '<span class="prompt-num">#' + p.number + '</span>' +
+        '<span class="prompt-time">' + time + '</span>' +
+        '<div class="prompt-text">' + escHtml(p.text) + '</div>' +
+        '</div>';
+    }).join('');
+  }
+  document.getElementById('promptModal').classList.add('open');
+}
+
+function closePrompts() { document.getElementById('promptModal').classList.remove('open'); }
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }

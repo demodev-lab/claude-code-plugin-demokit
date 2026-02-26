@@ -44,7 +44,10 @@ async function main() {
     if (!alreadyRunning) {
       const child = spawnChild(process.execPath, [
         path.join(__dirname, '..', 'scripts', 'web-ui.js'),
-      ], { detached: true, stdio: 'ignore', cwd: projectRoot });
+      ], {
+        detached: true, stdio: 'ignore', cwd: projectRoot,
+        env: { ...process.env, CLAUDE_PID: String(process.ppid) },
+      });
       child.unref();
     }
   } catch { /* ignore */ }

@@ -53,6 +53,9 @@ async function main() {
       if (!sessionId) throw new Error('no session_id');
       const session = sessionState.initSession(projectRoot, sessionId);
 
+      // 프롬프트 텍스트 기록
+      try { sessionState.recordPrompt(projectRoot, userPrompt); } catch { /* ignore */ }
+
       // 세션 최초 프롬프트에서만 hookSpecificOutput으로 이전 요약 주입
       // checkAndMarkContextInjected: 원자적 check+mark (TOCTOU 방지)
       if (session.promptNumber === 1) {
