@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-02-26
+
+### Added
+- 프롬프트별 변경 파일/작업 횟수 추적 (observation에 promptNumber 자동 주입)
+- 대시보드 세션 상세: 프롬프트마다 변경 파일, 작업 횟수 표시
+- 대시보드 프롬프트 모달: 현재 세션 프롬프트별 변경 추적
+- 대시보드 타임스탬프 KST(Asia/Seoul) 변환
+
+### Fixed
+- Stop hook `clearCurrentSession` 제거: 매 응답 후 세션/관찰 데이터 삭제되던 버그 수정
+- 같은 세션 중복 archive 방지 (sessionId 비교 후 덮어쓰기)
+- 세션 검색 API에서 prompts 필드 누락 수정
+
 ## [1.2.2] - 2026-02-26
 
 ### Added
