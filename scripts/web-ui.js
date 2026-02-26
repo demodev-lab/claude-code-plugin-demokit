@@ -389,7 +389,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-value" id="statTotal">\u2014</div>
-        <div class="stat-label">\uad00\ucc30</div>
+        <div class="stat-label">\uc791\uc5c5 \ud69f\uc218</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="statFiles">\u2014</div>
