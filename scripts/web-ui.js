@@ -514,7 +514,7 @@ function showSessionDetail(idx) {
   if (s.prompts?.length) {
     html += '<div class="detail-section"><h3>\ud504\ub86c\ud504\ud2b8 \ubaa9\ub85d</h3><ul>' +
       s.prompts.map(p => {
-        const time = p.ts ? p.ts.substring(11, 19) : '';
+        const time = toKST(p.ts);
         return '<li><span class="prompt-num">#' + p.number + '</span> <span class="prompt-time">' + time + '</span><br>' + escHtml(p.text) + '</li>';
       }).join('') + '</ul></div>';
   }
@@ -544,7 +544,7 @@ function renderTimeline() {
 function safeCls(s) { return String(s).replace(/[^a-zA-Z0-9\\-]/g, ''); }
 
 function renderObs(o, isNew) {
-  const time = o.ts ? o.ts.substring(11, 19) : '\u2014';
+  const time = toKST(o.ts);
   const type = safeCls(o.type || '?');
   const ot = safeCls(o.observationType || o.type || '');
   const detail = o.file || o.command?.substring(0, 80) || (o.skill ? 'skill:' + o.skill : '') || '';
@@ -633,7 +633,7 @@ async function showPrompts() {
     el.innerHTML = '<div class="empty-state"><p>\uae30\ub85d\ub41c \ud504\ub86c\ud504\ud2b8 \uc5c6\uc74c</p></div>';
   } else {
     el.innerHTML = prompts.map(p => {
-      const time = p.ts ? p.ts.substring(11, 19) : '';
+      const time = toKST(p.ts);
       return '<div class="prompt-item">' +
         '<span class="prompt-num">#' + p.number + '</span>' +
         '<span class="prompt-time">' + time + '</span>' +
@@ -645,6 +645,11 @@ async function showPrompts() {
 }
 
 function closePrompts() { document.getElementById('promptModal').classList.remove('open'); }
+
+function toKST(ts) {
+  if (!ts) return '\u2014';
+  return new Date(ts).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
