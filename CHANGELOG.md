@@ -7,6 +7,32 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-02-26
+
+### Added
+- 세션 컨텍스트 보존 시스템 (claude-mem → demokit 네이티브 포팅)
+  - `lib/memory/state.js`: 세션 상태 관리 (initSession, promptNumber 추적)
+  - `lib/memory/session-log.js`: JSONL append-only 관찰 로거 (SHA-256 중복 제거)
+  - `lib/memory/mode.js`: Spring Boot 도메인 특화 observation 자동 분류
+  - `lib/memory/summarizer.js`: LLM 요약 + template fallback, archive 관리
+  - `lib/memory/search.js`: 관찰 기록 검색 엔진 (type/file/concept 필터)
+  - `lib/context-store/summary-injector.js`: 이전 세션 요약 마크다운 렌더링
+- MCP 서버 (`scripts/mcp-server.js`): stdio JSON-RPC 2.0 프로토콜, 메모리 검색 도구
+- Web UI 대시보드 (`scripts/web-ui.js`): SSE 실시간 관찰 모니터링 (port 2415)
+- Web UI 자동 시작: SessionStart hook에서 포트 체크 후 background spawn
+- PostToolUse hook 연동: Write/Bash/Skill 관찰 자동 기록
+- Stop hook 연동: 세션 종료 시 자동 요약 생성 + archive
+- UserPromptSubmit hook: 세션 최초 프롬프트에서 이전 요약 hookSpecificOutput 주입
+- `checkAndMarkContextInjected`: 원자적 TOCTOU 방지 context 주입 제어
+- Integration test (`test/integration/session-context.test.js`): 19개 E2E 테스트
+
+### Fixed
+- MCP 서버 stdin Buffer 기반 처리 (Content-Length byte mismatch 수정)
+- `session-log.js` fd leak 수정 (try/finally)
+- `mode.js` Security 규칙 우선순위 수정 (SecurityConfig → security-concern)
+- `mode.js` 빌드/테스트 실패 시 concept 분류 정확도 개선
+- Web UI EADDRINUSE 에러 핸들링 추가
+
 ## [1.1.4] - 2026-02-25
 
 ### Added

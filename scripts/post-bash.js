@@ -25,6 +25,23 @@ async function main() {
   const output = hookData.tool_result?.stdout || hookData.tool_result?.output || '';
   const exitCode = hookData.tool_result?.exit_code ?? hookData.tool_result?.exitCode ?? 0;
 
+  // Observation logging + Mode 분류 (즉시 반환 — LLM 호출 금지)
+  try {
+    const { platform } = require('../lib/core');
+    const projRoot = platform.findProjectRoot(process.cwd());
+    if (projRoot && command) {
+      const { sessionLog, mode } = require('../lib/memory');
+      const classification = mode.classifyCommand(command, exitCode);
+      sessionLog.appendObservation(projRoot, {
+        type: 'bash',
+        tool: 'Bash',
+        command: command.substring(0, 200),
+        exitCode,
+        ...classification,
+      });
+    }
+  } catch { /* observation 실패 시 무시 */ }
+
   // Gradle 명령이 아니면 무시
   if (!command.includes('gradlew') && !command.includes('gradle')) {
     console.log(JSON.stringify({}));

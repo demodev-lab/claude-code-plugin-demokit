@@ -25,6 +25,22 @@ async function main() {
     return;
   }
 
+  // Observation logging + Mode 분류 (즉시 반환 — LLM 호출 금지)
+  try {
+    const { platform } = require('../lib/core');
+    const projRoot = platform.findProjectRoot(process.cwd());
+    if (projRoot) {
+      const { sessionLog, mode } = require('../lib/memory');
+      const classification = mode.classifySkill(skillName);
+      sessionLog.appendObservation(projRoot, {
+        type: 'skill',
+        tool: 'Skill',
+        skill: skillName,
+        ...classification,
+      });
+    }
+  } catch { /* observation 실패 시 무시 */ }
+
   const hints = [];
 
   // 1. Active skill 등록

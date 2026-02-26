@@ -29,6 +29,22 @@ async function main() {
   const filePath = hookData.tool_input?.file_path || hookData.tool_input?.filePath || '';
   const allHints = [];
 
+  // 0. Observation logging + Mode 분류 (즉시 반환 — LLM 호출 금지)
+  try {
+    const { platform } = require('../lib/core');
+    const projRoot = platform.findProjectRoot(process.cwd());
+    if (projRoot && filePath) {
+      const { sessionLog, mode } = require('../lib/memory');
+      const classification = mode.classifyFile(filePath);
+      sessionLog.appendObservation(projRoot, {
+        type: 'write',
+        tool: hookData.tool_name || 'Write',
+        file: filePath,
+        ...classification,
+      });
+    }
+  } catch { /* observation 실패 시 무시 */ }
+
   // 1. 기존 post-write.js 로직 통합: Java 파일 작성 시 관련 파일 제안
   if (filePath.endsWith('.java')) {
     try {

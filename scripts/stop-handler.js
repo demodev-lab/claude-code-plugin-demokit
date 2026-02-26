@@ -86,6 +86,22 @@ async function main() {
     process.stderr.write(`[demokit] context.md 저장 실패: ${err.message}\n`);
   }
 
+  // 세션 요약 생성 및 저장 (루프 비활성 시에만 — graceful degradation)
+  if (!loopState.active) {
+    try {
+      const { summarizer, state: sessionState } = require(path.join(__dirname, '..', 'lib', 'memory'));
+      try {
+        const currentSession = sessionState.loadCurrentSession(projectRoot);
+        if (currentSession) {
+          const summaryResult = await summarizer.generateSummary(projectRoot, hookData);
+          summarizer.saveSummary(projectRoot, currentSession, summaryResult);
+        }
+      } catch { /* 요약 실패 시 무시 */ }
+      // 요약 성공/실패 무관하게 항상 세션 정리
+      try { sessionState.clearCurrentSession(projectRoot); } catch { /* ignore */ }
+    } catch { /* 모듈 로드 실패 시 무시 */ }
+  }
+
   // Team 상태 영속화
   try {
     const { stateWriter, teamConfig } = require(path.join(__dirname, '..', 'lib', 'team'));

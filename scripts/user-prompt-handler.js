@@ -42,6 +42,32 @@ async function main() {
     return;
   }
 
+  // 세션 상태 초기화 + 이전 요약 context 주입 준비
+  let hookSpecificOutput = null;
+  try {
+    const { platform } = require('../lib/core');
+    const projectRoot = platform.findProjectRoot(process.cwd());
+    if (projectRoot) {
+      const { state: sessionState } = require('../lib/memory');
+      const sessionId = hookData.session_id || hookData.sessionId;
+      if (!sessionId) throw new Error('no session_id');
+      const session = sessionState.initSession(projectRoot, sessionId);
+
+      // 세션 최초 프롬프트에서만 hookSpecificOutput으로 이전 요약 주입
+      // checkAndMarkContextInjected: 원자적 check+mark (TOCTOU 방지)
+      if (session.promptNumber === 1) {
+        const shouldInject = sessionState.checkAndMarkContextInjected(projectRoot);
+        if (shouldInject) {
+          const { summaryInjector } = require('../lib/context-store');
+          if (summaryInjector) {
+            const contextOutput = summaryInjector.buildHookSpecificOutput(projectRoot);
+            if (contextOutput) hookSpecificOutput = contextOutput;
+          }
+        }
+      }
+    }
+  } catch { /* memory 모듈 실패 시 무시 */ }
+
   const messages = [];
 
   // 1. 의도 감지
@@ -137,13 +163,18 @@ async function main() {
     messages.push(`요청이 모호할 수 있습니다. ${ambiguity.message}${suggestionText}`);
   }
 
+  const result = {};
+
   if (messages.length > 0) {
-    console.log(JSON.stringify({
-      systemMessage: `[demokit] ${messages.join('\n')}`,
-    }));
-  } else {
-    console.log(JSON.stringify({}));
+    result.systemMessage = `[demokit] ${messages.join('\n')}`;
   }
+
+  // hookSpecificOutput: 세션 최초 프롬프트에서 이전 요약 주입
+  if (hookSpecificOutput) {
+    result.hookSpecificOutput = hookSpecificOutput;
+  }
+
+  console.log(JSON.stringify(Object.keys(result).length > 0 ? result : {}));
 }
 
 main().catch(err => {

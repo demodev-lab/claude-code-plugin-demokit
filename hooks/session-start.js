@@ -26,6 +26,22 @@ async function main() {
     return;
   }
 
+  // Web UI 자동 시작 (포트 2415 미사용 시)
+  try {
+    const net = require('net');
+    const { spawn: spawnChild } = require('child_process');
+    const conn = net.createConnection({ port: 2415 }, () => {
+      conn.end(); // 이미 실행 중
+    });
+    conn.setTimeout(500, () => conn.destroy());
+    conn.on('error', () => {
+      const child = spawnChild(process.execPath, [
+        path.join(__dirname, '..', 'scripts', 'web-ui.js'), projectRoot
+      ], { detached: true, stdio: 'ignore' });
+      child.unref();
+    });
+  } catch { /* ignore */ }
+
   // 1. build.gradle / build.gradle.kts 파싱
   const fs = require('fs');
   const buildGradlePath = path.join(projectRoot, 'build.gradle');
@@ -152,6 +168,18 @@ async function main() {
       }
     }
   } catch { /* team 모듈 로드 실패 시 무시 */ }
+
+  // 이전 세션 요약 주입
+  try {
+    const { summaryInjector } = require('../lib/context-store');
+    if (summaryInjector) {
+      const summaryLines = summaryInjector.buildSystemMessageLines(projectRoot);
+      if (summaryLines.length > 0) {
+        lines.push('');
+        lines.push(...summaryLines);
+      }
+    }
+  } catch { /* ignore */ }
 
   // 이전 세션 context.md 복원 안내
   try {

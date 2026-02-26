@@ -440,7 +440,21 @@
     "tokenTracking": true
   },
   "memory": {
-    "autoScan": true
+    "autoScan": true,
+    "sessionContext": {
+      "enabled": true,
+      "maxArchiveSessions": 10,
+      "summaryTokenBudget": 3,
+      "dedupWindowMs": 30000
+    },
+    "mode": {
+      "observationTypes": ["entity-change", "api-change", "config-change", "test-result", "build-result", "discovery", "decision", "refactor"],
+      "concepts": ["spring-pattern", "jpa-gotcha", "security-concern", "performance-issue", "how-it-works", "what-changed"]
+    },
+    "mcp": {
+      "serverName": "demokit-memory",
+      "enabled": true
+    }
   },
   "contextEngineering": {
     "enabled": true,
